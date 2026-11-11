@@ -2,6 +2,7 @@ import { useState } from "react"
 import { MenuIcon } from "lucide-react"
 import { toast } from "sonner"
 
+import { BeforeAfter } from "@/components/BeforeAfter"
 import { Configurator, type Selection } from "@/components/Configurator"
 import {
   Accordion,
@@ -301,6 +302,33 @@ export function Landing({ children }: { children?: React.ReactNode }) {
             GEO: клиника из второго кейса уже появляется в ответах ChatGPT и в
             AI-обзорах Google. Скриншоты с датами покажу на созвоне.
           </p>
+        </section>
+
+        <section id="before-after" className={`${wrap} pb-16 lg:pb-28`}>
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-14">
+            <div>
+              <h2 className={h2}>До и после</h2>
+              <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-muted-foreground">
+                Интернет-магазин technomodule.zp.ua, SEO. Ниша сезонная, поэтому
+                сравниваю одно и то же лето: до начала работ и через год.
+              </p>
+              <dl className="mt-8 border-t border-foreground/25">
+                <div className="flex items-baseline justify-between gap-6 border-b border-border py-4">
+                  <dt>Средняя позиция</dt>
+                  <dd className="text-2xl font-extrabold tracking-tight whitespace-nowrap">17,5 → 7,0</dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-6 border-b border-border py-4">
+                  <dt>Клики из поиска</dt>
+                  <dd className="text-2xl font-extrabold tracking-tight whitespace-nowrap text-primary">+69 %</dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-6 border-b border-border py-4">
+                  <dt>Клики на карточки товаров</dt>
+                  <dd className="text-2xl font-extrabold tracking-tight whitespace-nowrap">+99 %</dd>
+                </div>
+              </dl>
+            </div>
+            <BeforeAfter />
+          </div>
         </section>
 
         <section id="services" className="bg-card">
