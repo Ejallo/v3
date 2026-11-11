@@ -2,8 +2,8 @@ import { useState } from "react"
 import { MenuIcon } from "lucide-react"
 import { toast } from "sonner"
 
-import { BeforeAfter } from "@/components/BeforeAfter"
 import { Configurator, type Selection } from "@/components/Configurator"
+import { MoneyPath } from "@/components/MoneyPath"
 import {
   Accordion,
   AccordionContent,
@@ -26,148 +26,23 @@ import { Toaster } from "@/components/ui/sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { de } from "@/i18n/de"
+import { ru, type Dict } from "@/i18n/ru"
 
-const NAV = [
-  { href: "#results", label: "Результаты" },
-  { href: "#services", label: "Услуги" },
-  { href: "#prices", label: "Цены" },
-  { href: "#steps", label: "Как работаем" },
-  { href: "#faq", label: "Вопросы" },
-]
+export type Lang = "ru" | "de"
 
-const RESULTS = [
-  {
-    figure: "×13,16",
-    metric: "вернула каждая гривна в рекламе",
-    who: "Интернет-магазин, Украина · Google Ads",
-    text: "Расход 275 696 ₴, ценность конверсий 3 628 284 ₴. ROAS 1316 %.",
-  },
-  {
-    figure: "12 600",
-    metric: "конверсий в среднем по 21,57 zł",
-    who: "Многопрофильная клиника, Польша · Google Ads",
-    text: "Медицина — тематика с самыми жёсткими правилами Google: половина работы здесь — пройти модерацию и не потерять аккаунт. Название клиента закрыто NDA.",
-  },
-  {
-    figure: "+69 %",
-    metric: "кликов из поиска год к году",
-    who: "technomodule.zp.ua · SEO",
-    text: "Средняя позиция с 17,5 до 7,0, клики на карточки товаров +99 %. Сравниваю июль–август 2026 и 2025, потому что ниша сезонная.",
-  },
-  {
-    figure: "25 / 26",
-    metric: "покупки в Google Ads и покупатели в GA4",
-    who: "Онлайн-сервис документов, Польша · трекинг",
-    text: "Октябрь 2026. После настройки трекинга реклама и аналитика расходятся на одну покупку, и ставки учатся на настоящих продажах.",
-  },
-]
+const DICT: Record<Lang, Dict> = { ru, de }
 
-const SERVICES = [
-  {
-    id: "google",
-    name: "Google Ads",
-    price: "от 590 € в месяц",
-    lead: "Поиск, Performance Max, Shopping и ремаркетинг в вашем аккаунте.",
-    points: [
-      "Структура аккаунта, минус-слова, защита от скликивания",
-      "Тематики с ограничениями: медицина, юристы, документы",
-      "Отчёт в деньгах: расход, заявки, цена заявки",
-    ],
-  },
-  {
-    id: "seo",
-    name: "SEO и GEO",
-    price: "от 600 € в месяц",
-    lead: "Семантика, структура, мета-теги, технический аудит и контент. Проектом или помесячно.",
-    points: [
-      "Многоязычные сайты с hreflang",
-      "GEO: чтобы вас называли ChatGPT, Gemini и AI-обзоры Google",
-      "Цена зависит от размера сайта, числа языков и конкуренции",
-    ],
-  },
-  {
-    id: "tracking",
-    name: "Аналитика и трекинг",
-    price: "390–790 € разово",
-    lead: "GA4, Tag Manager, конверсии и связка GA4 с Google Ads.",
-    points: [
-      "Реклама считает настоящие покупки, а не просмотры страницы «спасибо»",
-      "Проверка, что цифры в Ads и GA4 сходятся",
-    ],
-  },
-  {
-    id: "social",
-    name: "Реклама в соцсетях",
-    price: "цена после мини-чека",
-    lead: "Платная реклама там, где ваша аудитория листает ленту.",
-    points: [
-      "Meta Ads: Facebook и Instagram",
-      "TikTok Ads: короткие видео под заявки",
-      "Telegram Ads: русскоязычная аудитория в Германии",
-    ],
-  },
-  {
-    id: "audit",
-    name: "Аудит аккаунта и трекинга",
-    price: "490 €",
-    lead: "Полный разбор: куда уходит бюджет, что считается неверно и что исправить первым.",
-    points: ["Сумма засчитывается в первый месяц ведения"],
-  },
-  {
-    id: "gstart",
-    name: "Google-Старт",
-    price: "290 €",
-    lead: "Профиль компании в Google и на Картах под ключ.",
-    points: ["Создать, подтвердить, заполнить", "Короткий созвон в конце"],
-  },
-]
-
-const STEPS = [
-  {
-    title: "Мини-чек, 0 €",
-    text: "Вы присылаете сайт. Я смотрю рекламу или выдачу и возвращаю одну страницу с находками. Дальше решаете сами.",
-  },
-  {
-    title: "Аудит, 490 €",
-    text: "Полный разбор аккаунта и трекинга с планом по приоритетам.",
-  },
-  {
-    title: "Запуск",
-    text: "Настраиваю кампании и измерение в ваших аккаунтах.",
-  },
-  {
-    title: "Ведение",
-    text: "Каждый месяц отчёт: расход, заявки, цена заявки.",
-  },
-]
-
-const FAQ = [
-  {
-    q: "Чьи будут рекламные аккаунты?",
-    a: "Ваши. Я работаю через доступ, который вы можете отозвать в любой момент. Кампании, данные и история остаются у вас.",
-  },
-  {
-    q: "На каком языке общаемся?",
-    a: "Созвоны на русском или украинском.",
-  },
-  {
-    q: "Какой нужен рекламный бюджет?",
-    a: "От 500 € в месяц на сам рекламный кабинет. При меньшем бюджете данных не хватает, чтобы делать выводы.",
-  },
-  {
-    q: "Вы гарантируете результат?",
-    a: "Нет, и не верьте тем, кто гарантирует: аукцион и выдачу не контролирует никто. Я гарантирую понятный отчёт и то, что вы видите каждое изменение в аккаунте.",
-  },
-  {
-    q: "Что, если мини-чек ничего не найдёт?",
-    a: "Так и напишу. Тогда вам не нужен ни аудит, ни я.",
-  },
+const base = import.meta.env.BASE_URL.replace(/\/$/, "")
+const LANGS: { lang: Lang; label: string; href: string }[] = [
+  { lang: "ru", label: "RU", href: `${base}/` },
+  { lang: "de", label: "DE", href: `${base}/de/` },
 ]
 
 const TOPICS = ["Google Ads", "SEO", "Meta Ads", "TikTok Ads", "Telegram Ads"]
 
 const h2 =
-  "text-[clamp(34px,4.6vw,68px)] leading-[1.02] font-extrabold tracking-[-0.03em]"
+  "max-w-[20ch] text-[clamp(32px,4.4vw,64px)] leading-[1.04] font-extrabold tracking-[-0.03em]"
 const wrap = "mx-auto w-full max-w-[1240px] px-4 sm:px-8"
 
 const topicChip =
@@ -176,7 +51,32 @@ const topicChip =
 const field =
   "h-12 rounded-sm border-input bg-transparent px-3.5 text-base md:text-base"
 
-export function Landing({ children }: { children?: React.ReactNode }) {
+function LangSwitch({ current }: { current: Lang }) {
+  return (
+    <div className="flex items-center gap-1 text-[13px] font-semibold">
+      {LANGS.map((item) => (
+        <a
+          key={item.lang}
+          href={item.href}
+          hrefLang={item.lang}
+          aria-current={item.lang === current ? "page" : undefined}
+          className="rounded-sm px-2 py-1.5 text-muted-foreground hover:text-foreground aria-[current=page]:bg-secondary aria-[current=page]:text-foreground"
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+  )
+}
+
+export function Landing({
+  lang = "ru",
+  children,
+}: {
+  lang?: Lang
+  children?: React.ReactNode
+}) {
+  const t = DICT[lang]
   const [selection, setSelection] = useState<Selection>({
     monthly: ["google"],
     once: ["audit"],
@@ -201,9 +101,7 @@ export function Landing({ children }: { children?: React.ReactNode }) {
     // Honeypot: real visitors never fill this field.
     if (data.get("company")) return
     // TODO: POST to /send.php once the hosting and mailbox exist.
-    toast.info("Это черновик: форма пока не отправляет", {
-      description: "Отправка заработает, когда подключим почту на хостинге.",
-    })
+    toast.info(t.contact.toastTitle, { description: t.contact.toastText })
   }
 
   return (
@@ -212,19 +110,16 @@ export function Landing({ children }: { children?: React.ReactNode }) {
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-sm focus:bg-foreground focus:px-3 focus:py-2 focus:text-background"
       >
-        К содержанию
+        {t.skip}
       </a>
 
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className={`${wrap} flex h-14 items-center justify-between gap-6`}>
-          <a
-            href="#top"
-            className="text-xl font-extrabold tracking-tight"
-          >
+        <div className={`${wrap} flex h-14 items-center justify-between gap-4`}>
+          <a href="#top" className="text-xl font-extrabold tracking-tight">
             VVdigital
           </a>
-          <nav aria-label="Основная" className="hidden items-center gap-7 md:flex">
-            {NAV.map((item) => (
+          <nav aria-label={t.navLabel} className="hidden items-center gap-6 lg:flex">
+            {t.nav.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
@@ -233,117 +128,60 @@ export function Landing({ children }: { children?: React.ReactNode }) {
                 {item.label}
               </a>
             ))}
+            <LangSwitch current={lang} />
             <Button asChild className="h-9 px-4 text-[15px] font-semibold">
-              <a href="#contact">Написать</a>
+              <a href="#contact">{t.write}</a>
             </Button>
           </nav>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon-lg"
-                className="border-input bg-transparent md:hidden"
-                aria-label="Меню"
-              >
-                <MenuIcon />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[82%] border-foreground/25 bg-background">
-              <SheetHeader>
-                <SheetTitle className="text-2xl font-extrabold">
-                  Меню
-                </SheetTitle>
-                <SheetDescription className="sr-only">Разделы страницы</SheetDescription>
-              </SheetHeader>
-              <nav aria-label="Мобильная" className="flex flex-col px-4">
-                {[...NAV, { href: "#contact", label: "Написать" }].map((item) => (
-                  <SheetClose asChild key={item.href}>
-                    <a
-                      href={item.href}
-                      className="border-b border-border py-4 text-lg font-medium"
-                    >
-                      {item.label}
-                    </a>
-                  </SheetClose>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
+          <div className="flex items-center gap-2 lg:hidden">
+            <LangSwitch current={lang} />
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon-lg"
+                  className="border-input bg-transparent"
+                  aria-label={t.menu}
+                >
+                  <MenuIcon />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[82%] border-foreground/25 bg-background">
+                <SheetHeader>
+                  <SheetTitle className="text-2xl font-extrabold">{t.menu}</SheetTitle>
+                  <SheetDescription className="sr-only">{t.menuDescription}</SheetDescription>
+                </SheetHeader>
+                <nav aria-label={t.navMobileLabel} className="flex flex-col px-4">
+                  {[...t.nav, { href: "#contact", label: t.write }].map((item) => (
+                    <SheetClose asChild key={item.href}>
+                      <a href={item.href} className="border-b border-border py-4 text-lg font-medium">
+                        {item.label}
+                      </a>
+                    </SheetClose>
+                  ))}
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
       <main id="main">
         {children}
 
-        <section id="results" className={`${wrap} py-16 lg:py-28`}>
-          <h2 className={h2}>
-            Цифры из кабинетов,
-            <br />
-            не из презентаций
-          </h2>
-          <div className="mt-10 border-b border-foreground/25 lg:mt-14">
-            {RESULTS.map((r) => (
-              <article
-                key={r.figure}
-                className="grid gap-x-10 gap-y-3 border-t border-foreground/25 py-7 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:items-center lg:py-9"
-              >
-                <p className="text-[clamp(52px,7.6vw,108px)] leading-[0.9] font-extrabold tracking-[-0.04em] whitespace-nowrap text-violet">
-                  {r.figure}
-                </p>
-                <div>
-                  <h3 className="text-xl leading-snug font-semibold lg:text-2xl">{r.metric}</h3>
-                  <p className="mt-1 text-sm font-medium text-muted-foreground">{r.who}</p>
-                  <p className="mt-3 max-w-[58ch] leading-relaxed">{r.text}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-          <p className="mt-5 max-w-[70ch] text-[15px] text-muted-foreground">
-            GEO: клиника из второго кейса уже появляется в ответах ChatGPT и в
-            AI-обзорах Google. Скриншоты с датами покажу на созвоне.
-          </p>
-        </section>
-
-        <section id="before-after" className={`${wrap} pb-16 lg:pb-28`}>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-14">
-            <div>
-              <h2 className={h2}>До и после</h2>
-              <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-muted-foreground">
-                Интернет-магазин technomodule.zp.ua, SEO. Ниша сезонная, поэтому
-                сравниваю одно и то же лето: до начала работ и через год.
-              </p>
-              <dl className="mt-8 border-t border-foreground/25">
-                <div className="flex items-baseline justify-between gap-6 border-b border-border py-4">
-                  <dt>Средняя позиция</dt>
-                  <dd className="text-2xl font-extrabold tracking-tight whitespace-nowrap">17,5 → 7,0</dd>
-                </div>
-                <div className="flex items-baseline justify-between gap-6 border-b border-border py-4">
-                  <dt>Клики из поиска</dt>
-                  <dd className="text-2xl font-extrabold tracking-tight whitespace-nowrap text-primary">+69 %</dd>
-                </div>
-                <div className="flex items-baseline justify-between gap-6 border-b border-border py-4">
-                  <dt>Клики на карточки товаров</dt>
-                  <dd className="text-2xl font-extrabold tracking-tight whitespace-nowrap">+99 %</dd>
-                </div>
-              </dl>
-            </div>
-            <BeforeAfter />
-          </div>
-        </section>
-
         <section id="services" className="bg-card">
           <div className={`${wrap} py-16 lg:py-28`}>
-            <h2 className={h2}>Что я делаю</h2>
+            <h2 className={h2}>{t.services.h2}</h2>
             <Tabs
               defaultValue="google"
               orientation="vertical"
               className="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14"
             >
               <TabsList
-                aria-label="Услуги"
+                aria-label={t.services.tabsLabel}
                 className="-mx-4 gap-6 overflow-x-auto px-4 pb-2 lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:px-0 lg:pb-0"
               >
-                {SERVICES.map((s) => (
+                {t.services.items.map((s) => (
                   <TabsTrigger
                     key={s.id}
                     value={s.id}
@@ -353,9 +191,9 @@ export function Landing({ children }: { children?: React.ReactNode }) {
                   </TabsTrigger>
                 ))}
               </TabsList>
-              {SERVICES.map((s) => (
+              {t.services.items.map((s) => (
                 <TabsContent key={s.id} value={s.id} className="lg:min-h-[420px]">
-                  <h3 className="text-[clamp(32px,4vw,54px)] leading-[1.02] font-extrabold tracking-[-0.03em]">
+                  <h3 className="text-[clamp(30px,4vw,54px)] leading-[1.04] font-extrabold tracking-[-0.03em]">
                     {s.name}
                   </h3>
                   <p className="mt-5 max-w-[48ch] text-xl leading-snug">{s.lead}</p>
@@ -375,25 +213,63 @@ export function Landing({ children }: { children?: React.ReactNode }) {
           </div>
         </section>
 
-        <section id="prices" className={`${wrap} py-16 lg:py-28`}>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
+        <section id="results" className={`${wrap} py-16 lg:py-28`}>
+          <h2 className={h2}>{t.results.h2}</h2>
+          <div className="mt-10 border-b border-foreground/25 lg:mt-14">
+            {t.results.rows.map((r) => (
+              <article
+                key={r.figure}
+                className="grid gap-x-10 gap-y-3 border-t border-foreground/25 py-7 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:items-center lg:py-9"
+              >
+                <p className="text-[clamp(52px,7.6vw,108px)] leading-[0.9] font-extrabold tracking-[-0.04em] whitespace-nowrap text-violet">
+                  {r.figure}
+                </p>
+                <div>
+                  <h3 className="text-xl leading-snug font-semibold lg:text-2xl">{r.metric}</h3>
+                  <p className="mt-1 text-sm font-medium text-muted-foreground">{r.who}</p>
+                  <p className="mt-3 max-w-[58ch] leading-relaxed">{r.text}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="mt-5 max-w-[70ch] text-[15px] text-muted-foreground">{t.results.geo}</p>
+        </section>
+
+        <section id="money" className={`${wrap} pb-16 lg:pb-28`}>
+          <h2 className={h2}>{t.money.h2}</h2>
+          <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-muted-foreground">
+            {t.money.lead}
+          </p>
+          <div className="mt-10 lg:mt-14">
+            <MoneyPath t={t.money} />
+          </div>
+        </section>
+
+        <section id="prices" className="bg-card">
+          <div
+            className={`${wrap} grid gap-10 py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28`}
+          >
             <div>
-              <h2 className={h2}>Сколько это стоит</h2>
+              <h2 className={h2}>{t.prices.h2}</h2>
               <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-muted-foreground">
-                Цена зависит от размера сайта, числа языков и конкуренции, а не
-                от названия ниши. Соберите задачу и увидите, от какой суммы
-                считать.
+                {t.prices.lead}
               </p>
             </div>
-            <Configurator value={selection} onChange={setSelection} onSubmit={goToForm} />
+            <Configurator
+              t={t.configurator}
+              locale={t.locale}
+              value={selection}
+              onChange={setSelection}
+              onSubmit={goToForm}
+            />
           </div>
         </section>
 
         <section id="steps" className={`${wrap} py-16 lg:py-28`}>
           <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
-            <h2 className={h2}>Как начинаем</h2>
+            <h2 className={h2}>{t.steps.h2}</h2>
             <ol>
-              {STEPS.map((step, i) => (
+              {t.steps.items.map((step, i) => (
                 <li
                   key={step.title}
                   className="grid grid-cols-[64px_minmax(0,1fr)] gap-x-4 border-t border-foreground/25 py-6 sm:grid-cols-[96px_minmax(0,1fr)]"
@@ -414,30 +290,22 @@ export function Landing({ children }: { children?: React.ReactNode }) {
           </div>
         </section>
 
-        <section id="faq" className="bg-card">
+        <section id="about" className="bg-card">
           <div
             className={`${wrap} grid gap-12 py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28`}
           >
             <div>
-              <h2 className={h2}>Кто за этим стоит</h2>
+              <h2 className={h2}>{t.about.h2}</h2>
               <div className="mt-7 max-w-[46ch] space-y-4 text-lg leading-relaxed">
-                <p>
-                  Меня зовут Владислав. Начинал с арбитража трафика в Facebook и
-                  Google Ads, где за каждую неточную ставку платишь своими
-                  деньгами.
-                </p>
-                <p>
-                  Потом были TikTok, SEO и клиентские проекты в Украине и
-                  Польше. С 2023 года живу в Германии, работаю как
-                  Selbstständig и выставляю Rechnung. Работаю удалённо по всей
-                  стране.
-                </p>
+                {t.about.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
               </div>
             </div>
-            <div>
-              <h2 className="sr-only">Частые вопросы</h2>
-              <Accordion type="single" collapsible className="border-t border-foreground/25">
-                {FAQ.map((item) => (
+            <div id="faq">
+              <h2 className="text-2xl font-extrabold tracking-tight lg:text-3xl">{t.faq.h2}</h2>
+              <Accordion type="single" collapsible className="mt-5 border-t border-foreground/25">
+                {t.faq.items.map((item) => (
                   <AccordionItem key={item.q} value={item.q} className="border-border">
                     <AccordionTrigger className="rounded-sm py-5 text-lg font-semibold">
                       {item.q}
@@ -452,25 +320,20 @@ export function Landing({ children }: { children?: React.ReactNode }) {
           </div>
         </section>
 
-        <section id="contact" className="bg-card">
+        <section id="contact">
           <div
             className={`${wrap} grid gap-10 py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28`}
           >
             <div>
-              <h2 className={h2}>
-                Пришлите сайт —<br />
-                верну страницу
-                <br />с находками
-              </h2>
+              <h2 className={h2}>{t.contact.h2}</h2>
               <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-muted-foreground">
-                Бесплатно и без обязательств. Доступы к аккаунтам на этом шаге
-                не нужны.
+                {t.contact.lead}
               </p>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-6" noValidate={false}>
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="f-site" className="text-[15px]">
-                  Сайт
+                  {t.contact.site}
                 </Label>
                 <Input
                   id="f-site"
@@ -483,7 +346,7 @@ export function Landing({ children }: { children?: React.ReactNode }) {
                 />
               </div>
               <fieldset>
-                <legend className="mb-2 text-[15px] font-medium">Что проверить</legend>
+                <legend className="mb-2 text-[15px] font-medium">{t.contact.topics}</legend>
                 <ToggleGroup
                   type="multiple"
                   value={topics}
@@ -501,19 +364,19 @@ export function Landing({ children }: { children?: React.ReactNode }) {
               </fieldset>
               <div className="space-y-2">
                 <Label htmlFor="f-contact" className="text-[15px]">
-                  Куда ответить
+                  {t.contact.reply}
                 </Label>
                 <Input
                   id="f-contact"
                   name="contact"
                   required
-                  placeholder="E-mail или Telegram"
+                  placeholder={t.contact.replyPlaceholder}
                   className={field}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="f-note" className="text-[15px]">
-                  Комментарий, если хотите
+                  {t.contact.note}
                 </Label>
                 <Textarea id="f-note" name="note" rows={3} className={`${field} h-auto py-3`} />
               </div>
@@ -521,12 +384,8 @@ export function Landing({ children }: { children?: React.ReactNode }) {
                 <label htmlFor="f-company">Company</label>
                 <input id="f-company" name="company" tabIndex={-1} autoComplete="off" />
               </div>
-              <Button
-                type="submit"
-                size="lg"
-                className="h-13 w-full px-6 text-base font-semibold sm:w-auto"
-              >
-                Получить мини-чек за 0 €
+              <Button type="submit" size="lg" className="h-13 w-full px-6 text-base font-semibold sm:w-auto">
+                {t.contact.submit}
               </Button>
             </form>
           </div>
@@ -535,8 +394,8 @@ export function Landing({ children }: { children?: React.ReactNode }) {
 
       <footer className="border-t border-border bg-card text-muted-foreground">
         <div className={`${wrap} flex flex-col gap-2 py-6 text-sm sm:flex-row sm:justify-between`}>
-          <p>VVdigital, Германия</p>
-          <p>Impressum и Datenschutz добавим перед запуском</p>
+          <p>{t.footer.left}</p>
+          <p>{t.footer.right}</p>
         </div>
       </footer>
 

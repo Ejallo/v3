@@ -1,0 +1,65 @@
+---
+// One landing page in a given language. Used by / (ru) and /de/.
+import '../styles/global.css';
+import { Landing, type Lang } from './Landing';
+import { VVGrain } from './VVGrain';
+import { ru } from '../i18n/ru';
+import { de } from '../i18n/de';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = { ru, de }[lang];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<html lang={t.lang}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, nofollow" />
+		<meta name="theme-color" content="#08080f" />
+		<link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+		<title>{t.meta.title}</title>
+		<meta name="description" content={t.meta.description} />
+	</head>
+	<body>
+		<Landing client:load lang={lang}>
+			<!-- Hero: the page's single animated accent is the VV scene -->
+			<section id="top" class="sky relative overflow-hidden">
+				<div class="absolute inset-0">
+					<VVGrain client:only="react" />
+				</div>
+				<div class="relative mx-auto flex min-h-[calc(100svh-57px)] w-full max-w-[1240px] flex-col px-4 sm:px-8">
+					<div class="flex flex-1 flex-col justify-end pt-[46svh] pb-10 md:ml-[52%] md:justify-center md:pt-0 md:pb-0">
+						<!-- The slogan is the visual headline; the keyword line below it is the real h1 -->
+						<p class="glow text-[clamp(40px,6vw,96px)] leading-[0.95] font-extrabold tracking-[-0.03em]">
+							{t.hero.slogan.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+						</p>
+						<h1 class="mt-4 text-[clamp(20px,2.2vw,32px)] leading-tight font-bold text-primary">
+							{t.hero.h1}
+						</h1>
+						<p class="mt-5 max-w-[42ch] text-lg leading-relaxed text-foreground/70">
+							{t.hero.lead}
+						</p>
+						<div class="mt-7">
+							<a href="#contact" class="inline-flex h-13 items-center rounded-sm bg-primary px-6 text-base font-bold text-primary-foreground hover:bg-primary/85">
+								{t.hero.cta}
+							</a>
+						</div>
+					</div>
+					<dl class="grid grid-cols-3 gap-4 border-t border-foreground/15 py-6">
+						{t.hero.proof.map((p) => (
+							<div>
+								<dd class="text-[clamp(24px,3.6vw,48px)] leading-none font-extrabold tracking-tight">{p.n}</dd>
+								<dt class="mt-1.5 text-[13px] leading-snug text-foreground/65">{p.l}</dt>
+							</div>
+						))}
+					</dl>
+				</div>
+			</section>
+		</Landing>
+	</body>
+</html>
