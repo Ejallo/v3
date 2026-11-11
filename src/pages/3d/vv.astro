@@ -1,0 +1,81 @@
+---
+// Draft: night palette + VV monogram made of beads. First screen only.
+import '../../styles/global.css';
+import { VVGrain } from '../../components/VVGrain';
+
+const proof = [
+	{ n: '1316 %', l: 'ROAS интернет-магазина' },
+	{ n: '12 600', l: 'конверсий клиники' },
+	{ n: '+69 %', l: 'кликов из поиска' },
+];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<html lang="ru">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, nofollow" />
+		<title>VVdigital — ночной вариант</title>
+		<style>
+			body {
+				--night: #08080f;
+				--fog: #e3e3ea;
+				--dim: rgba(227, 227, 234, 0.64);
+				--line: rgba(227, 227, 234, 0.16);
+				--cyan: #62f0ee;
+				background: var(--night);
+				color: var(--fog);
+			}
+			.sky {
+				background:
+					radial-gradient(60% 28% at 50% 100%, rgba(255, 95, 154, 0.38), transparent 70%),
+					radial-gradient(55% 60% at 72% 62%, rgba(40, 92, 220, 0.45), transparent 70%),
+					linear-gradient(180deg, #08080f 0%, #0b0d1c 55%, #131634 100%);
+			}
+			.glow {
+				text-shadow: 0 0 42px rgba(160, 190, 255, 0.35);
+			}
+		</style>
+	</head>
+	<body>
+		<section class="sky relative min-h-svh overflow-hidden">
+			<div class="absolute inset-0">
+				<VVGrain client:only="react" />
+			</div>
+
+			<div class="relative mx-auto flex min-h-svh w-full max-w-[1320px] flex-col px-4 sm:px-8">
+				<header class="flex h-16 items-center justify-between">
+					<a href={`${base}/`} class="text-xl font-extrabold tracking-tight">VVdigital</a>
+					<a href={`${base}/#contact`} class="rounded-sm border px-4 py-2 text-[15px] font-semibold" style="border-color:var(--line)">Написать</a>
+				</header>
+
+				<div class="flex flex-1 flex-col justify-end pb-10 md:ml-[52%] md:justify-center md:pb-0">
+					<h1 class="glow text-[clamp(44px,6.2vw,104px)] leading-[0.95] font-extrabold tracking-[-0.03em]">
+						Сначала<br />считаем.<br />Потом тратим.
+					</h1>
+					<p class="mt-4 text-[clamp(20px,2.2vw,34px)] leading-tight font-bold" style="color:var(--cyan)">
+						Реклама и SEO в Германии
+					</p>
+					<p class="mt-5 max-w-[42ch] text-lg leading-relaxed" style="color:var(--dim)">
+						Google Ads, SEO и соцсети. Первый шаг — бесплатный мини-чек: одна страница с находками по вашей рекламе или сайту.
+					</p>
+					<div class="mt-7">
+						<a href={`${base}/#contact`} class="inline-flex h-13 items-center rounded-sm px-6 text-base font-bold" style="background:var(--cyan);color:var(--night)">
+							Получить мини-чек за 0 €
+						</a>
+					</div>
+				</div>
+
+				<dl class="grid grid-cols-3 gap-4 border-t py-6" style="border-color:var(--line)">
+					{proof.map((p) => (
+						<div>
+							<dd class="text-[clamp(26px,3.6vw,48px)] leading-none font-extrabold tracking-tight">{p.n}</dd>
+							<dt class="mt-1.5 text-[13px] leading-snug" style="color:var(--dim)">{p.l}</dt>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
+	</body>
+</html>

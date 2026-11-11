@@ -1,0 +1,78 @@
+---
+// Draft 3D hero directions. Only the first screen is designed; the rest of the
+// page will be taken from the main landing once a direction is picked.
+import '../../styles/global.css';
+import { Scene3D } from '../../components/Scene3D';
+
+export function getStaticPaths() {
+	return [{ params: { variant: 'glass' } }, { params: { variant: 'pearl' } }, { params: { variant: 'chrome' } }];
+}
+
+const { variant } = Astro.params as { variant: 'glass' | 'pearl' | 'chrome' };
+
+const THEMES = {
+	glass: { name: 'Стекло', bg: '#0a0a10', fg: '#f1efea', dim: 'rgba(241,239,234,.66)', line: 'rgba(241,239,234,.18)', accent: '#b9c2ff', onAccent: '#0a0a10' },
+	pearl: { name: 'Перламутр', bg: '#ece9e3', fg: '#15141a', dim: 'rgba(21,20,26,.66)', line: 'rgba(21,20,26,.18)', accent: '#15141a', onAccent: '#ece9e3' },
+	chrome: { name: 'Хром', bg: '#111114', fg: '#f1efea', dim: 'rgba(241,239,234,.66)', line: 'rgba(241,239,234,.18)', accent: '#f2c9a0', onAccent: '#111114' },
+};
+const t = THEMES[variant];
+const proof = [
+	{ n: '1316 %', l: 'ROAS интернет-магазина' },
+	{ n: '12 600', l: 'конверсий клиники' },
+	{ n: '+69 %', l: 'кликов из поиска' },
+];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<html lang="ru">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, nofollow" />
+		<title>{`VVdigital — 3D-вариант «${t.name}»`}</title>
+	</head>
+	<body style={`--bg:${t.bg};--fg:${t.fg};--dim:${t.dim};--line:${t.line};--acc:${t.accent};--on-acc:${t.onAccent};background:var(--bg);color:var(--fg)`}>
+		<section class="relative min-h-svh overflow-hidden">
+			<div class="absolute inset-0">
+				<Scene3D client:only="react" variant={variant} />
+			</div>
+
+			<div class="relative mx-auto flex min-h-svh w-full max-w-[1240px] flex-col px-4 sm:px-8">
+				<header class="flex h-16 items-center justify-between">
+					<a href={`${base}/`} class="font-heading text-[30px] leading-none font-extrabold uppercase">VVdigital</a>
+					<a href={`${base}/#contact`} class="rounded-sm border px-4 py-2 text-[15px] font-semibold" style="border-color:var(--line)">Написать</a>
+				</header>
+
+				<div class="flex flex-1 flex-col justify-end pb-10 lg:justify-center lg:pb-0">
+					<p class="text-[15px] font-medium" style="color:var(--dim)">Реклама и SEO для бизнеса в Германии</p>
+					<h1 class="mt-4 max-w-[9ch] font-heading text-[clamp(64px,10.5vw,164px)] leading-[0.84] font-extrabold uppercase">
+						Сначала считаем. <span style="color:var(--acc)">Потом тратим.</span>
+					</h1>
+					<p class="mt-6 max-w-[44ch] text-lg leading-relaxed" style="color:var(--dim)">
+						Google Ads, SEO и реклама в соцсетях. Первый шаг — бесплатный мини-чек: одна страница с находками по вашей рекламе или сайту.
+					</p>
+					<div class="mt-8">
+						<a href={`${base}/#contact`} class="inline-flex h-13 items-center rounded-sm px-6 text-base font-semibold" style="background:var(--acc);color:var(--on-acc)">
+							Получить мини-чек за 0 €
+						</a>
+					</div>
+				</div>
+
+				<dl class="grid grid-cols-3 gap-4 border-t py-6" style="border-color:var(--line)">
+					{proof.map((p) => (
+						<div>
+							<dd class="font-heading text-[clamp(34px,5vw,64px)] leading-none font-extrabold">{p.n}</dd>
+							<dt class="mt-1 text-[13px] leading-snug" style="color:var(--dim)">{p.l}</dt>
+						</div>
+					))}
+				</dl>
+			</div>
+		</section>
+
+		<nav aria-label="Варианты" class="fixed right-3 bottom-3 z-50 flex gap-1 rounded-sm p-1 text-[13px] font-medium" style="background:var(--fg);color:var(--bg)">
+			{Object.entries(THEMES).map(([key, theme]) => (
+				<a href={`${base}/3d/${key}`} class="rounded-sm px-2.5 py-1.5" style={key === variant ? 'background:var(--bg);color:var(--fg)' : ''}>{theme.name}</a>
+			))}
+		</nav>
+	</body>
+</html>
