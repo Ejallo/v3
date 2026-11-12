@@ -186,11 +186,29 @@ function Rocks() {
 
 function Stage({ still }: { still: boolean }) {
   const group = useRef<THREE.Group>(null!)
-  const { width, height, aspect } = useThree((s) => s.viewport)
+  const size = useThree((s) => s.size)
+  const gl = useThree((s) => s.gl)
+  const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera
+  // The canvas runs past the hero into a "tail" (the section's bottom padding)
+  // so the rocks can continue downwards. Frame the scene by the hero height
+  // only, and let the tail show what lies below that frame.
+  const tail = useMemo(() => {
+    const sky = gl.domElement.closest(".sky")
+    return sky ? parseFloat(getComputedStyle(sky).paddingBottom) || 0 : 0
+  }, [gl, size.width, size.height])
+  const baseH = Math.max(1, size.height - tail)
+  const aspect = size.width / baseH
+  const height = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z
+  const width = height * aspect
   const wide = aspect > 0.9
   // On phones the canvas is taller than the screen, so size by width and pin the letters to the top
   const scale = wide ? THREE.MathUtils.clamp(width / 8, 0.62, 1.05) : width / 4.9
   useFrame((_, dt) => {
+    const v = camera.view
+    if (Math.abs(camera.aspect - aspect) > 1e-4 || !v || v.fullHeight !== baseH || v.height !== size.height || v.width !== size.width) {
+      camera.aspect = aspect
+      camera.setViewOffset(size.width, baseH, 0, 0, size.width, size.height)
+    }
     const g = group.current
     g.rotation.y = THREE.MathUtils.damp(g.rotation.y, (wide ? 0.32 : 0.18) + pointer.x * 0.18, 3, dt)
     g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pointer.y * 0.08, 3, dt)

@@ -114,12 +114,39 @@
     html { scroll-behavior: auto; }
     }
 }
-/* Night sky behind the hero scene */
+/* Night sky behind the hero scene. The section ends in a "tail" (bottom
+   padding): the 3D rocks continue into it, get blurred and fade into the next
+   section's colour (bg-card). */
 .sky {
+  --hero-tail: clamp(90px, 18svh, 240px);
+  padding-bottom: var(--hero-tail);
   background:
-    radial-gradient(60% 28% at 50% 100%, rgba(255, 95, 154, 0.36), transparent 70%),
-    radial-gradient(55% 60% at 72% 62%, rgba(40, 92, 220, 0.45), transparent 70%),
-    linear-gradient(180deg, #08080f 0%, #0b0d1c 55%, #131634 100%);
+    radial-gradient(60% 28% at 50% calc(100% - var(--hero-tail)), rgba(255, 95, 154, 0.36), transparent 70%),
+    radial-gradient(55% 60% at 72% 55%, rgba(40, 92, 220, 0.45), transparent 70%),
+    linear-gradient(180deg, #08080f 0%, #0b0d1c 48%, #131634 calc(100% - var(--hero-tail)), var(--card) 100%);
+}
+.sky::before,
+.sky::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  z-index: 1;
+  pointer-events: none;
+}
+/* Progressive blur: nothing at the top of the tail, full at the bottom */
+.sky::before {
+  height: var(--hero-tail);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 70%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 70%);
+}
+/* Colour fade into the next section */
+.sky::after {
+  height: var(--hero-tail);
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--card) 45%, transparent) 55%, var(--card) 100%);
 }
 .glow {
   text-shadow: 0 0 42px rgba(160, 190, 255, 0.35);
