@@ -121,27 +121,6 @@
     radial-gradient(55% 60% at 72% 62%, rgba(40, 92, 220, 0.45), transparent 70%),
     linear-gradient(180deg, #08080f 0%, #0b0d1c 55%, #131634 100%);
 }
-/* Low-poly rock strip that continues the 3D rocks and fades into the next
-   section (bg-card). The hero gets extra room below the stats for the fade. */
-.sky {
-  --rocks-pad: clamp(70px, 9vw, 170px);
-  padding-bottom: var(--rocks-pad);
-}
-/* The 3D canvas stops above the extra room so the scene keeps its framing */
-.sky-scene {
-  position: absolute;
-  inset: 0 0 var(--rocks-pad) 0;
-}
-.sky::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: clamp(250px, 27.5vw, 500px);
-  background: url("../assets/hero-rocks.svg") center bottom / cover no-repeat;
-  pointer-events: none;
-}
 .glow {
   text-shadow: 0 0 42px rgba(160, 190, 255, 0.35);
 }
