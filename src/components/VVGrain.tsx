@@ -22,7 +22,7 @@ function vvGeometry() {
     s.closePath()
     return s
   }
-  const g = new THREE.ExtrudeGeometry([v(-0.72), v(0.72)], {
+  const g = new THREE.ExtrudeGeometry([v(-0.9), v(0.9)], {
     depth: 0.6,
     bevelEnabled: true,
     bevelSize: 0.06,
@@ -30,6 +30,9 @@ function vvGeometry() {
     bevelSegments: 4,
   })
   g.center()
+  // The wider gap keeps the two letters from reading as a "W"; scale the pair
+  // down so it still fits the same footprint next to the headline.
+  g.scale(0.86, 0.86, 0.86)
   return g
 }
 
