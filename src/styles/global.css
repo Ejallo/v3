@@ -121,6 +121,28 @@
     radial-gradient(55% 60% at 72% 62%, rgba(40, 92, 220, 0.45), transparent 70%),
     linear-gradient(180deg, #08080f 0%, #0b0d1c 55%, #131634 100%);
 }
+/* Low-poly ridge that closes the hero into the next section (bg-card) */
+.sky::before,
+.sky::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  pointer-events: none;
+}
+/* Far ridge: sits under the 3D canvas */
+.sky::before {
+  height: 170px;
+  background: #11132b;
+  clip-path: polygon(0 62%, 7% 48%, 13% 58%, 21% 30%, 27% 44%, 34% 36%, 41% 60%, 49% 46%, 56% 22%, 62% 40%, 70% 52%, 77% 28%, 84% 46%, 91% 34%, 100% 55%, 100% 100%, 0 100%);
+}
+/* Near ridge: same colour as the next section, covers the canvas edge */
+.sky::after {
+  height: 120px;
+  background: var(--card);
+  clip-path: polygon(0 40%, 6% 62%, 12% 46%, 19% 70%, 26% 52%, 33% 74%, 42% 58%, 50% 80%, 58% 60%, 66% 76%, 73% 50%, 81% 72%, 88% 56%, 95% 70%, 100% 48%, 100% 100%, 0 100%);
+}
 .glow {
   text-shadow: 0 0 42px rgba(160, 190, 255, 0.35);
 }
