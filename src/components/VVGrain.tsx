@@ -222,7 +222,8 @@ function Stage({ still }: { still: boolean }) {
       <group scale={1.25}>
         <Beads still={still} />
       </group>
-      {wide && <Rocks />}
+      {/* On phones the rocks sit under the letters too, behind the headline */}
+      <Rocks />
     </group>
   )
 }
