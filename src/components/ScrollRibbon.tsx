@@ -105,28 +105,21 @@ export function ScrollRibbon() {
 
       // The ribbon comes straight down into the right side of a true circle, runs
       // three quarters of it and leaves the top heading right, crossing its own descent.
+      // From there one wide clockwise arc carries it onto the form: it leaves the loop
+      // heading right and lands heading down, with no S-bend on the way.
       const start: Pt = [-70, pr.top + (desktop ? 90 : 30)]
       const entry: Pt = [cx + R, cy]
       const approach: Pt[] = desktop
         ? [start, [cl + cw * 0.14, pr.top + pr.height * 0.27], [cl + cw * 0.3, pr.top + pr.height * 0.66], entry]
         : [start, [W * 0.45, pr.top + pr.height * 0.3], entry]
-      const exit: Pt[] = desktop
-        ? [
-            [cx, loopTop],
-            [cx + R * 1.42, loopTop + drop * 0.085],
-            [cl + cw * 0.56, loopTop + drop * 0.33],
-            [cl + cw * 0.72, loopTop + drop * 0.44],
-            [cl + cw * 0.855, loopTop + drop * 0.5],
-            [cl + cw * 0.885, loopTop + drop * 0.66],
-            [fx + cw * 0.045, fy - drop * 0.13],
-            [fx, fy],
-          ]
-        : [[cx, loopTop], [cx + R * 1.3, loopTop + drop * 0.2], [W * 0.86, loopTop + drop * 0.6], [fx, fy]]
+      const exit =
+        ` C${fmt(cx + (fx - cx) * 0.9)},${fmt(loopTop)}` +
+        ` ${fmt(fx)},${fmt(fy - drop * 0.55)} ${fmt(fx)},${fmt(fy)}`
       const d =
         `M${fmt(start[0])},${fmt(start[1])}` +
         spline(approach, undefined, [0, 1]) +
         threeQuarterCircle(cx, cy, R) +
-        spline(exit, [1, 0])
+        exit
 
       const top = start[1] - 80
       const height = fy - top + 40

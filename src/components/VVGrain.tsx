@@ -55,6 +55,11 @@ function rockGeometry(seed: number) {
 
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
 
+// Assembly timing, seconds. At SPEED 1 the last bead lands at 3.5 s
+// (1.8 s stagger + 1.7 s flight); 0.63 brings the whole intro to 2.2 s.
+const SPEED = 0.63
+const FLY = 1.7 * SPEED // one bead's flight from the dust to its place
+
 function Beads({ still }: { still: boolean }) {
   const mesh = useRef<THREE.InstancedMesh>(null!)
   const core = useRef<THREE.MeshStandardMaterial>(null!)
@@ -78,8 +83,8 @@ function Beads({ still }: { still: boolean }) {
       // Start as dust scattered low around the letters
       const a = Math.random() * Math.PI * 2
       const r = 1.5 + Math.random() * 3.5
-      start.set([p.x + Math.cos(a) * r, -2.2 - Math.random() * 1.5, p.z + Math.sin(a) * r], i * 3)
-      delay[i] = ((p.x + 1.5) / 3) * 1.3 + Math.random() * 0.5
+      start.set([p.x + Math.cos(a) * r, -1.6 - Math.random() * 1.0, p.z + Math.sin(a) * r], i * 3)
+      delay[i] = Math.max(0, ((p.x + 1.5) / 3) * 1.3 + Math.random() * 0.5) * SPEED
       size[i] = BEAD_RADIUS * (0.7 + Math.random() * 0.7)
       phase[i] = Math.random() * Math.PI * 2
     }
@@ -120,7 +125,7 @@ function Beads({ still }: { still: boolean }) {
 
     for (let i = 0; i < BEADS; i++) {
       const j = i * 3
-      const p = easeOut(THREE.MathUtils.clamp((t - delay[i]) / 1.7, 0, 1))
+      const p = easeOut(THREE.MathUtils.clamp((t - delay[i]) / FLY, 0, 1))
       const breathe = p === 1 && !still ? Math.sin(t * 1.4 + phase[i]) * 0.012 : 0
 
       let ox = 0, oy = 0, oz = 0
@@ -147,7 +152,7 @@ function Beads({ still }: { still: boolean }) {
       m[o + 14] = start[j + 2] + (target[j + 2] - start[j + 2]) * p + normal[j + 2] * breathe + offset[j + 2]
     }
     mesh.current.instanceMatrix.needsUpdate = true
-    core.current.opacity = THREE.MathUtils.clamp((t - 1.6) / 1.2, 0, 1)
+    core.current.opacity = THREE.MathUtils.clamp((t - 1.6 * SPEED) / (1.2 * SPEED), 0, 1)
   })
 
   return (
