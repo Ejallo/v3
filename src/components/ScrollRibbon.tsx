@@ -49,7 +49,11 @@ function threeQuarterCircle(cx: number, cy: number, r: number) {
 
 // The tip follows the scroll like a critically damped spring: it eases in and out
 // on every wheel notch instead of darting forward and braking.
-const SPRING = 7 // angular frequency, 1/s; settles in roughly 0.7 s
+const SPRING = 11 // angular frequency, 1/s; settles in roughly 0.45 s
+// Where the form's centre is on screen (share of viewport height from the top)
+// when the tip lands. Below the middle, so even a fast flick, which the spring
+// trails by a fraction of a second, finishes while the form is still centred.
+const LAND_AT = 0.62
 // Scroll needed per pixel of ribbon that does not go down (the loop, the sideways run).
 // Going down, the tip moves 1:1 with the page, so it never races ahead of the reader.
 const SIDEWAYS_RATE = 0.6
@@ -151,7 +155,7 @@ export function ScrollRibbon() {
     function target() {
       const mainTop = main!.getBoundingClientRect().top + window.scrollY
       const from = mainTop + startY - window.innerHeight * 0.66
-      const to = mainTop + endY - window.innerHeight * 0.5
+      const to = mainTop + endY - window.innerHeight * LAND_AT
       const t = Math.max(0, Math.min(1, (window.scrollY - from) / (to - from)))
       // Find how much of the path this scroll position has "paid for".
       const last = keys.length - 1
