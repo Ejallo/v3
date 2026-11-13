@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { MenuIcon } from "lucide-react"
+import { MenuIcon, Plus } from "lucide-react"
 import { toast } from "sonner"
 
 import { Configurator, type Selection } from "@/components/Configurator"
@@ -379,13 +379,27 @@ export function Landing({
             </div>
             <div id="faq">
               <h2 className="text-2xl font-extrabold tracking-tight lg:text-3xl">{t.faq.h2}</h2>
-              <Accordion type="single" collapsible className="mt-5 border-t border-foreground/25">
+              <Accordion
+                type="single"
+                collapsible
+                defaultValue={t.faq.items[0]?.q}
+                className="mt-5 gap-2"
+              >
                 {t.faq.items.map((item) => (
-                  <AccordionItem key={item.q} value={item.q} className="border-border">
-                    <AccordionTrigger className="rounded-sm py-5 text-lg font-semibold">
-                      {item.q}
+                  <AccordionItem
+                    key={item.q}
+                    value={item.q}
+                    className="rounded-lg border border-foreground/15 transition-colors not-last:border-b data-[state=open]:border-primary"
+                  >
+                    <AccordionTrigger className="m-1 items-center gap-4 rounded-sm bg-panel px-4 py-3.5 text-lg leading-tight font-semibold transition-colors hover:bg-primary/8 hover:no-underline data-[state=open]:rounded-b-none data-[state=open]:bg-primary data-[state=open]:text-primary-foreground sm:px-6 sm:py-4 sm:text-[22px] [&>[data-slot=accordion-trigger-icon]]:hidden">
+                      <span>{item.q}</span>
+                      <Plus
+                        aria-hidden
+                        strokeWidth={2}
+                        className="ml-auto size-6 shrink-0 text-primary transition-transform duration-500 group-aria-expanded/accordion-trigger:rotate-225 group-aria-expanded/accordion-trigger:text-primary-foreground"
+                      />
                     </AccordionTrigger>
-                    <AccordionContent className="max-w-[60ch] pb-5 text-base leading-relaxed">
+                    <AccordionContent className="max-w-[60ch] p-4 text-base leading-relaxed sm:px-6 sm:pt-5 sm:pb-6 sm:text-[17px]">
                       {item.a}
                     </AccordionContent>
                   </AccordionItem>
