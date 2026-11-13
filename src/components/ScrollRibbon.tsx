@@ -8,30 +8,51 @@ import { useEffect, useRef } from "react"
 
 type Pt = [number, number]
 
-// Centripetal Catmull-Rom through the points, written as cubic Bezier segments.
-function splinePath(pts: Pt[]) {
+const fmt = (v: number) => v.toFixed(1)
+
+// Centripetal Catmull-Rom through the points, as cubic Bezier segments (no leading "M").
+// startDir / endDir pin the tangent at the first / last point, so the run joins
+// the circle without a kink.
+function spline(pts: Pt[], startDir?: Pt, endDir?: Pt) {
   const p = [pts[0], ...pts, pts[pts.length - 1]]
   const gap = (a: Pt, b: Pt) => Math.max(1e-3, Math.sqrt(Math.hypot(b[0] - a[0], b[1] - a[1])))
-  const n = (v: number) => v.toFixed(1)
-  let d = `M${n(pts[0][0])},${n(pts[0][1])}`
+  let d = ""
   for (let i = 1; i < p.length - 2; i++) {
     const [p0, p1, p2, p3] = [p[i - 1], p[i], p[i + 1], p[i + 2]]
     const d1 = gap(p0, p1)
     const d2 = gap(p1, p2)
     const d3 = gap(p2, p3)
-    const c1 = [0, 1].map(
+    let c1 = [0, 1].map(
       (j) => (d1 * d1 * p2[j] - d2 * d2 * p0[j] + (2 * d1 * d1 + 3 * d1 * d2 + d2 * d2) * p1[j]) / (3 * d1 * (d1 + d2)),
     )
-    const c2 = [0, 1].map(
+    let c2 = [0, 1].map(
       (j) => (d3 * d3 * p1[j] - d2 * d2 * p3[j] + (2 * d3 * d3 + 3 * d3 * d2 + d2 * d2) * p2[j]) / (3 * d3 * (d3 + d2)),
     )
-    d += ` C${n(c1[0])},${n(c1[1])} ${n(c2[0])},${n(c2[1])} ${n(p2[0])},${n(p2[1])}`
+    const third = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / 3
+    if (startDir && i === 1) c1 = [p1[0] + startDir[0] * third, p1[1] + startDir[1] * third]
+    if (endDir && i === p.length - 3) c2 = [p2[0] - endDir[0] * third, p2[1] - endDir[1] * third]
+    d += ` C${fmt(c1[0])},${fmt(c1[1])} ${fmt(c2[0])},${fmt(c2[1])} ${fmt(p2[0])},${fmt(p2[1])}`
   }
   return d
 }
 
-const LOOP_ANGLES = [32, 72, 112, 150, 188, 228, 268]
-const FOLLOW_MS = 260 // how long the tip takes to catch up with the scroll position
+// Three quarters of an exact circle, clockwise on screen: right -> bottom -> left -> top.
+function threeQuarterCircle(cx: number, cy: number, r: number) {
+  const k = 0.5523 * r
+  const c = (...v: number[]) => ` C${v.map(fmt).join(",")}`
+  return (
+    c(cx + r, cy + k, cx + k, cy + r, cx, cy + r) +
+    c(cx - k, cy + r, cx - r, cy + k, cx - r, cy) +
+    c(cx - r, cy - k, cx - k, cy - r, cx, cy - r)
+  )
+}
+
+// The tip follows the scroll like a critically damped spring: it eases in and out
+// on every wheel notch instead of darting forward and braking.
+const SPRING = 7 // angular frequency, 1/s; settles in roughly 0.7 s
+// Scroll needed per pixel of ribbon that does not go down (the loop, the sideways run).
+// Going down, the tip moves 1:1 with the page, so it never races ahead of the reader.
+const SIDEWAYS_RATE = 0.6
 
 export function ScrollRibbon() {
   const svgRef = useRef<SVGSVGElement>(null)
@@ -50,9 +71,11 @@ export function ScrollRibbon() {
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)")
     let length = 0
-    let startY = 0 // tops relative to <main>
-    let endY = 0
+    let startY = 0 // relative to <main>
+    let endY = 0 // form centre
+    let keys = new Float32Array(2) // cumulative scroll "cost" along the path
     let current = 0
+    let velocity = 0
     let frame = 0
     let lastTime = 0
 
@@ -80,63 +103,75 @@ export function ScrollRibbon() {
       const loopTop = cy - R
       const drop = fy - loopTop
 
-      // The loop is a slightly tilted oval, so it reads as a pen stroke, not a compass circle.
-      const tilt = (-12 * Math.PI) / 180
-      const onLoop = (deg: number): Pt => {
-        const t = (deg * Math.PI) / 180
-        const x = R * 1.04 * Math.cos(t)
-        const y = R * 0.97 * Math.sin(t)
-        return [cx + x * Math.cos(tilt) - y * Math.sin(tilt), cy + x * Math.sin(tilt) + y * Math.cos(tilt)]
-      }
+      // The ribbon comes straight down into the right side of a true circle, runs
+      // three quarters of it and leaves the top heading right, crossing its own descent.
+      const start: Pt = [-70, pr.top + (desktop ? 90 : 30)]
+      const entry: Pt = [cx + R, cy]
+      const approach: Pt[] = desktop
+        ? [start, [cl + cw * 0.14, pr.top + pr.height * 0.27], [cl + cw * 0.3, pr.top + pr.height * 0.66], entry]
+        : [start, [W * 0.45, pr.top + pr.height * 0.3], entry]
+      const exit: Pt[] = desktop
+        ? [
+            [cx, loopTop],
+            [cx + R * 1.42, loopTop + drop * 0.085],
+            [cl + cw * 0.56, loopTop + drop * 0.33],
+            [cl + cw * 0.72, loopTop + drop * 0.44],
+            [cl + cw * 0.855, loopTop + drop * 0.5],
+            [cl + cw * 0.885, loopTop + drop * 0.66],
+            [fx + cw * 0.045, fy - drop * 0.13],
+            [fx, fy],
+          ]
+        : [[cx, loopTop], [cx + R * 1.3, loopTop + drop * 0.2], [W * 0.86, loopTop + drop * 0.6], [fx, fy]]
+      const d =
+        `M${fmt(start[0])},${fmt(start[1])}` +
+        spline(approach, undefined, [0, 1]) +
+        threeQuarterCircle(cx, cy, R) +
+        spline(exit, [1, 0])
 
-      const pts: Pt[] = [[-70, pr.top + (desktop ? 90 : 30)]]
-      if (desktop) {
-        pts.push(
-          [cl + cw * 0.1, pr.top + pr.height * 0.3],
-          [cl + cw * 0.235, pr.top + pr.height * 0.66],
-          [cl + cw * 0.3, sp.top + sp.height * 0.1],
-        )
-      } else {
-        pts.push([W * 0.45, pr.top + pr.height * 0.3], [W * 0.72, sp.top + sp.height * 0.1])
-      }
-      for (const deg of LOOP_ANGLES) pts.push(onLoop(deg))
-      if (desktop) {
-        pts.push(
-          [cx + R * 1.42, loopTop + drop * 0.085],
-          [cl + cw * 0.56, loopTop + drop * 0.33],
-          [cl + cw * 0.72, loopTop + drop * 0.44],
-          [cl + cw * 0.855, loopTop + drop * 0.5],
-          [cl + cw * 0.885, loopTop + drop * 0.66],
-          [fx + cw * 0.045, fy - drop * 0.13],
-          [fx, fy],
-        )
-      } else {
-        pts.push([cx + R * 1.3, loopTop + drop * 0.2], [W * 0.86, loopTop + drop * 0.6], [fx, fy])
-      }
-
-      const top = pts[0][1] - 80
+      const top = start[1] - 80
       const height = fy - top + 40
       svg!.setAttribute("width", String(W))
       svg!.setAttribute("height", String(height))
       svg!.setAttribute("viewBox", `0 ${top} ${W} ${height}`)
       svg!.style.top = `${top}px`
-      grad!.setAttribute("y1", String(pts[0][1]))
+      grad!.setAttribute("y1", String(start[1]))
       grad!.setAttribute("y2", String(fy))
-      path!.setAttribute("d", splinePath(pts))
+      path!.setAttribute("d", d)
       path!.setAttribute("stroke-width", String(stroke))
       path!.setAttribute("opacity", desktop ? "1" : "0.6")
       length = path!.getTotalLength()
       path!.style.strokeDasharray = `${length} ${length + stroke * 2}`
-      startY = pr.top
-      endY = f.top
+      startY = start[1]
+      endY = f.top + f.height / 2 // land when the form is centred on screen
+
+      const samples = Math.max(1, Math.ceil(length / 6))
+      keys = new Float32Array(samples + 1)
+      let prev = path!.getPointAtLength(0)
+      for (let i = 1; i <= samples; i++) {
+        const pt = path!.getPointAtLength((length * i) / samples)
+        const ds = Math.hypot(pt.x - prev.x, pt.y - prev.y)
+        keys[i] = keys[i - 1] + Math.max(pt.y - prev.y, SIDEWAYS_RATE * ds)
+        prev = pt
+      }
     }
 
     function target() {
       const mainTop = main!.getBoundingClientRect().top + window.scrollY
-      const from = mainTop + startY - window.innerHeight * 0.72
-      const to = mainTop + endY - window.innerHeight * 0.42
+      const from = mainTop + startY - window.innerHeight * 0.66
+      const to = mainTop + endY - window.innerHeight * 0.5
       const t = Math.max(0, Math.min(1, (window.scrollY - from) / (to - from)))
-      return t * t * (3 - 2 * t) * 0.35 + t * 0.65 // soft start and soft landing
+      // Find how much of the path this scroll position has "paid for".
+      const last = keys.length - 1
+      const key = t * keys[last]
+      let lo = 0
+      let hi = last
+      while (hi - lo > 1) {
+        const mid = (lo + hi) >> 1
+        if (keys[mid] < key) lo = mid
+        else hi = mid
+      }
+      const span = keys[hi] - keys[lo]
+      return (lo + (span > 0 ? (key - keys[lo]) / span : 0)) / last
     }
 
     function apply() {
@@ -147,10 +182,14 @@ export function ScrollRibbon() {
 
     function tick(now: number) {
       const goal = target()
-      const dt = Math.min(64, now - (lastTime || now))
+      const dt = Math.min(0.05, (now - (lastTime || now - 16)) / 1000)
       lastTime = now
-      current += (goal - current) * (1 - Math.exp(-dt / FOLLOW_MS))
-      if (Math.abs(goal - current) < 0.0004) current = goal
+      velocity += (SPRING * SPRING * (goal - current) - 2 * SPRING * velocity) * dt
+      current += velocity * dt
+      if (Math.abs(goal - current) < 0.0004 && Math.abs(velocity) < 0.002) {
+        current = goal
+        velocity = 0
+      }
       apply()
       if (current === goal) {
         frame = 0
@@ -162,6 +201,7 @@ export function ScrollRibbon() {
 
     const jump = () => {
       current = target()
+      velocity = 0
       apply()
     }
     const onScroll = () => {
