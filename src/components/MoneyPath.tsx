@@ -38,19 +38,19 @@ export function MoneyPath({ t }: { t: Dict["money"] }) {
         <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label={t.aria}>
           <defs>
             <linearGradient id="mp-stream" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="var(--violet)" />
-              <stop offset="0.45" stopColor="var(--violet)" />
-              <stop offset="1" stopColor="var(--primary)" />
+              <stop offset="0" stopColor="var(--violet)" stopOpacity="0.55" />
+              <stop offset="0.45" stopColor="var(--violet)" stopOpacity="0.55" />
+              <stop offset="1" stopColor="var(--primary)" stopOpacity="0.7" />
             </linearGradient>
           </defs>
-          <path d={stream} fill="url(#mp-stream)" />
+          <path d={stream} fill="url(#mp-stream)" className="money-stream" />
           <line
             x1={(A + B) / 2} x2={(A + B) / 2} y1="8" y2={H - 8}
             stroke="var(--foreground)" strokeOpacity="0.35" strokeWidth="1.5" strokeDasharray="4 7"
           />
         </svg>
         <p
-          className="absolute top-1/2 -translate-y-1/2 text-[clamp(30px,6.4vw,84px)] leading-none font-extrabold tracking-[-0.04em] text-primary-foreground"
+          className="absolute top-1/2 -translate-y-1/2 text-[clamp(30px,6.4vw,84px)] leading-none font-extrabold tracking-[-0.04em] text-foreground"
           style={{ right: "4%" }}
         >
           {t.ratio}
@@ -73,7 +73,7 @@ export function MoneyPath({ t }: { t: Dict["money"] }) {
         </li>
         <li className="text-right">
           <p className={label}>{t.returned.label}</p>
-          <p className="mt-1 text-[clamp(22px,4.4vw,56px)] leading-none font-extrabold tracking-tight whitespace-nowrap text-primary">
+          <p className="mt-1 text-[clamp(22px,4.4vw,56px)] leading-none font-extrabold tracking-tight whitespace-nowrap text-violet">
             {t.returned.value}
           </p>
           <p className={sub}>{t.returned.sub}</p>

@@ -58,7 +58,7 @@ export function Configurator({
   const nothing = value.monthly.length === 0 && value.once.length === 0
 
   return (
-    <div className="relative rounded-lg border border-border bg-background p-5 text-foreground sm:p-7">
+    <div className="relative rounded-lg border border-border bg-panel p-5 text-foreground sm:p-7">
       <p className="text-sm font-medium text-muted-foreground">{t.hint}</p>
 
       <div className="mt-5 space-y-5">
@@ -130,7 +130,7 @@ export function Configurator({
             value={monthly}
             format={eur}
             locales={locale}
-            className="text-[40px] leading-none font-extrabold tracking-tight text-primary tabular-nums sm:text-[56px]"
+            className="text-[40px] leading-none font-extrabold tracking-tight text-violet tabular-nums sm:text-[56px]"
           />
         </div>
         <div>

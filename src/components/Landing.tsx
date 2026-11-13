@@ -4,6 +4,7 @@ import { toast } from "sonner"
 
 import { Configurator, type Selection } from "@/components/Configurator"
 import { MoneyPath } from "@/components/MoneyPath"
+import { ScrollRibbon } from "@/components/ScrollRibbon"
 import {
   Accordion,
   AccordionContent,
@@ -166,10 +167,10 @@ export function Landing({
         </div>
       </header>
 
-      <main id="main">
+      <main id="main" className="relative">
         {children}
 
-        <section id="services" className="bg-card">
+        <section id="services" className="relative z-1">
           <div className={`${wrap} py-16 lg:py-28`}>
             <h2 className={h2}>{t.services.h2}</h2>
             <Tabs
@@ -204,7 +205,7 @@ export function Landing({
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-7 text-[30px] leading-none font-extrabold tracking-tight text-primary">
+                  <p className="mt-7 text-[30px] leading-none font-extrabold tracking-tight text-violet">
                     {s.price}
                   </p>
                 </TabsContent>
@@ -213,7 +214,7 @@ export function Landing({
           </div>
         </section>
 
-        <section id="results" className={`${wrap} py-16 lg:py-28`}>
+        <section id="results" className={`${wrap} relative z-1 py-16 lg:py-28`}>
           <h2 className={h2}>{t.results.h2}</h2>
           <div className="mt-10 border-b border-foreground/25 lg:mt-14">
             {t.results.rows.map((r) => (
@@ -235,7 +236,7 @@ export function Landing({
           <p className="mt-5 max-w-[70ch] text-[15px] text-muted-foreground">{t.results.geo}</p>
         </section>
 
-        <section id="money" className={`${wrap} pb-16 lg:pb-28`}>
+        <section id="money" className={`${wrap} relative z-1 pb-16 lg:pb-28`}>
           <h2 className={h2}>{t.money.h2}</h2>
           <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-muted-foreground">
             {t.money.lead}
@@ -245,7 +246,7 @@ export function Landing({
           </div>
         </section>
 
-        <section id="prices" className="bg-card">
+        <section id="prices" className="relative z-1">
           <div
             className={`${wrap} grid gap-10 py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28`}
           >
@@ -265,7 +266,7 @@ export function Landing({
           </div>
         </section>
 
-        <section id="steps" className={`${wrap} py-16 lg:py-28`}>
+        <section id="steps" className={`${wrap} relative z-1 py-16 lg:py-28`}>
           <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
             <h2 className={h2}>{t.steps.h2}</h2>
             <ol>
@@ -290,37 +291,7 @@ export function Landing({
           </div>
         </section>
 
-        <section id="about" className="bg-card">
-          <div
-            className={`${wrap} grid gap-12 py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28`}
-          >
-            <div>
-              <h2 className={h2}>{t.about.h2}</h2>
-              <div className="mt-7 max-w-[46ch] space-y-4 text-lg leading-relaxed">
-                {t.about.paragraphs.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
-            </div>
-            <div id="faq">
-              <h2 className="text-2xl font-extrabold tracking-tight lg:text-3xl">{t.faq.h2}</h2>
-              <Accordion type="single" collapsible className="mt-5 border-t border-foreground/25">
-                {t.faq.items.map((item) => (
-                  <AccordionItem key={item.q} value={item.q} className="border-border">
-                    <AccordionTrigger className="rounded-sm py-5 text-lg font-semibold">
-                      {item.q}
-                    </AccordionTrigger>
-                    <AccordionContent className="max-w-[60ch] pb-5 text-base leading-relaxed">
-                      {item.a}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </div>
-          </div>
-        </section>
-
-        <section id="contact">
+        <section id="contact" className="relative z-1">
           <div
             className={`${wrap} grid gap-10 py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28`}
           >
@@ -330,7 +301,10 @@ export function Landing({
                 {t.contact.lead}
               </p>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              className="ribbon-target space-y-6 rounded-lg border border-border bg-panel p-5 sm:p-8"
+            >
               <div className="space-y-2">
                 <Label htmlFor="f-site" className="text-[15px]">
                   {t.contact.site}
@@ -390,6 +364,38 @@ export function Landing({
             </form>
           </div>
         </section>
+
+        <section id="about" className="relative z-1">
+          <div
+            className={`${wrap} grid gap-12 py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28`}
+          >
+            <div>
+              <h2 className={h2}>{t.about.h2}</h2>
+              <div className="mt-7 max-w-[46ch] space-y-4 text-lg leading-relaxed">
+                {t.about.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+            </div>
+            <div id="faq">
+              <h2 className="text-2xl font-extrabold tracking-tight lg:text-3xl">{t.faq.h2}</h2>
+              <Accordion type="single" collapsible className="mt-5 border-t border-foreground/25">
+                {t.faq.items.map((item) => (
+                  <AccordionItem key={item.q} value={item.q} className="border-border">
+                    <AccordionTrigger className="rounded-sm py-5 text-lg font-semibold">
+                      {item.q}
+                    </AccordionTrigger>
+                    <AccordionContent className="max-w-[60ch] pb-5 text-base leading-relaxed">
+                      {item.a}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          </div>
+        </section>
+
+        <ScrollRibbon />
       </main>
 
       <footer className="border-t border-border bg-card text-muted-foreground">
