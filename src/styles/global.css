@@ -156,10 +156,6 @@
   text-shadow: 0 0 42px rgba(160, 190, 255, 0.35);
 }
 
-/* Money path: a muted stream with a glow instead of a solid bright slab */
-.money-stream {
-  filter: drop-shadow(0 0 28px rgba(120, 110, 255, 0.45));
-}
 /* Contact form reacts when the scroll ribbon lands on it (see ScrollRibbon.tsx) */
 .ribbon-target {
   position: relative;

@@ -238,10 +238,7 @@ export function Landing({
 
         <section id="money" className={`${wrap} relative z-1 pb-16 lg:pb-28`}>
           <h2 className={h2}>{t.money.h2}</h2>
-          <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-muted-foreground">
-            {t.money.lead}
-          </p>
-          <div className="mt-10 lg:mt-14">
+          <div className="mt-7">
             <MoneyPath t={t.money} />
           </div>
         </section>

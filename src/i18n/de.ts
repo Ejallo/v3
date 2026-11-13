@@ -128,19 +128,25 @@ export const de: Dict = {
   },
   money: {
     h2: "Google Ads Beispiel: Onlineshop, ROAS 1.316 %",
-    lead: "Onlineshop, Ukraine. Die Breite des Stroms ist maßstabsgetreu: Rechts ist er 13,16-mal so breit wie links.",
-    aria: "Maßstabsgetreues Schema: Der schmale Strom der Werbeausgaben wird zu einem Umsatzstrom, der 13,16-mal so breit ist.",
-    ratio: "×13,16",
-    spent: { label: "In Anzeigen investiert", value: "5.460 €", sub: "275.696 ₴" },
-    orders: { label: "Bestellungen", value: "2.526" },
-    returned: { label: "Umsatz daraus", value: "71.870 €", sub: "3.628.284 ₴" },
-    derived: [
-      { label: "Kosten pro Bestellung", value: "≈ 2,16 €" },
-      { label: "Durchschnittliche Bestellung", value: "≈ 28,45 €" },
-      { label: "Je 1 € Werbung", value: "13,16 € Umsatz" },
-    ],
-    caption:
-      "Eurobeträge umgerechnet aus Hrywnja zum Kurs der Nationalbank der Ukraine vom 12.11.2026: 1 € = 50,48 ₴.",
+    meta: "Ergebnis eines Projekts · Google Ads · Onlineshop für Autoteile, Ukraine · 10.03.–06.10.2026",
+    spent: { label: "Werbeausgaben", value: "5.461 €" },
+    ratio: "×13",
+    returned: { label: "Umsatz daraus*", value: "71.876 €" },
+    band: {
+      kicker: "In diesem Projekt:",
+      big: "1 € → 13,16 €",
+      before: "Jeder Werbe-Euro brachte ",
+      strong: "13,16 €",
+      after: " Umsatz – ROAS 1.316 %.",
+    },
+    stats: {
+      orders: "2.526 Bestellungen",
+      mid: " · je ",
+      cpa: "2,16 €",
+      rest: " pro Bestellung · durchschnittlicher Bestellwert 28,45 €",
+    },
+    cta: "Ihr Projekt besprechen",
+    note: "* Conversion-Wert in Google Ads aus Performance-Max- und Shopping-Kampagnen. Umgerechnet aus Hrywnja zum Kurs der Nationalbank der Ukraine vom 12.11.2026 (1 € = 50,48 ₴). Das ist das Ergebnis eines konkreten Kunden, keine Garantie: Es hängt von Branche, Marge, Preisen und Website ab.",
   },
   prices: {
     h2: "Preise für Google Ads und SEO",

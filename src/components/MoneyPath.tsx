@@ -1,102 +1,69 @@
 import type { Dict } from "@/i18n/ru"
 
-// "Money path" for the online-store Google Ads case.
-// The stream is drawn to scale: the right end is 13.16 times thicker than the left,
-// the same ratio as conversion value to ad spend.
-// Euro figures are converted from hryvnia at the NBU rate of 12 Nov 2026 (50.4823 UAH per EUR).
+// "Spent -> earned" block for the online-store Google Ads case (ROAS 1316 %).
+// Euro figures are converted from hryvnia at the NBU rate of 12 Nov 2026 (50.48 UAH per EUR).
 
-const W = 1000
-const H = 240
-const MID = H / 2
-const THIN = 14
-const WIDE = THIN * 13.16
-const A = 300 // where the stream starts to widen
-const B = 700 // where it reaches full width
-
-const top = (h: number) => MID - h / 2
-const bottom = (h: number) => MID + h / 2
-
-const stream = [
-  `M0,${top(THIN)}`,
-  `L${A},${top(THIN)}`,
-  `C${A + 180},${top(THIN)} ${B - 180},${top(WIDE)} ${B},${top(WIDE)}`,
-  `L${W},${top(WIDE)}`,
-  `L${W},${bottom(WIDE)}`,
-  `L${B},${bottom(WIDE)}`,
-  `C${B - 180},${bottom(WIDE)} ${A + 180},${bottom(THIN)} ${A},${bottom(THIN)}`,
-  `L0,${bottom(THIN)}`,
-  "Z",
-].join(" ")
-
-const label = "text-[13px] text-muted-foreground sm:text-[15px]"
-const sub = "mt-1.5 text-[12px] text-muted-foreground sm:text-[13px]"
+const label = "text-[13px] font-semibold tracking-[0.1em] uppercase text-muted-foreground sm:text-[15px]"
 
 export function MoneyPath({ t }: { t: Dict["money"] }) {
   return (
-    <figure>
-      <div className="relative">
-        <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label={t.aria}>
-          <defs>
-            <linearGradient id="mp-stream" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="var(--violet)" stopOpacity="0.55" />
-              <stop offset="0.45" stopColor="var(--violet)" stopOpacity="0.55" />
-              <stop offset="1" stopColor="var(--primary)" stopOpacity="0.7" />
-            </linearGradient>
-          </defs>
-          <path d={stream} fill="url(#mp-stream)" className="money-stream" />
-          <line
-            x1={(A + B) / 2} x2={(A + B) / 2} y1="8" y2={H - 8}
-            stroke="var(--foreground)" strokeOpacity="0.35" strokeWidth="1.5" strokeDasharray="4 7"
-          />
-        </svg>
-        <p
-          className="absolute top-1/2 -translate-y-1/2 text-[clamp(30px,6.4vw,84px)] leading-none font-extrabold tracking-[-0.04em] text-foreground"
-          style={{ right: "4%" }}
+    <div className="flex flex-col gap-9 sm:gap-12">
+      <p className="text-[15px] text-muted-foreground">{t.meta}</p>
+
+      <div className="flex flex-col items-start gap-5 sm:flex-row sm:flex-wrap sm:items-end sm:gap-8">
+        <div className="flex flex-col gap-3">
+          <span className={label}>{t.spent.label}</span>
+          <span className="text-[clamp(40px,4.4vw,64px)] leading-none font-extrabold tracking-[-0.03em] whitespace-nowrap">
+            {t.spent.value}
+          </span>
+        </div>
+        <div
+          className="-my-2 flex rotate-90 flex-col items-center gap-1 text-xl font-extrabold text-(--ribbon-to) sm:my-0 sm:rotate-0 sm:pb-2"
+          aria-hidden="true"
         >
-          {t.ratio}
+          <span>{t.ratio}</span>
+          <svg width="96" height="24" viewBox="0 0 96 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 12h88M82 4l8 8-8 8" />
+          </svg>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-[1_1_360px]">
+          <span className={label}>{t.returned.label}</span>
+          <span className="text-[clamp(64px,9vw,128px)] leading-[0.9] font-extrabold tracking-[-0.04em] whitespace-nowrap text-violet">
+            {t.returned.value}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-6 rounded-sm bg-(--ribbon-from) px-6 py-7 text-white sm:px-10 sm:py-9">
+        <div>
+          <span className="mb-1.5 block text-lg font-semibold opacity-85">{t.band.kicker}</span>
+          <span className="text-[clamp(36px,4vw,56px)] leading-none font-extrabold tracking-[-0.03em] whitespace-nowrap">
+            {t.band.big}
+          </span>
+        </div>
+        <p className="max-w-[380px] text-lg leading-normal">
+          {t.band.before}
+          <strong>{t.band.strong}</strong>
+          {t.band.after}
         </p>
       </div>
 
-      <ol className="mt-5 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.3fr)] gap-x-3 sm:mt-7 sm:gap-x-8">
-        <li>
-          <p className={label}>{t.spent.label}</p>
-          <p className="mt-1 text-[clamp(19px,3.2vw,40px)] leading-none font-extrabold tracking-tight whitespace-nowrap text-violet">
-            {t.spent.value}
-          </p>
-          <p className={sub}>{t.spent.sub}</p>
-        </li>
-        <li>
-          <p className={label}>{t.orders.label}</p>
-          <p className="mt-1 text-[clamp(19px,3.2vw,40px)] leading-none font-extrabold tracking-tight whitespace-nowrap">
-            {t.orders.value}
-          </p>
-        </li>
-        <li className="text-right">
-          <p className={label}>{t.returned.label}</p>
-          <p className="mt-1 text-[clamp(22px,4.4vw,56px)] leading-none font-extrabold tracking-tight whitespace-nowrap text-violet">
-            {t.returned.value}
-          </p>
-          <p className={sub}>{t.returned.sub}</p>
-        </li>
-      </ol>
+      <div className="flex flex-wrap items-center justify-between gap-6">
+        <p className="text-base text-muted-foreground">
+          <strong className="text-foreground">{t.stats.orders}</strong>
+          {t.stats.mid}
+          <strong className="text-foreground">{t.stats.cpa}</strong>
+          {t.stats.rest}
+        </p>
+        <a
+          href="#contact"
+          className="inline-flex min-h-13 items-center rounded-sm bg-primary px-7 font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary"
+        >
+          {t.cta}
+        </a>
+      </div>
 
-      <dl className="mt-7 grid grid-cols-1 border-t border-foreground/25 sm:grid-cols-3 sm:gap-x-8">
-        {t.derived.map((item) => (
-          <div
-            key={item.label}
-            className="flex items-baseline justify-between gap-4 border-b border-border py-3.5 sm:block sm:border-b-0"
-          >
-            <dt className="text-[15px] text-muted-foreground">{item.label}</dt>
-            <dd className="text-xl font-extrabold tracking-tight whitespace-nowrap sm:mt-1 sm:text-2xl">
-              {item.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
-
-      <figcaption className="mt-4 text-[13px] leading-relaxed text-muted-foreground">
-        {t.caption}
-      </figcaption>
-    </figure>
+      <p className="max-w-[860px] text-[13px] leading-relaxed text-muted-foreground">{t.note}</p>
+    </div>
   )
 }
