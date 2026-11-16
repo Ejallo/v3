@@ -409,32 +409,32 @@ export const de: Dict = {
   about: {
     h2: "Über mich",
     paragraphs: [
-      "Ich heiße Vladyslav. Angefangen habe ich mit Performance-Kampagnen in Facebook und Google Ads auf eigenes Risiko – dort zahlt man jedes ungenaue Gebot aus eigener Tasche.",
-      "Danach kamen TikTok, SEO und Kundenprojekte in der Ukraine und in Polen. Seit 2023 lebe ich in Deutschland, arbeite selbstständig und stelle Rechnungen aus. Ich arbeite remote für Kunden in ganz Deutschland.",
+      "Ich heiße Vladyslav. Seit 2019 schalte ich Werbung in Facebook und Google Ads, später kam SEO dazu. Angefangen habe ich mit eigenem Geld – so lernt man schnell, dass Werbung sich rechnen muss.",
+      "Ich habe Werbung und SEO für E-Commerce, Kliniken, Anwälte, Baufirmen und Online-Services betreut.",
     ],
   },
   faq: {
     h2: "Häufige Fragen",
     items: [
       {
-        q: "Wem gehören die Werbekonten?",
-        a: "Ihnen. Ich arbeite über einen Zugriff, den Sie jederzeit entziehen können. Kampagnen, Daten und Verlauf bleiben bei Ihnen.",
+        q: "Was kostet die Betreuung und wie wird abgerechnet?",
+        a: "Das sind zwei getrennte Beträge. Für meine Arbeit zahlen Sie einen festen Monatsbetrag, abhängig vom Umfang: Größe der Website, Anzahl der Sprachen und Wettbewerb. Berechnen können Sie ihn im Rechner oben. Das Werbebudget zahlen Sie direkt an Google, es läuft nicht über mich. Die Rechnung für meine Arbeit kommt einmal im Monat.",
       },
       {
-        q: "Wie läuft die Kommunikation?",
-        a: "Schriftlich per Messenger oder E-Mail, auf Deutsch. Telefonate sind auf Russisch oder Ukrainisch möglich.",
+        q: "Welches Werbebudget brauche ich?",
+        a: "Eine feste Zahl gibt es nicht: Es hängt von der Branche, dem Wettbewerb und der Zahl der Anfragen ab, die Sie brauchen. Deshalb prüfe ich zuerst, was ein Klick in Ihrer Branche kostet und wie viele Klicks meist auf eine Anfrage kommen, und rechne daraus das Budget. Ein Beispiel: Ein Klick kostet 2 €, jeder 20. Besucher fragt an – eine Anfrage kostet also etwa 40 €, 20 Anfragen im Monat etwa 800 €.",
       },
       {
-        q: "Welches Werbebudget ist nötig?",
-        a: "Ab 500 € pro Monat für das Werbekonto selbst. Mit weniger Budget reichen die Daten nicht aus, um Schlüsse zu ziehen.",
+        q: "Wann kommen die ersten Ergebnisse?",
+        a: "Die ersten Anfragen aus Google Ads kommen meist in den ersten Tagen nach dem Start. Ihre volle Leistung erreicht die Kampagne nach 2–4 Wochen: In dieser Zeit lernt Google aus Ihren Daten und findet gezielter die Menschen, die kaufen wollen. Bei SEO ist das Wachstum nach 3–6 Monaten sichtbar.",
       },
       {
-        q: "Garantieren Sie Ergebnisse?",
-        a: "Nein, und glauben Sie niemandem, der das tut: Auktion und Suchergebnisse kontrolliert niemand. Ich garantiere einen verständlichen Bericht und dass Sie jede Änderung im Konto sehen.",
+        q: "Gibt es eine Mindestlaufzeit?",
+        a: "Ja, 3 Monate. In dieser Zeit starten wir die Werbung, sammeln Daten und behalten nur, was Anfragen bringt. Danach bauen wir die Kampagnen aus, die funktionieren.",
       },
       {
-        q: "Was, wenn die Analyse nichts findet?",
-        a: "Dann schreibe ich genau das. Dann brauchen Sie weder ein Audit noch mich.",
+        q: "Was passiert mit den Kampagnen, wenn wir die Zusammenarbeit beenden?",
+        a: "Alles bleibt bei Ihnen: Konten, Kampagnen, Daten und Verlauf. Ich arbeite in Ihrem Konto, nicht in meinem, deshalb muss nichts übertragen werden.",
       },
     ],
   },
