@@ -25,7 +25,7 @@ export const de: Dict = {
   hero: {
     slogan: ["Erst", "rechnen.", "Dann ausgeben."],
     h1: "Google Ads & SEO Freelancer",
-    lead: "Google Ads, SEO und Social Ads für kleine und mittlere Unternehmen. Kommunikation schriftlich per Messenger. Sie können direkt anfragen oder mit einer kostenlosen Analyse Ihrer Anzeigen oder Website starten.",
+    lead: "Genug von schönen Grafiken und leeren Klicks? Ich zeige Ihnen das echte Bild: wohin Ihr Geld fließt und wie daraus echte Anrufe werden.",
     cta: "Projekt anfragen",
     free: "Kostenlose Analyse",
     proof: [
