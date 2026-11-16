@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { MenuIcon, Plus } from "lucide-react"
 import { toast } from "sonner"
 
@@ -41,6 +41,10 @@ const LANGS: { lang: Lang; label: string; href: string }[] = [
 ]
 
 const TOPICS = ["Google Ads", "SEO", "Meta Ads", "TikTok Ads", "Telegram Ads"]
+// A free review covers one channel at a time.
+const REVIEW_TOPICS = ["Google Ads", "SEO", "Meta Ads"]
+
+type FormMode = "order" | "free"
 
 const h2 =
   "max-w-[20ch] text-[clamp(32px,4.4vw,64px)] leading-[1.04] font-extrabold tracking-[-0.03em]"
@@ -81,17 +85,34 @@ export function Landing({
   const [selection, setSelection] = useState<Selection>({
     monthly: ["google"],
     once: ["audit"],
-    pilot: false,
     budget: 1500,
   })
   const [topics, setTopics] = useState<string[]>(["Google Ads"])
+  const [mode, setMode] = useState<FormMode>("order")
+  const [reviewTopic, setReviewTopic] = useState("Google Ads")
+  const form = t.contact[mode]
+  const orderTopics = [...TOPICS, t.contact.audit]
+
+  // Any link with data-form="order" | "free" (hero, header, case, configurator)
+  // opens the matching tab of the contact form before the browser jumps to #contact.
+  useEffect(() => {
+    function onClick(event: MouseEvent) {
+      const link = (event.target as Element | null)?.closest<HTMLElement>("[data-form]")
+      const next = link?.dataset.form
+      if (next === "order" || next === "free") setMode(next)
+    }
+    document.addEventListener("click", onClick, true)
+    return () => document.removeEventListener("click", onClick, true)
+  }, [])
 
   function goToForm() {
     const next: string[] = []
     if (selection.monthly.includes("google")) next.push("Google Ads")
     if (selection.monthly.includes("seo")) next.push("SEO")
     if (selection.monthly.includes("social")) next.push("Meta Ads")
+    if (selection.once.includes("audit")) next.push(t.contact.audit)
     if (next.length) setTopics(next)
+    setMode("order")
     document.getElementById("contact")?.scrollIntoView()
     document.getElementById("f-site")?.focus({ preventScroll: true })
   }
@@ -131,7 +152,9 @@ export function Landing({
             ))}
             <LangSwitch current={lang} />
             <Button asChild className="h-9 px-4 text-[15px] font-semibold">
-              <a href="#contact">{t.write}</a>
+              <a href="#contact" data-form="order">
+                {t.write}
+              </a>
             </Button>
           </nav>
           <div className="flex items-center gap-2 lg:hidden">
@@ -155,7 +178,11 @@ export function Landing({
                 <nav aria-label={t.navMobileLabel} className="flex flex-col px-4">
                   {[...t.nav, { href: "#contact", label: t.write }].map((item) => (
                     <SheetClose asChild key={item.href}>
-                      <a href={item.href} className="border-b border-border py-4 text-lg font-medium">
+                      <a
+                        href={item.href}
+                        data-form={item.href === "#contact" ? "order" : undefined}
+                        className="border-b border-border py-4 text-lg font-medium"
+                      >
                         {item.label}
                       </a>
                     </SheetClose>
@@ -173,6 +200,7 @@ export function Landing({
         <section id="services" className="relative z-1">
           <div className={`${wrap} py-16 lg:py-28`}>
             <h2 className={h2}>{t.services.h2}</h2>
+            <p className="mt-5 max-w-[56ch] text-xl leading-snug text-muted-foreground">{t.services.lead}</p>
             <Tabs
               defaultValue="google"
               orientation="vertical"
@@ -197,17 +225,14 @@ export function Landing({
                   <h3 className="text-[clamp(30px,4vw,54px)] leading-[1.04] font-extrabold tracking-[-0.03em]">
                     {s.name}
                   </h3>
-                  <p className="mt-5 max-w-[48ch] text-xl leading-snug">{s.lead}</p>
+                  {s.lead && <p className="mt-5 max-w-[48ch] text-xl leading-snug">{s.lead}</p>}
                   <ul className="mt-6 max-w-[60ch] border-t border-foreground/25">
                     {s.points.map((point) => (
-                      <li key={point} className="border-b border-border py-3 leading-relaxed">
-                        {point}
+                      <li key={point.d} className="border-b border-border py-3 leading-relaxed">
+                        {point.t && <strong className="font-semibold">{point.t}</strong>} {point.d}
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-7 text-[30px] leading-none font-extrabold tracking-tight text-violet">
-                    {s.price}
-                  </p>
                 </TabsContent>
               ))}
             </Tabs>
@@ -293,15 +318,33 @@ export function Landing({
             className={`${wrap} grid gap-10 py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28`}
           >
             <div>
-              <h2 className={h2}>{t.contact.h2}</h2>
+              <h2 className={h2}>{form.h2}</h2>
               <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-muted-foreground">
-                {t.contact.lead}
+                {form.lead}
               </p>
             </div>
             <form
               onSubmit={handleSubmit}
               className="ribbon-target space-y-6 rounded-lg border border-border bg-panel p-5 sm:p-8"
             >
+              <div
+                role="group"
+                aria-label={t.contact.tabsLabel}
+                className="grid grid-cols-2 gap-1 rounded-md border border-border bg-background p-1"
+              >
+                {(["order", "free"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    aria-pressed={mode === m}
+                    onClick={() => setMode(m)}
+                    className="min-h-11 rounded-sm px-1 py-2 text-[13px] leading-tight font-semibold whitespace-nowrap min-[400px]:text-[15px] text-foreground transition-colors hover:bg-foreground/5 aria-pressed:bg-primary aria-pressed:text-primary-foreground sm:text-base"
+                  >
+                    {t.contact[m].tab}
+                  </button>
+                ))}
+              </div>
+              <input type="hidden" name="type" value={mode} />
               <div className="space-y-2">
                 <Label htmlFor="f-site" className="text-[15px]">
                   {t.contact.site}
@@ -316,23 +359,43 @@ export function Landing({
                   className={field}
                 />
               </div>
-              <fieldset>
-                <legend className="mb-2 text-[15px] font-medium">{t.contact.topics}</legend>
-                <ToggleGroup
-                  type="multiple"
-                  value={topics}
-                  onValueChange={setTopics}
-                  className="flex w-full flex-wrap"
-                  spacing={2}
-                >
-                  {TOPICS.map((topic) => (
-                    <ToggleGroupItem key={topic} value={topic} className={topicChip}>
-                      {topic}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-                <input type="hidden" name="topics" value={topics.join(", ")} />
-              </fieldset>
+              {mode === "order" ? (
+                <fieldset>
+                  <legend className="mb-2 text-[15px] font-medium">{form.topics}</legend>
+                  <ToggleGroup
+                    type="multiple"
+                    value={topics}
+                    onValueChange={setTopics}
+                    className="flex w-full flex-wrap"
+                    spacing={2}
+                  >
+                    {orderTopics.map((topic) => (
+                      <ToggleGroupItem key={topic} value={topic} className={topicChip}>
+                        {topic}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                  <input type="hidden" name="topics" value={topics.join(", ")} />
+                </fieldset>
+              ) : (
+                <fieldset>
+                  <legend className="mb-2 text-[15px] font-medium">{form.topics}</legend>
+                  <ToggleGroup
+                    type="single"
+                    value={reviewTopic}
+                    onValueChange={(v) => v && setReviewTopic(v)}
+                    className="flex w-full flex-wrap"
+                    spacing={2}
+                  >
+                    {REVIEW_TOPICS.map((topic) => (
+                      <ToggleGroupItem key={topic} value={topic} className={topicChip}>
+                        {topic}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                  <input type="hidden" name="topics" value={reviewTopic} />
+                </fieldset>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="f-contact" className="text-[15px]">
                   {t.contact.reply}
@@ -345,18 +408,20 @@ export function Landing({
                   className={field}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="f-note" className="text-[15px]">
-                  {t.contact.note}
-                </Label>
-                <Textarea id="f-note" name="note" rows={3} className={`${field} h-auto py-3`} />
-              </div>
+              {mode === "order" && (
+                <div className="space-y-2">
+                  <Label htmlFor="f-note" className="text-[15px]">
+                    {t.contact.note}
+                  </Label>
+                  <Textarea id="f-note" name="note" rows={3} className={`${field} h-auto py-3`} />
+                </div>
+              )}
               <div className="absolute -left-[9999px]" aria-hidden="true">
                 <label htmlFor="f-company">Company</label>
                 <input id="f-company" name="company" tabIndex={-1} autoComplete="off" />
               </div>
               <Button type="submit" size="lg" className="h-13 w-full px-6 text-base font-semibold sm:w-auto">
-                {t.contact.submit}
+                {form.submit}
               </Button>
             </form>
           </div>

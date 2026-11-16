@@ -57,6 +57,7 @@ export function MoneyPath({ t }: { t: Dict["money"] }) {
         </p>
         <a
           href="#contact"
+          data-form="order"
           className="inline-flex min-h-13 items-center rounded-sm bg-primary px-7 font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary"
         >
           {t.cta}

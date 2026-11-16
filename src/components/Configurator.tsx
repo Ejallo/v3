@@ -2,14 +2,12 @@ import NumberFlow from "@number-flow/react"
 
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
-import { Toggle } from "@/components/ui/toggle"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import type { Dict } from "@/i18n/ru"
 
 export type Selection = {
   monthly: string[]
   once: string[]
-  pilot: boolean
   budget: number
 }
 
@@ -23,7 +21,6 @@ const MONTHLY = [
 const ONCE = [
   { id: "audit", price: 490 },
   { id: "tracking", price: 390 },
-  { id: "gstart", price: 290 },
 ] as const
 
 const chip =
@@ -48,7 +45,7 @@ export function Configurator({
     (sum, s) => (value.monthly.includes(s.id) && s.from ? sum + s.from : sum),
     0
   )
-  const monthly = value.pilot ? Math.round((base * 2) / 3) : base
+  const monthly = base
   const once = ONCE.reduce(
     (sum, s) => (value.once.includes(s.id) ? sum + s.price : sum),
     0
@@ -94,6 +91,7 @@ export function Configurator({
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
+          <p className="mt-2 text-[13px] leading-snug text-muted-foreground">{t.onceHint}</p>
         </fieldset>
 
         {hasAds && (
@@ -133,15 +131,18 @@ export function Configurator({
             className="text-[40px] leading-none font-extrabold tracking-tight text-violet tabular-nums sm:text-[56px]"
           />
         </div>
-        <div>
-          <p className="text-[13px] text-muted-foreground">{t.onceFrom}</p>
-          <NumberFlow
-            value={once}
-            format={eur}
-            locales={locale}
-            className="text-[40px] leading-none font-extrabold tracking-tight tabular-nums sm:text-[56px]"
-          />
-        </div>
+        {/* Hidden when nothing one-off is picked: "from 0 €" reads like a bug. */}
+        {once > 0 && (
+          <div>
+            <p className="text-[13px] text-muted-foreground">{t.onceFrom}</p>
+            <NumberFlow
+              value={once}
+              format={eur}
+              locales={locale}
+              className="text-[40px] leading-none font-extrabold tracking-tight tabular-nums sm:text-[56px]"
+            />
+          </div>
+        )}
       </div>
 
       <ul className="mt-3 space-y-1 text-[13px] leading-snug text-muted-foreground">
@@ -155,15 +156,17 @@ export function Configurator({
         <Button size="lg" className="h-12 px-5 text-base font-semibold" onClick={onSubmit}>
           {t.cta}
         </Button>
-        <Toggle
-          pressed={value.pilot}
-          onPressedChange={(pilot) => onChange({ ...value, pilot })}
-          className={chip + " h-12 justify-start whitespace-normal text-left text-[13px] leading-tight"}
+        <Button
+          asChild
+          variant="outline"
+          size="lg"
+          className="h-12 border-foreground/30 bg-transparent px-5 text-base font-semibold"
         >
-          {t.pilot}
-        </Toggle>
+          <a href="#contact" data-form="free">
+            {t.more}
+          </a>
+        </Button>
       </div>
-      {value.pilot && <p className="mt-2 text-[13px] text-muted-foreground">{t.pilotNote}</p>}
     </div>
   )
 }
