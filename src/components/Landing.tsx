@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
-import { MenuIcon, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 import { toast } from "sonner"
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Cases } from "@/components/Cases"
+import { CasesCards } from "@/components/CasesCards"
 import { Configurator, type Selection } from "@/components/Configurator"
-import { MoneyPath } from "@/components/MoneyPath"
 import { ScrollRibbon } from "@/components/ScrollRibbon"
 import {
   Accordion,
@@ -14,31 +16,13 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
 import { Toaster } from "@/components/ui/sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { de } from "@/i18n/de"
-import { ru, type Dict } from "@/i18n/ru"
+import { DICT, SiteFooter, SiteHeader, wrap, type Lang } from "@/components/SiteChrome"
 
-export type Lang = "ru" | "de"
-
-const DICT: Record<Lang, Dict> = { ru, de }
-
-const base = import.meta.env.BASE_URL.replace(/\/$/, "")
-const LANGS: { lang: Lang; label: string; href: string }[] = [
-  { lang: "ru", label: "RU", href: `${base}/` },
-  { lang: "de", label: "DE", href: `${base}/de/` },
-]
+export type { Lang }
 
 const TOPICS = ["Google Ads", "SEO", "Meta Ads", "TikTok Ads", "Telegram Ads"]
 // A free review covers one channel at a time.
@@ -48,31 +32,12 @@ type FormMode = "order" | "free"
 
 const h2 =
   "max-w-[20ch] text-[clamp(32px,4.4vw,64px)] leading-[1.04] font-extrabold tracking-[-0.03em]"
-const wrap = "mx-auto w-full max-w-[1240px] px-4 sm:px-8"
 
 const topicChip =
   "h-10 rounded-sm border border-foreground/30 px-3.5 text-[15px] font-medium text-foreground hover:bg-foreground/5 hover:text-foreground aria-pressed:bg-primary data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:hover:bg-primary data-[state=on]:hover:text-primary-foreground"
 
 const field =
   "h-12 rounded-sm border-input bg-transparent px-3.5 text-base md:text-base"
-
-function LangSwitch({ current }: { current: Lang }) {
-  return (
-    <div className="flex items-center gap-1 text-[13px] font-semibold">
-      {LANGS.map((item) => (
-        <a
-          key={item.lang}
-          href={item.href}
-          hrefLang={item.lang}
-          aria-current={item.lang === current ? "page" : undefined}
-          className="rounded-sm px-2 py-1.5 text-muted-foreground hover:text-foreground aria-[current=page]:bg-secondary aria-[current=page]:text-foreground"
-        >
-          {item.label}
-        </a>
-      ))}
-    </div>
-  )
-}
 
 export function Landing({
   lang = "ru",
@@ -96,6 +61,10 @@ export function Landing({
   // Any link with data-form="order" | "free" (hero, header, case, configurator)
   // opens the matching tab of the contact form before the browser jumps to #contact.
   useEffect(() => {
+    // Links from other pages (the cases page) pick the tab with ?form=order|free.
+    const fromUrl = new URLSearchParams(window.location.search).get("form")
+    if (fromUrl === "order" || fromUrl === "free") setMode(fromUrl)
+
     function onClick(event: MouseEvent) {
       const link = (event.target as Element | null)?.closest<HTMLElement>("[data-form]")
       const next = link?.dataset.form
@@ -128,71 +97,7 @@ export function Landing({
 
   return (
     <>
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-sm focus:bg-foreground focus:px-3 focus:py-2 focus:text-background"
-      >
-        {t.skip}
-      </a>
-
-      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className={`${wrap} flex h-14 items-center justify-between gap-4`}>
-          <a href="#top" className="text-xl font-extrabold tracking-tight">
-            VVdigital
-          </a>
-          <nav aria-label={t.navLabel} className="hidden items-center gap-6 lg:flex">
-            {t.nav.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="text-[15px] font-medium underline-offset-4 hover:underline"
-              >
-                {item.label}
-              </a>
-            ))}
-            <LangSwitch current={lang} />
-            <Button asChild className="h-9 px-4 text-[15px] font-semibold">
-              <a href="#contact" data-form="order">
-                {t.write}
-              </a>
-            </Button>
-          </nav>
-          <div className="flex items-center gap-2 lg:hidden">
-            <LangSwitch current={lang} />
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon-lg"
-                  className="border-input bg-transparent"
-                  aria-label={t.menu}
-                >
-                  <MenuIcon />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[82%] border-foreground/25 bg-background">
-                <SheetHeader>
-                  <SheetTitle className="text-2xl font-extrabold">{t.menu}</SheetTitle>
-                  <SheetDescription className="sr-only">{t.menuDescription}</SheetDescription>
-                </SheetHeader>
-                <nav aria-label={t.navMobileLabel} className="flex flex-col px-4">
-                  {[...t.nav, { href: "#contact", label: t.write }].map((item) => (
-                    <SheetClose asChild key={item.href}>
-                      <a
-                        href={item.href}
-                        data-form={item.href === "#contact" ? "order" : undefined}
-                        className="border-b border-border py-4 text-lg font-medium"
-                      >
-                        {item.label}
-                      </a>
-                    </SheetClose>
-                  ))}
-                </nav>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </header>
+      <SiteHeader lang={lang} />
 
       <main id="main" className="relative">
         {children}
@@ -240,32 +145,8 @@ export function Landing({
         </section>
 
         <section id="results" className={`${wrap} relative z-1 py-16 lg:py-28`}>
-          <h2 className={h2}>{t.results.h2}</h2>
-          <div className="mt-10 border-b border-foreground/25 lg:mt-14">
-            {t.results.rows.map((r) => (
-              <article
-                key={r.figure}
-                className="grid gap-x-10 gap-y-3 border-t border-foreground/25 py-7 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:items-center lg:py-9"
-              >
-                <p className="text-[clamp(52px,7.6vw,108px)] leading-[0.9] font-extrabold tracking-[-0.04em] whitespace-nowrap text-violet">
-                  {r.figure}
-                </p>
-                <div>
-                  <h3 className="text-xl leading-snug font-semibold lg:text-2xl">{r.metric}</h3>
-                  <p className="mt-1 text-sm font-medium text-muted-foreground">{r.who}</p>
-                  <p className="mt-3 max-w-[58ch] leading-relaxed">{r.text}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-          <p className="mt-5 max-w-[70ch] text-[15px] text-muted-foreground">{t.results.geo}</p>
-        </section>
-
-        <section id="money" className={`${wrap} relative z-1 pb-16 lg:pb-28`}>
-          <h2 className={h2}>{t.money.h2}</h2>
-          <div className="mt-7">
-            <MoneyPath t={t.money} />
-          </div>
+          {/* Preview of variant C; previous slider: <h2 className={h2}>{t.results.h2}</h2><Cases t={t.results} /> */}
+          <CasesCards title={t.results.h2} titleClass={h2} />
         </section>
 
         <section id="prices" className="relative z-1">
@@ -474,12 +355,7 @@ export function Landing({
         <ScrollRibbon />
       </main>
 
-      <footer className="border-t border-border bg-card text-muted-foreground">
-        <div className={`${wrap} flex flex-col gap-2 py-6 text-sm sm:flex-row sm:justify-between`}>
-          <p>{t.footer.left}</p>
-          <p>{t.footer.right}</p>
-        </div>
-      </footer>
+      <SiteFooter lang={lang} />
 
       <Toaster position="bottom-center" />
     </>

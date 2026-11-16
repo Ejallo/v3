@@ -1,0 +1,31 @@
+---
+// The cases page in a given language. Used by /cases/ (ru) and /de/cases/.
+import '../styles/global.css';
+import { CasesPage } from './CasesPage';
+import type { Lang } from './SiteChrome';
+import { ru } from '../i18n/ru';
+import { de } from '../i18n/de';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = { ru, de }[lang];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<html lang={t.lang}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, nofollow" />
+		<meta name="theme-color" content="#08080f" />
+		<link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+		<title>{t.casesPage.meta.title}</title>
+		<meta name="description" content={t.casesPage.meta.description} />
+	</head>
+	<body>
+		<CasesPage client:load lang={lang} />
+	</body>
+</html>
