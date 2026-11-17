@@ -102,6 +102,12 @@ export const ru = {
     prev: "Предыдущий кейс",
     next: "Следующий кейс",
     all: { label: "Смотреть все кейсы", href: "/cases/" },
+    // Cards of the cases block on the home page (CasesCards.tsx); colors and chart points live there.
+    cards: [
+      { tag: "Интернет-магазин · Google Ads", num: "×13,16", txt: "вернула каждая гривна в рекламе", lab: "Ценность конверсий", val: "3 628 284 ₴" },
+      { tag: "Клиника · Польша · Google Ads", num: "12 600", txt: "конверсий по 21,57 zł", lab: "Конверсии", val: "12 600" },
+      { tag: "Интернет-магазин · SEO", num: "+69 %", txt: "кликов из поиска год к году", lab: "Всего кликов", val: "+69 %" },
+    ],
     cases: [
       {
         figure: "×13,16",
@@ -502,12 +508,20 @@ export const ru = {
     reply: "Куда ответить",
     replyPlaceholder: "E-mail или Telegram",
     note: "Комментарий, если хотите",
-    toastTitle: "Это черновик: форма пока не отправляет",
-    toastText: "Отправка заработает, когда подключим почту на хостинге.",
+    sending: "Отправляю…",
+    sentTitle: "Заявка отправлена",
+    sentText: "Отвечу туда, куда вы указали.",
+    errorTitle: "Не получилось отправить",
+    errorText: "Попробуйте ещё раз через минуту.",
+    draftTitle: "Форма ещё не подключена",
+    draftText: "Отправка заработает в ближайшее время.",
+    privacy: "Как я обрабатываю данные из формы:",
   },
   footer: {
     left: "VVdigital, Германия",
-    right: "Impressum и Datenschutz добавим перед запуском",
+    legalLabel: "Правовая информация",
+    imprint: "Impressum",
+    privacy: "Datenschutz",
   },
 }
 

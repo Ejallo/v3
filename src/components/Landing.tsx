@@ -22,7 +22,8 @@ import { Toaster } from "@/components/ui/sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { DICT, SiteFooter, SiteHeader, wrap, type Lang } from "@/components/SiteChrome"
+import { DICT, SiteFooter, SiteHeader, homeOf, wrap, type Lang } from "@/components/SiteChrome"
+import { FORM_ENDPOINT } from "@/config"
 
 export type { Lang }
 
@@ -57,6 +58,7 @@ export function Landing({
   const [topics, setTopics] = useState<string[]>(["Google Ads"])
   const [mode, setMode] = useState<FormMode>("order")
   const [reviewTopic, setReviewTopic] = useState("Google Ads")
+  const [sending, setSending] = useState(false)
   const form = t.contact[mode]
   const orderTopics = [...TOPICS, t.contact.audit]
 
@@ -88,13 +90,42 @@ export function Landing({
     document.getElementById("f-site")?.focus({ preventScroll: true })
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  // After a no-JS form post the Worker sends the visitor back with ?sent=1 or ?sent=0.
+  useEffect(() => {
+    const sent = new URLSearchParams(window.location.search).get("sent")
+    if (sent === "1") toast.success(t.contact.sentTitle, { description: t.contact.sentText })
+    if (sent === "0") toast.error(t.contact.errorTitle, { description: t.contact.errorText })
+    if (sent) {
+      const url = new URL(window.location.href)
+      url.searchParams.delete("sent")
+      history.replaceState(null, "", url)
+    }
+  }, [])
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    // Honeypot: real visitors never fill this field.
-    if (data.get("company")) return
-    // TODO: POST to /send.php once the hosting and mailbox exist.
-    toast.info(t.contact.toastTitle, { description: t.contact.toastText })
+    if (sending) return
+    const formEl = event.currentTarget
+    if (!FORM_ENDPOINT) {
+      toast.info(t.contact.draftTitle, { description: t.contact.draftText })
+      return
+    }
+    setSending(true)
+    try {
+      const res = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(formEl))),
+      })
+      const body = await res.json().catch(() => null)
+      if (!res.ok || !body?.ok) throw new Error(body?.error ?? String(res.status))
+      formEl.reset()
+      toast.success(t.contact.sentTitle, { description: t.contact.sentText })
+    } catch {
+      toast.error(t.contact.errorTitle, { description: t.contact.errorText })
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -148,7 +179,7 @@ export function Landing({
 
         <section id="results" className={`${wrap} relative z-1 py-16 lg:py-28`}>
           {/* Preview of variant C; previous slider: <h2 className={h2}>{t.results.h2}</h2><Cases t={t.results} /> */}
-          <CasesCards title={t.results.h2} titleClass={h2} />
+          <CasesCards lang={lang} title={t.results.h2} titleClass={h2} />
         </section>
 
         <section id="prices" className="relative z-1">
@@ -199,7 +230,10 @@ export function Landing({
                 {form.lead}
               </p>
             </div>
+            {/* method/action make the form work as a plain POST before React loads, so data never lands in the URL */}
             <form
+              method="post"
+              action={FORM_ENDPOINT || undefined}
               onSubmit={handleSubmit}
               className="ribbon-target space-y-6 rounded-lg border border-border bg-panel p-5 sm:p-8"
             >
@@ -221,6 +255,7 @@ export function Landing({
                 ))}
               </div>
               <input type="hidden" name="type" value={mode} />
+              <input type="hidden" name="lang" value={lang} />
               <div className="space-y-2">
                 <Label htmlFor="f-site" className="text-[15px]">
                   {t.contact.site}
@@ -292,13 +327,27 @@ export function Landing({
                   <Textarea id="f-note" name="note" rows={3} className={`${field} h-auto py-3`} />
                 </div>
               )}
+              {/* Honeypot with a name no browser autofill knows, so real visitors never fill it */}
               <div className="absolute -left-[9999px]" aria-hidden="true">
-                <label htmlFor="f-company">Company</label>
-                <input id="f-company" name="company" tabIndex={-1} autoComplete="off" />
+                <label htmlFor="f-hp">Leave empty</label>
+                <input id="f-hp" name="hp_zx" tabIndex={-1} autoComplete="off" />
               </div>
-              <Button type="submit" size="lg" className="h-13 w-full px-6 text-base font-semibold sm:w-auto">
-                {form.submit}
-              </Button>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={sending}
+                  className="h-13 w-full px-6 text-base font-semibold sm:w-auto"
+                >
+                  {sending ? t.contact.sending : form.submit}
+                </Button>
+                <p className="text-[13px] leading-snug text-muted-foreground">
+                  {t.contact.privacy}{" "}
+                  <a href={`${homeOf(lang)}datenschutz/`} className="underline underline-offset-2 hover:text-foreground">
+                    {t.footer.privacy}
+                  </a>
+                </p>
+              </div>
             </form>
           </div>
         </section>

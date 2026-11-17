@@ -1,0 +1,18 @@
+name = "vvdigital-form"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+# Sites allowed to post the form. Add the final domain here before launch.
+ALLOWED_ORIGINS = "https://ejallo.github.io,http://localhost:4321"
+# Where a no-JS form post returns when the browser sends no Referer.
+FALLBACK_PATH = "/v3/"
+
+# Max 5 submissions per minute from one IP (per Cloudflare location).
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 5
+  period = 60

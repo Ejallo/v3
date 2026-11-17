@@ -1,0 +1,93 @@
+---
+// Shell for the legal pages (Impressum, Datenschutz) in a given language.
+import '../styles/global.css';
+import { SiteHeader, SiteFooter, homeOf, type Lang } from './SiteChrome';
+import { INDEXABLE } from '../config';
+
+interface Props {
+	lang: Lang;
+	title: string;
+	/** Slug of the page, e.g. "impressum": the language switch leads to the same page in the other language. */
+	slug: string;
+}
+
+const { lang, title, slug } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const langHrefs = { ru: `${homeOf('ru')}${slug}/`, de: `${homeOf('de')}${slug}/` };
+---
+
+<html lang={lang}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content={INDEXABLE ? 'noindex, follow' : 'noindex, nofollow'} />
+		<meta name="theme-color" content="#08080f" />
+		<link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+		<title>{`${title} | VVdigital`}</title>
+	</head>
+	<body>
+		<SiteHeader client:load lang={lang} home={homeOf(lang)} langHrefs={langHrefs} />
+		<main id="main" class="mx-auto w-full max-w-[1240px] px-4 py-14 sm:px-8 lg:py-20">
+			<article class="legal">
+				<h1>{title}</h1>
+				<slot />
+			</article>
+		</main>
+		<SiteFooter lang={lang} />
+	</body>
+</html>
+
+<style is:global>
+	.legal {
+		max-width: 68ch;
+		font-size: 17px;
+		line-height: 1.65;
+	}
+	.legal h1 {
+		font-size: clamp(30px, 5vw, 64px);
+		line-height: 1.04;
+		/* Long German compounds ("Datenschutzerklärung") must not push the page sideways on phones */
+		hyphens: auto;
+		overflow-wrap: break-word;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		margin-bottom: 2rem;
+	}
+	.legal h2 {
+		font-size: 22px;
+		font-weight: 700;
+		margin: 2.5rem 0 0.75rem;
+	}
+	.legal h3 {
+		font-size: 18px;
+		font-weight: 600;
+		margin: 1.5rem 0 0.5rem;
+	}
+	.legal p,
+	.legal ul {
+		margin: 0 0 1rem;
+		color: color-mix(in oklab, var(--foreground) 85%, transparent);
+	}
+	.legal ul {
+		list-style: disc;
+		padding-left: 1.25rem;
+	}
+	.legal a {
+		color: var(--primary);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+	.legal .note {
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 0.75rem 1rem;
+		font-size: 15px;
+	}
+	/* Data still to fill in: visibly marked so it can't slip through to launch. */
+	.legal mark {
+		background: color-mix(in oklab, #ffcc4d 25%, transparent);
+		color: #ffd97a;
+		padding: 0 0.25em;
+		border-radius: 3px;
+	}
+</style>

@@ -103,6 +103,11 @@ export const de: Dict = {
     prev: "Vorheriges Beispiel",
     next: "Nächstes Beispiel",
     all: { label: "Alle Beispiele ansehen", href: "/de/cases/" },
+    cards: [
+      { tag: "Onlineshop · Google Ads", num: "×13,16", txt: "Umsatz pro Euro Werbebudget", lab: "Umsatz aus Werbung", val: "71.876 €" },
+      { tag: "Klinik · Polen · Google Ads", num: "12.600", txt: "Conversions zu je 21,57 zł", lab: "Conversions", val: "12.600" },
+      { tag: "Onlineshop · SEO", num: "+69 %", txt: "mehr Klicks aus der Google-Suche im Jahresvergleich", lab: "Klicks gesamt", val: "+69 %" },
+    ],
     cases: [
       {
         figure: "×13,16",
@@ -501,11 +506,19 @@ export const de: Dict = {
     reply: "Wohin soll die Antwort gehen?",
     replyPlaceholder: "E-Mail oder Messenger",
     note: "Kommentar, wenn Sie möchten",
-    toastTitle: "Entwurf: Das Formular sendet noch nicht",
-    toastText: "Der Versand funktioniert, sobald das Postfach eingerichtet ist.",
+    sending: "Wird gesendet…",
+    sentTitle: "Anfrage gesendet",
+    sentText: "Ich antworte an die angegebene Adresse.",
+    errorTitle: "Senden fehlgeschlagen",
+    errorText: "Bitte versuchen Sie es in einer Minute noch einmal.",
+    draftTitle: "Das Formular ist noch nicht verbunden",
+    draftText: "Der Versand funktioniert in Kürze.",
+    privacy: "Wie ich die Daten aus dem Formular verarbeite:",
   },
   footer: {
     left: "VVdigital, Deutschland",
-    right: "Impressum und Datenschutz folgen vor dem Start",
+    legalLabel: "Rechtliches",
+    imprint: "Impressum",
+    privacy: "Datenschutz",
   },
 }

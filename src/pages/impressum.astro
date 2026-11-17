@@ -1,0 +1,35 @@
+---
+import LegalLayout from '../components/LegalLayout.astro';
+import { homeOf } from '../components/SiteChrome';
+// Russian translation of /de/impressum/. Keep both in sync.
+---
+
+<LegalLayout lang="ru" title="Impressum (выходные данные)" slug="impressum">
+	<p class="note">
+		Перевод для удобства. Юридически действует <a href={`${homeOf('de')}impressum/`}>немецкая версия</a>.
+	</p>
+
+	<h2>Сведения по § 5 DDG</h2>
+	<p>
+		<mark>[Имя Фамилия]</mark><br />
+		VVdigital<br />
+		<mark>[Улица, дом]</mark><br />
+		<mark>[Индекс, город]</mark><br />
+		Германия
+	</p>
+
+	<h2>Контакты</h2>
+	<p>
+		E-mail: <mark>[e-mail]</mark><br />
+		Telegram: <mark>[@ник]</mark>
+	</p>
+
+	<h2>Налоговые данные</h2>
+	<p>
+		<mark>[USt-IdNr. по § 27a UStG: DE…]</mark><br />
+		<mark>[или, если выдан: Wirtschafts-IdNr. по § 139c AO: DE…]</mark>
+	</p>
+
+	<h2>Урегулирование споров с потребителями</h2>
+	<p>Я не участвую и не обязан участвовать в процедурах урегулирования споров в арбитражной комиссии для потребителей.</p>
+</LegalLayout>

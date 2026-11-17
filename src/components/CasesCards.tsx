@@ -1,56 +1,22 @@
 import { useEffect, useRef, useState } from "react"
 
-import { base } from "@/components/SiteChrome"
+import { DICT, homeOf, type Lang } from "@/components/SiteChrome"
+import type { Dict } from "@/i18n/ru"
 import "@/styles/cases-cards.css"
 
 // Cases block: three colored cards with a laptop mock-up fit the row; the rest scroll in with the arrows.
-// Data is local for now (preview); move it to i18n once the design is approved.
-type Card = {
-  tag: string
-  num: string
-  txt: string
-  lab: string
-  val: string
+// Texts come from i18n (results.cards); colors and chart shapes are per card index here.
+type Card = Dict["results"]["cards"][number] & {
   points: number[]
   bg: string
   fg: string
   line: string
 }
 
-const CARDS: Card[] = [
-  {
-    tag: "Интернет-магазин · Google Ads",
-    num: "×13,16",
-    txt: "вернула каждая гривна в рекламе",
-    lab: "Ценность конверсий",
-    val: "3 628 284 ₴",
-    points: [8, 12, 11, 20, 26, 34, 45, 58, 66, 82, 100],
-    bg: "#a59cff",
-    fg: "#1a1640",
-    line: "#5b4fe0",
-  },
-  {
-    tag: "Клиника · Польша · Google Ads",
-    num: "12 600",
-    txt: "конверсий по 21,57 zł",
-    lab: "Конверсии",
-    val: "12 600",
-    points: [10, 18, 24, 30, 38, 47, 55, 66, 74, 88, 100],
-    bg: "#5dcaa5",
-    fg: "#04342c",
-    line: "#0f9d6b",
-  },
-  {
-    tag: "Интернет-магазин · SEO",
-    num: "+69 %",
-    txt: "кликов из поиска год к году",
-    lab: "Всего кликов",
-    val: "+69 %",
-    points: [20, 24, 22, 30, 36, 42, 55, 63, 74, 86, 100],
-    bg: "#85b7eb",
-    fg: "#042c53",
-    line: "#1a73e8",
-  },
+const LOOKS = [
+  { points: [8, 12, 11, 20, 26, 34, 45, 58, 66, 82, 100], bg: "#a59cff", fg: "#1a1640", line: "#5b4fe0" },
+  { points: [10, 18, 24, 30, 38, 47, 55, 66, 74, 88, 100], bg: "#5dcaa5", fg: "#04342c", line: "#0f9d6b" },
+  { points: [20, 24, 22, 30, 36, 42, 55, 63, 74, 86, 100], bg: "#85b7eb", fg: "#042c53", line: "#1a73e8" },
 ]
 
 const W = 200
@@ -80,10 +46,12 @@ function Chart({ points }: { points: number[] }) {
 const reducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-/** Counts the number inside `text` (e.g. "3 628 284 ₴", "+69 %") from 0 while `play` is on. */
+/** Counts the number inside `text` (e.g. "3 628 284 ₴", "71.876 €", "+69 %") from 0 while `play` is on. */
 function Counter({ text, play }: { text: string; play: boolean }) {
-  const m = text.match(/^(\D*?)(\d(?:[\d\s]*\d)?)(\D*)$/)
-  const target = m ? Number(m[2].replace(/\s/g, "")) : 0
+  const m = text.match(/^(\D*?)(\d(?:[\d\s.]*\d)?)(\D*)$/)
+  const target = m ? Number(m[2].replace(/[\s.]/g, "")) : 0
+  // Keep the thousands separator of the source text: "." in German, a space in Russian.
+  const sep = m?.[2].includes(".") ? "." : " "
   // Idle state shows the final number; a hover replays the count from 0.
   const animate = play && !!m && !reducedMotion()
   const [v, setV] = useState(animate ? 0 : target)
@@ -102,7 +70,7 @@ function Counter({ text, play }: { text: string; play: boolean }) {
   }, [play])
 
   if (!m) return <>{text}</>
-  const num = String(v).replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+  const num = String(v).replace(/\B(?=(\d{3})+(?!\d))/g, sep)
   return (
     <>
       {m[1]}
@@ -147,10 +115,20 @@ function CaseCard({ c, href }: { c: Card; href: string }) {
   )
 }
 
-export function CasesCards({ title, titleClass }: { title: string; titleClass?: string }) {
+export function CasesCards({
+  lang,
+  title,
+  titleClass,
+}: {
+  lang: Lang
+  title: string
+  titleClass?: string
+}) {
+  const t = DICT[lang].results
+  const cards: Card[] = t.cards.map((c, i) => ({ ...c, ...LOOKS[i % LOOKS.length] }))
   const track = useRef<HTMLDivElement>(null)
   const [edge, setEdge] = useState({ start: true, end: false })
-  const href = `${base}/cases/`
+  const href = `${homeOf(lang)}cases/`
 
   useEffect(() => {
     const el = track.current
@@ -180,23 +158,23 @@ export function CasesCards({ title, titleClass }: { title: string; titleClass?: 
       <div className="tm-cases__head">
         <h2 className={titleClass}>{title}</h2>
         <div className="tm-cases__arrows">
-          <button className="tm-cases__arrow" type="button" aria-label="Назад" disabled={edge.start} onClick={() => scroll(-1)}>
+          <button className="tm-cases__arrow" type="button" aria-label={t.prev} disabled={edge.start} onClick={() => scroll(-1)}>
             ←
           </button>
-          <button className="tm-cases__arrow" type="button" aria-label="Вперёд" disabled={edge.end} onClick={() => scroll(1)}>
+          <button className="tm-cases__arrow" type="button" aria-label={t.next} disabled={edge.end} onClick={() => scroll(1)}>
             →
           </button>
         </div>
       </div>
 
       <div className="tm-cases__track" ref={track}>
-        {CARDS.map((c) => (
+        {cards.map((c) => (
           <CaseCard key={c.num} c={c} href={href} />
         ))}
 
         <a className="tm-case tm-case--all" href={href}>
           <span className="tm-case__go">→</span>
-          <span className="tm-case__all">Смотреть все кейсы</span>
+          <span className="tm-case__all">{t.all.label}</span>
         </a>
       </div>
     </div>

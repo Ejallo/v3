@@ -134,7 +134,14 @@ export function SiteFooter({ lang }: { lang: Lang }) {
     <footer className="border-t border-border bg-card text-muted-foreground">
       <div className={`${wrap} flex flex-col gap-2 py-6 text-sm sm:flex-row sm:justify-between`}>
         <p>{t.footer.left}</p>
-        <p>{t.footer.right}</p>
+        <nav aria-label={t.footer.legalLabel} className="flex gap-5">
+          <a href={`${homeOf(lang)}impressum/`} className="underline-offset-4 hover:text-foreground hover:underline">
+            {t.footer.imprint}
+          </a>
+          <a href={`${homeOf(lang)}datenschutz/`} className="underline-offset-4 hover:text-foreground hover:underline">
+            {t.footer.privacy}
+          </a>
+        </nav>
       </div>
     </footer>
   )
