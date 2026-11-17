@@ -4,6 +4,7 @@ import '../styles/global.css';
 import { Landing, type Lang } from './Landing';
 import { VVGrain } from './VVGrain';
 import SeoHead from './SeoHead.astro';
+import CookieConsent from './CookieConsent.astro';
 import { ru } from '../i18n/ru';
 import { de } from '../i18n/de';
 
@@ -71,5 +72,6 @@ const faqLd = {
 				</div>
 			</section>
 		</Landing>
+		<CookieConsent lang={lang} />
 	</body>
 </html>

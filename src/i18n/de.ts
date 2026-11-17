@@ -414,5 +414,6 @@ export const de: Dict = {
     legalLabel: "Rechtliches",
     imprint: "Impressum",
     privacy: "Datenschutz",
+    cookies: "Cookie-Einstellungen",
   },
 }

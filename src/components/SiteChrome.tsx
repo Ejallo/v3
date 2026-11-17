@@ -141,6 +141,13 @@ export function SiteFooter({ lang }: { lang: Lang }) {
           <a href={`${homeOf(lang)}datenschutz/`} className="underline-offset-4 hover:text-foreground hover:underline">
             {t.footer.privacy}
           </a>
+          <button
+            type="button"
+            onClick={() => (window as any).vvConsent?.open()}
+            className="cursor-pointer underline-offset-4 hover:text-foreground hover:underline"
+          >
+            {t.footer.cookies}
+          </button>
         </nav>
       </div>
     </footer>

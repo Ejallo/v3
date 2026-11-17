@@ -4,6 +4,7 @@ import '../styles/global.css';
 import { CasesPage } from './CasesPage';
 import type { Lang } from './SiteChrome';
 import SeoHead from './SeoHead.astro';
+import CookieConsent from './CookieConsent.astro';
 import { ru } from '../i18n/ru';
 import { de } from '../i18n/de';
 
@@ -21,5 +22,6 @@ const t = { ru, de }[lang];
 	</head>
 	<body>
 		<CasesPage client:load lang={lang} />
+		<CookieConsent lang={lang} />
 	</body>
 </html>

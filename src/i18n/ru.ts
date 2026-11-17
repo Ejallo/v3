@@ -417,6 +417,7 @@ export const ru = {
     legalLabel: "Правовая информация",
     imprint: "Impressum",
     privacy: "Datenschutz",
+    cookies: "Настройки cookies",
   },
 }
 
