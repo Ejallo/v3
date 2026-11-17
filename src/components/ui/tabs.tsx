@@ -56,7 +56,8 @@ function TabsContent({
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("outline-none", className)}
+      // The panel is focusable (Radix sets tabIndex=0): give keyboard users a visible ring like the inputs have.
+      className={cn("rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-8 focus-visible:ring-offset-background", className)}
       {...props}
     />
   )
