@@ -7,7 +7,7 @@ export const de: Dict = {
   meta: {
     title: "Google Ads & SEO Freelancer für KMU | VVdigital",
     description:
-      "Google Ads, SEO und Social Ads für kleine und mittlere Unternehmen in Deutschland. Kommunikation schriftlich per Messenger. Direkt anfragen oder mit einer kostenlosen Analyse starten.",
+      "Google Ads, SEO und Social Ads für kleine und mittlere Unternehmen in Deutschland. Kommunikation schriftlich per Messenger. Direkt anfragen oder mit einer kostenlosen SEO-Analyse starten.",
   },
   skip: "Zum Inhalt",
   menu: "Menü",
@@ -27,7 +27,7 @@ export const de: Dict = {
     h1: "Google Ads & SEO Freelancer",
     lead: "Genug von schönen Grafiken und leeren Klicks? Ich zeige Ihnen das echte Bild: wohin Ihr Geld fließt und wie daraus echte Anrufe werden.",
     cta: "Projekt anfragen",
-    free: "Kostenlose Analyse",
+    free: "Kostenlose SEO-Analyse",
     proof: [
       { n: "1.316 %", l: "ROAS eines Onlineshops" },
       { n: "12.600", l: "Conversions einer Klinik" },
@@ -123,9 +123,9 @@ export const de: Dict = {
     was: "Ausgangslage",
     did: "Was ich getan habe",
     cta: {
-      h2: "Möchten Sie eine solche Analyse Ihrer Werbung?",
+      h2: "Möchten Sie ein solches Ergebnis?",
       order: "Projekt anfragen",
-      free: "Kostenlose Analyse",
+      free: "Kostenlose SEO-Analyse",
     },
     items: [
       {
@@ -323,14 +323,14 @@ export const de: Dict = {
     auditNote: "Buchen Sie nach dem Audit Google Ads, wird der Betrag auf den ersten Betreuungsmonat angerechnet.",
     budgetNote: "Das Werbebudget zahlen Sie direkt an Google oder Meta, es ist nicht im Preis enthalten.",
     cta: "Projekt anfragen",
-    more: "Kostenlose Analyse",
+    more: "Kostenlose SEO-Analyse",
   },
   steps: {
     h2: "So läuft die Zusammenarbeit ab",
     items: [
       {
-        title: "Kostenlose Analyse",
-        text: "Sie schicken mir Ihre Website. Ich sehe mir Anzeigen oder Suchergebnisse an und sende eine Seite mit Befunden zurück. Danach entscheiden Sie selbst.",
+        title: "Kostenlose SEO-Analyse",
+        text: "Sie schicken mir Ihre Website. Ich sehe sie mir an und sende eine Seite mit SEO-Befunden zurück. Danach entscheiden Sie selbst.",
       },
       {
         title: "Audit, 490 €",
@@ -385,12 +385,11 @@ export const de: Dict = {
       submit: "Anfrage senden",
     },
     free: {
-      tab: "Kostenlose Analyse",
-      h2: "Kostenlose Analyse Ihrer Anzeigen oder Website",
-      lead: "Schicken Sie Ihre Website – Sie erhalten eine Seite mit 3–5 wichtigen Befunden zu einem Kanal, Anzeigen oder Website. Das ist eine Kurzanalyse. Ein vollständiges Audit und die Einrichtung sind nicht enthalten. Ich antworte innerhalb von 24 Stunden.",
-      topics: "Was soll analysiert werden?",
+      tab: "Kostenlose SEO-Analyse",
+      h2: "Kostenlose SEO-Analyse Ihrer Website",
+      lead: "Schicken Sie Ihre Website – Sie erhalten eine Seite mit 3–5 wichtigen Befunden zum Thema SEO. Das ist eine Kurzanalyse auf Basis öffentlicher Daten. Ein vollständiges Audit und Arbeiten an der Website sind nicht enthalten. Ich antworte innerhalb von 24 Stunden.",
       submit: "Analyse anfordern",
-      ack: "Mir ist klar, dass es eine Kurzanalyse eines Kanals ist, ohne vollständiges Audit und ohne Einrichtung",
+      ack: "Mir ist klar, dass es eine Kurzanalyse zum Thema SEO ist, ohne vollständiges Audit und ohne Umsetzung",
     },
     audit: "Audit",
     site: "Website",

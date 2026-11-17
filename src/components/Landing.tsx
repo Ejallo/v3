@@ -24,9 +24,6 @@ import { FORM_ENDPOINT } from "@/config"
 export type { Lang }
 
 const TOPICS = ["Google Ads", "SEO", "Meta Ads", "TikTok Ads", "Telegram Ads"]
-// A free review covers one channel at a time.
-const REVIEW_TOPICS = ["Google Ads", "SEO", "Meta Ads"]
-
 type FormMode = "order" | "free"
 type ReplyType = "email" | "telegram" | "whatsapp"
 
@@ -58,7 +55,6 @@ export function Landing({
   const t = DICT[lang]
   const [topics, setTopics] = useState<string[]>(["Google Ads"])
   const [mode, setMode] = useState<FormMode>("order")
-  const [reviewTopic, setReviewTopic] = useState("Google Ads")
   const [replyType, setReplyType] = useState<ReplyType>("email")
   const [sending, setSending] = useState(false)
   const form = t.contact[mode]
@@ -248,7 +244,7 @@ export function Landing({
                     type="button"
                     aria-pressed={mode === m}
                     onClick={() => setMode(m)}
-                    className="min-h-11 rounded-sm px-1 py-2 text-[13px] leading-tight font-semibold whitespace-nowrap min-[400px]:text-[15px] text-foreground transition-colors hover:bg-foreground/5 aria-pressed:bg-primary aria-pressed:text-primary-foreground sm:text-base"
+                    className="min-h-11 rounded-sm px-1 py-2 text-[13px] leading-tight font-semibold min-[400px]:text-[15px] sm:whitespace-nowrap text-foreground transition-colors hover:bg-foreground/5 aria-pressed:bg-primary aria-pressed:text-primary-foreground sm:text-base"
                   >
                     {t.contact[m].tab}
                   </button>
@@ -272,7 +268,7 @@ export function Landing({
               </div>
               {mode === "order" ? (
                 <fieldset>
-                  <legend className="mb-2 text-[15px] font-medium">{form.topics}</legend>
+                  <legend className="mb-2 text-[15px] font-medium">{t.contact.order.topics}</legend>
                   <ToggleGroup
                     type="multiple"
                     value={topics}
@@ -289,23 +285,7 @@ export function Landing({
                   <input type="hidden" name="topics" value={topics.join(", ")} />
                 </fieldset>
               ) : (
-                <fieldset>
-                  <legend className="mb-2 text-[15px] font-medium">{form.topics}</legend>
-                  <ToggleGroup
-                    type="single"
-                    value={reviewTopic}
-                    onValueChange={(v) => v && setReviewTopic(v)}
-                    className="flex w-full flex-wrap"
-                    spacing={2}
-                  >
-                    {REVIEW_TOPICS.map((topic) => (
-                      <ToggleGroupItem key={topic} value={topic} className={topicChip}>
-                        {topic}
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
-                  <input type="hidden" name="topics" value={reviewTopic} />
-                </fieldset>
+                <input type="hidden" name="topics" value="SEO" />
               )}
               <div className="space-y-2">
                 <Label htmlFor="f-contact" className="text-[15px]">
