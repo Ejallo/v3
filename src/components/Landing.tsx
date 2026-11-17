@@ -5,7 +5,9 @@ import { toast } from "sonner"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Cases } from "@/components/Cases"
 import { CasesCards } from "@/components/CasesCards"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Configurator, type Selection } from "@/components/Configurator"
+import { PriceBuilder } from "@/components/PriceBuilder"
 import { ScrollRibbon } from "@/components/ScrollRibbon"
 import {
   Accordion,
@@ -74,12 +76,12 @@ export function Landing({
     return () => document.removeEventListener("click", onClick, true)
   }, [])
 
-  function goToForm() {
+  function goToForm(ids: string[] = [...selection.monthly, ...selection.once]) {
     const next: string[] = []
-    if (selection.monthly.includes("google")) next.push("Google Ads")
-    if (selection.monthly.includes("seo")) next.push("SEO")
-    if (selection.monthly.includes("social")) next.push("Meta Ads")
-    if (selection.once.includes("audit")) next.push(t.contact.audit)
+    if (ids.includes("google")) next.push("Google Ads")
+    if (ids.includes("seo")) next.push("SEO")
+    if (ids.includes("social")) next.push("Meta Ads")
+    if (ids.includes("audit") && !ids.includes("google")) next.push(t.contact.audit)
     if (next.length) setTopics(next)
     setMode("order")
     document.getElementById("contact")?.scrollIntoView()
@@ -150,22 +152,15 @@ export function Landing({
         </section>
 
         <section id="prices" className="relative z-1">
-          <div
-            className={`${wrap} grid gap-10 py-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:py-28`}
-          >
-            <div>
-              <h2 className={h2}>{t.prices.h2}</h2>
-              <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-muted-foreground">
-                {t.prices.lead}
-              </p>
+          {/* Preview of the price list builder; previous layout: 5/7 grid with <Configurator t={t.configurator} locale={t.locale} value={selection} onChange={setSelection} onSubmit={goToForm} /> */}
+          <div className={`${wrap} py-16 lg:py-28`}>
+            <h2 className={h2}>{t.prices.h2}</h2>
+            <p className="mt-6 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">
+              {t.prices.lead}
+            </p>
+            <div className="mt-10 lg:mt-14">
+              <PriceBuilder t={t.priceBuilder} locale={t.locale} onSubmit={goToForm} />
             </div>
-            <Configurator
-              t={t.configurator}
-              locale={t.locale}
-              value={selection}
-              onChange={setSelection}
-              onSubmit={goToForm}
-            />
           </div>
         </section>
 
