@@ -14,4 +14,4 @@ export const INDEXABLE = false
 export const PAGES = ["/", "/de/", "/cases/", "/de/cases/"]
 
 /** The final domain, used for sitemap.xml and robots.txt once INDEXABLE is on. Fill in before launch. */
-export const SITE_URL = ""
+export const SITE_URL = "https://vvdigital.de"
