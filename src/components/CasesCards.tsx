@@ -77,14 +77,19 @@ function Chart({ points }: { points: number[] }) {
   )
 }
 
+const reducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
 /** Counts the number inside `text` (e.g. "3 628 284 ₴", "+69 %") from 0 while `play` is on. */
 function Counter({ text, play }: { text: string; play: boolean }) {
   const m = text.match(/^(\D*?)(\d(?:[\d\s]*\d)?)(\D*)$/)
   const target = m ? Number(m[2].replace(/\s/g, "")) : 0
-  const [v, setV] = useState(0)
+  // Idle state shows the final number; a hover replays the count from 0.
+  const animate = play && !!m && !reducedMotion()
+  const [v, setV] = useState(animate ? 0 : target)
 
   useEffect(() => {
-    if (!play || !m) return
+    if (!animate) return
     let raf = 0
     const t0 = performance.now()
     const tick = (now: number) => {
@@ -108,35 +113,16 @@ function Counter({ text, play }: { text: string; play: boolean }) {
 }
 
 function CaseCard({ c, href }: { c: Card; href: string }) {
-  const el = useRef<HTMLAnchorElement>(null)
-  // Bumped on every hover: remounts the chart and the counter so the growth replays from 0.
+  // The chart is drawn in full by default. Every hover bumps `run`, which remounts
+  // the chart and the counter so the growth replays once from 0.
   const [run, setRun] = useState(0)
   const play = run > 0
-  const setPlay = (_: boolean) => setRun((r) => r || 1)
-
-  // Touch screens have no hover: play when the card is on screen instead.
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return setPlay(true)
-    if (!window.matchMedia("(hover: none)").matches || !("IntersectionObserver" in window)) return
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setPlay(true)
-          io.disconnect()
-        }
-      },
-      { threshold: 0.6 },
-    )
-    if (el.current) io.observe(el.current)
-    return () => io.disconnect()
-  }, [])
 
   return (
     <a
-      ref={el}
       className={play ? "tm-case is-play" : "tm-case"}
       href={href}
-      onPointerEnter={() => setRun((r) => r + 1)}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setRun((r) => r + 1)}
       style={{ "--bg": c.bg, "--fg": c.fg, "--line": c.line } as React.CSSProperties}
     >
       <span className="tm-case__tag">{c.tag}</span>
