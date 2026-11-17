@@ -18,7 +18,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { DICT, SiteFooter, SiteHeader, homeOf, wrap, type Lang } from "@/components/SiteChrome"
+import { DICT, SiteFooter, SiteHeader, wrap, type Lang } from "@/components/SiteChrome"
 import { FORM_ENDPOINT } from "@/config"
 
 export type { Lang }
@@ -28,6 +28,16 @@ const TOPICS = ["Google Ads", "SEO", "Meta Ads", "TikTok Ads", "Telegram Ads"]
 const REVIEW_TOPICS = ["Google Ads", "SEO", "Meta Ads"]
 
 type FormMode = "order" | "free"
+type ReplyType = "email" | "telegram" | "whatsapp"
+
+const REPLY_TYPES: ReplyType[] = ["email", "telegram", "whatsapp"]
+
+// Same rules as in worker/src/index.js. The HTML pattern is anchored by the browser.
+const REPLY_FIELD: Record<ReplyType, { type: string; inputMode: "email" | "text" | "tel"; pattern?: string }> = {
+  email: { type: "email", inputMode: "email" },
+  telegram: { type: "text", inputMode: "text", pattern: "@?[A-Za-z0-9_]{5,32}|(https?://)?(www\\.)?t\\.me/\\S+" },
+  whatsapp: { type: "tel", inputMode: "tel", pattern: "\\+?[0-9 \\-]{7,20}" },
+}
 
 const h2 =
   "max-w-[20ch] text-[clamp(32px,4.4vw,64px)] leading-[1.04] font-extrabold tracking-[-0.03em]"
@@ -49,6 +59,7 @@ export function Landing({
   const [topics, setTopics] = useState<string[]>(["Google Ads"])
   const [mode, setMode] = useState<FormMode>("order")
   const [reviewTopic, setReviewTopic] = useState("Google Ads")
+  const [replyType, setReplyType] = useState<ReplyType>("email")
   const [sending, setSending] = useState(false)
   const form = t.contact[mode]
   const orderTopics = [...TOPICS, t.contact.audit]
@@ -300,18 +311,39 @@ export function Landing({
                 <Label htmlFor="f-contact" className="text-[15px]">
                   {t.contact.reply}
                 </Label>
+                <ToggleGroup
+                  type="single"
+                  value={replyType}
+                  onValueChange={(v) => v && setReplyType(v as ReplyType)}
+                  className="flex w-full flex-wrap"
+                  spacing={2}
+                  aria-label={t.contact.reply}
+                >
+                  {REPLY_TYPES.map((r) => (
+                    <ToggleGroupItem key={r} value={r} className={topicChip}>
+                      {t.contact.replyTypes[r].label}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+                <input type="hidden" name="contact_type" value={replyType} />
                 <Input
+                  key={replyType}
                   id="f-contact"
                   name="contact"
                   required
-                  placeholder={t.contact.replyPlaceholder}
+                  type={REPLY_FIELD[replyType].type}
+                  inputMode={REPLY_FIELD[replyType].inputMode}
+                  pattern={REPLY_FIELD[replyType].pattern}
+                  title={t.contact.replyTypes[replyType].hint}
+                  placeholder={t.contact.replyTypes[replyType].placeholder}
                   className={field}
                 />
               </div>
               {mode === "order" && (
                 <div className="space-y-2">
                   <Label htmlFor="f-note" className="text-[15px]">
-                    {t.contact.note}
+                    {t.contact.note}{" "}
+                    <span className="font-normal text-muted-foreground">{t.contact.noteHint}</span>
                   </Label>
                   <Textarea id="f-note" name="note" rows={3} className={`${field} h-auto py-3`} />
                 </div>
@@ -321,22 +353,20 @@ export function Landing({
                 <label htmlFor="f-hp">Leave empty</label>
                 <input id="f-hp" name="hp_zx" tabIndex={-1} autoComplete="off" />
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
-                <Button
-                  type="submit"
-                  size="lg"
-                  disabled={sending}
-                  className="h-13 w-full px-6 text-base font-semibold sm:w-auto"
-                >
-                  {sending ? t.contact.sending : form.submit}
-                </Button>
-                <p className="text-[13px] leading-snug text-muted-foreground">
-                  {t.contact.privacy}{" "}
-                  <a href={`${homeOf(lang)}datenschutz/`} className="underline underline-offset-2 hover:text-foreground">
-                    {t.footer.privacy}
-                  </a>
-                </p>
-              </div>
+              {mode === "free" && (
+                <label className="flex cursor-pointer items-start gap-3 text-[15px] leading-snug">
+                  <input type="checkbox" name="ack" required className="mt-0.5 size-5 shrink-0 accent-primary" />
+                  <span>{t.contact.free.ack}</span>
+                </label>
+              )}
+              <Button
+                type="submit"
+                size="lg"
+                disabled={sending}
+                className="h-13 w-full px-6 text-base font-semibold sm:w-auto"
+              >
+                {sending ? t.contact.sending : form.submit}
+              </Button>
             </form>
           </div>
         </section>

@@ -10,6 +10,14 @@ const LIMITS = { site: 200, contact: 200, topics: 300, note: 2000 }
 const TYPES = new Set(["order", "free"])
 const LANGS = new Set(["ru", "de"])
 
+// How to reply: format check per channel (same rules as the form) and the label shown in Telegram.
+const CONTACT_RULES = {
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+  telegram: /^(@?[A-Za-z0-9_]{5,32}|(https?:\/\/)?(www\.)?t\.me\/\S+)$/,
+  whatsapp: /^\+?[0-9 -]{7,20}$/,
+}
+const CONTACT_LABELS = { email: "E-mail", telegram: "Telegram", whatsapp: "WhatsApp" }
+
 function allowedOrigins(env) {
   return (env.ALLOWED_ORIGINS || "")
     .split(",")
@@ -56,13 +64,16 @@ function validate(raw) {
     lang: clean(raw.lang),
     site: clean(raw.site),
     contact: clean(raw.contact),
+    contactType: clean(raw.contact_type),
     topics: clean(raw.topics),
     note: clean(raw.note),
   }
   if (!TYPES.has(data.type)) return { error: "type" }
   if (!LANGS.has(data.lang)) data.lang = "ru"
+  if (!CONTACT_RULES[data.contactType]) data.contactType = "email"
   if (data.site.length < 3 || data.site.length > LIMITS.site) return { error: "site" }
   if (data.contact.length < 3 || data.contact.length > LIMITS.contact) return { error: "contact" }
+  if (!CONTACT_RULES[data.contactType].test(data.contact)) return { error: "contact" }
   if (data.topics.length > LIMITS.topics) return { error: "topics" }
   if (data.note.length > LIMITS.note) return { error: "note" }
   return { data }
@@ -74,7 +85,7 @@ function message(d) {
     `Новая заявка: ${kind} (${d.lang.toUpperCase()})`,
     "",
     `Сайт: ${d.site}`,
-    `Ответить: ${d.contact}`,
+    `Ответить (${CONTACT_LABELS[d.contactType]}): ${d.contact}`,
   ]
   if (d.topics) lines.push(`Темы: ${d.topics}`)
   if (d.note) lines.push("", `Комментарий: ${d.note}`)
