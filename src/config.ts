@@ -1,7 +1,7 @@
 // Site-wide switches. Change here, rebuild, push.
 
 /** URL of the form Worker (worker/README.md). Empty: the form shows a "not connected yet" notice. */
-export const FORM_ENDPOINT = ""
+export const FORM_ENDPOINT = "https://vvdigital-form.vetervlad94.workers.dev"
 
 /**
  * Launch switch. false while the site is a draft on ejallo.github.io/v3:
