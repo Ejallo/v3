@@ -1,0 +1,34 @@
+---
+// Not-found page. GitHub Pages serves one 404.html for every missing path, so it speaks both languages.
+import '../styles/global.css';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, nofollow" />
+		<meta name="theme-color" content="#08080f" />
+		<link rel="icon" href={`${base}/favicon.ico`} sizes="48x48" />
+		<link rel="icon" type="image/png" sizes="192x192" href={`${base}/icon-192.png`} />
+		<title>404 · VVdigital</title>
+	</head>
+	<body class="flex min-h-svh flex-col">
+		<header class="border-b border-border">
+			<div class="mx-auto flex h-14 w-full max-w-[1240px] items-center px-4 sm:px-8">
+				<a href={`${base}/de/`} class="text-xl font-extrabold tracking-tight">VVdigital</a>
+			</div>
+		</header>
+		<main class="mx-auto w-full max-w-[1240px] flex-1 px-4 pt-24 pb-16 sm:px-8 lg:pt-36">
+			<p class="text-lg font-bold text-primary">404</p>
+			<h1 class="mt-2 text-[clamp(36px,5vw,72px)] leading-[1.04] font-extrabold tracking-[-0.03em]">Diese Seite gibt es nicht.</h1>
+			<p class="mt-3 text-xl text-muted-foreground" lang="ru">Такой страницы нет.</p>
+			<nav class="mt-9 flex flex-wrap gap-x-8 gap-y-3 text-lg font-semibold">
+				<a href={`${base}/de/`} class="text-primary underline underline-offset-4">→ Startseite</a>
+				<a href={`${base}/`} lang="ru" class="text-primary underline underline-offset-4">→ Главная</a>
+			</nav>
+		</main>
+	</body>
+</html>

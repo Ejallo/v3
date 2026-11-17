@@ -2,7 +2,7 @@
 // Shell for the legal pages (Impressum, Datenschutz) in a given language.
 import '../styles/global.css';
 import { SiteHeader, SiteFooter, homeOf, type Lang } from './SiteChrome';
-import { INDEXABLE } from '../config';
+import SeoHead from './SeoHead.astro';
 
 interface Props {
 	lang: Lang;
@@ -12,18 +12,12 @@ interface Props {
 }
 
 const { lang, title, slug } = Astro.props;
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const langHrefs = { ru: `${homeOf('ru')}${slug}/`, de: `${homeOf('de')}${slug}/` };
 ---
 
 <html lang={lang}>
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="robots" content={INDEXABLE ? 'noindex, follow' : 'noindex, nofollow'} />
-		<meta name="theme-color" content="#08080f" />
-		<link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
-		<title>{`${title} | VVdigital`}</title>
+		<SeoHead lang={lang} path={`/${slug}/`} title={`${title} | VVdigital`} noindex />
 	</head>
 	<body>
 		<SiteHeader client:load lang={lang} home={homeOf(lang)} langHrefs={langHrefs} />

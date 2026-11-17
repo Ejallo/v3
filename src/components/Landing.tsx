@@ -2,11 +2,7 @@ import { useEffect, useState } from "react"
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Cases } from "@/components/Cases"
 import { CasesCards } from "@/components/CasesCards"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Configurator, type Selection } from "@/components/Configurator"
 import { PriceBuilder } from "@/components/PriceBuilder"
 import { ScrollRibbon } from "@/components/ScrollRibbon"
 import {
@@ -50,11 +46,6 @@ export function Landing({
   children?: React.ReactNode
 }) {
   const t = DICT[lang]
-  const [selection, setSelection] = useState<Selection>({
-    monthly: ["google"],
-    once: ["audit"],
-    budget: 1500,
-  })
   const [topics, setTopics] = useState<string[]>(["Google Ads"])
   const [mode, setMode] = useState<FormMode>("order")
   const [reviewTopic, setReviewTopic] = useState("Google Ads")
@@ -78,7 +69,7 @@ export function Landing({
     return () => document.removeEventListener("click", onClick, true)
   }, [])
 
-  function goToForm(ids: string[] = [...selection.monthly, ...selection.once]) {
+  function goToForm(ids: string[]) {
     const next: string[] = []
     if (ids.includes("google")) next.push("Google Ads")
     if (ids.includes("seo")) next.push("SEO")
@@ -178,12 +169,10 @@ export function Landing({
         </section>
 
         <section id="results" className={`${wrap} relative z-1 py-16 lg:py-28`}>
-          {/* Preview of variant C; previous slider: <h2 className={h2}>{t.results.h2}</h2><Cases t={t.results} /> */}
           <CasesCards lang={lang} title={t.results.h2} titleClass={h2} />
         </section>
 
         <section id="prices" className="relative z-1">
-          {/* Preview of the price list builder; previous layout: 5/7 grid with <Configurator t={t.configurator} locale={t.locale} value={selection} onChange={setSelection} onSubmit={goToForm} /> */}
           <div className={`${wrap} py-16 lg:py-28`}>
             <h2 className={h2}>{t.prices.h2}</h2>
             <p className="mt-6 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">

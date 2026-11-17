@@ -1,9 +1,6 @@
-import { useRef, useState } from "react"
+// Chart mock-ups for the cases page (CasesPage.tsx).
+import type { CaseChart } from "@/i18n/ru"
 
-import { base } from "@/components/SiteChrome"
-import type { CaseChart, Dict } from "@/i18n/ru"
-
-type Results = Dict["results"]
 type Chart = CaseChart
 
 const W = 480
@@ -128,85 +125,6 @@ export function ChartScreen({ chart }: { chart: Chart }) {
         {chart.kind === "curve" && <Curve end={chart.end} />}
         {chart.kind === "ranks" && <Ranks rows={chart.rows} />}
       </svg>
-    </div>
-  )
-}
-
-export function Cases({ t }: { t: Results }) {
-  const n = t.cases.length
-  const [i, setI] = useState(0)
-  // Bumped on every change so the slide and the progress bar restart their animations.
-  const [run, setRun] = useState(0)
-  const touchX = useRef<number | null>(null)
-
-  const go = (k: number) => {
-    setI(((k % n) + n) % n)
-    setRun((r) => r + 1)
-  }
-  const c = t.cases[i]
-
-  return (
-    <div className="cases">
-      <div
-        className="cases-card"
-        onTouchStart={(e) => {
-          touchX.current = e.touches[0].clientX
-        }}
-        onTouchEnd={(e) => {
-          if (touchX.current === null) return
-          const dx = e.changedTouches[0].clientX - touchX.current
-          touchX.current = null
-          if (Math.abs(dx) > 48) go(dx < 0 ? i + 1 : i - 1)
-        }}
-      >
-        <div className="cases-body" key={run} aria-live="polite">
-          <div className="cases-left">
-            <div className="cases-head">
-              <span className="cases-chip">{c.channel}</span>
-              <span className="cases-who">{c.client}</span>
-            </div>
-            <p className={c.small ? "cases-fig cases-fig-small" : "cases-fig"}>{c.figure}</p>
-            <h3 className="cases-metric">{c.metric}</h3>
-            <p className="cases-text">{c.text}</p>
-          </div>
-          <ChartScreen chart={c.chart} />
-        </div>
-
-        <div className="cases-foot">
-          <div className="cases-segs">
-            {t.cases.map((item, k) => (
-              <button
-                key={item.figure}
-                type="button"
-                aria-label={`${k + 1} / ${n}`}
-                aria-current={k === i ? "true" : undefined}
-                onClick={() => go(k)}
-              >
-                <span className="cases-seg">
-                  <i
-                    key={k === i ? run : "idle"}
-                    className={k === i ? "cases-prog" : undefined}
-                    data-done={k < i ? "true" : undefined}
-                    onAnimationEnd={k === i ? () => go(i + 1) : undefined}
-                  />
-                </span>
-              </button>
-            ))}
-          </div>
-          <div className="cases-arrows">
-            <button type="button" aria-label={t.prev} onClick={() => go(i - 1)}>
-              ←
-            </button>
-            <button type="button" aria-label={t.next} onClick={() => go(i + 1)}>
-              →
-            </button>
-          </div>
-          <a className="cases-all" href={base + t.all.href}>
-            {t.all.label} →
-          </a>
-        </div>
-      </div>
-      <p className="cases-note">{t.note}</p>
     </div>
   )
 }

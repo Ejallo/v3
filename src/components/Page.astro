@@ -3,6 +3,7 @@
 import '../styles/global.css';
 import { Landing, type Lang } from './Landing';
 import { VVGrain } from './VVGrain';
+import SeoHead from './SeoHead.astro';
 import { ru } from '../i18n/ru';
 import { de } from '../i18n/de';
 
@@ -12,19 +13,23 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = { ru, de }[lang];
-import { INDEXABLE } from '../config';
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// FAQ as structured data (schema.org FAQPage), built from the same texts as the accordion.
+const faqLd = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	inLanguage: t.lang,
+	mainEntity: t.faq.items.map((item) => ({
+		'@type': 'Question',
+		name: item.q,
+		acceptedAnswer: { '@type': 'Answer', text: item.a },
+	})),
+};
 ---
 
 <html lang={t.lang}>
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="robots" content={INDEXABLE ? 'index, follow' : 'noindex, nofollow'} />
-		<meta name="theme-color" content="#08080f" />
-		<link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
-		<title>{t.meta.title}</title>
-		<meta name="description" content={t.meta.description} />
+		<SeoHead lang={lang} path="/" title={t.meta.title} description={t.meta.description} />
+		<script type="application/ld+json" set:html={JSON.stringify(faqLd).replace(/</g, '\\u003c')} />
 	</head>
 	<body>
 		<Landing client:load lang={lang}>
@@ -54,11 +59,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 							</a>
 						</div>
 					</div>
+					<!-- dt comes first for valid markup; flex-col-reverse keeps the number on top -->
 					<dl class="grid grid-cols-3 gap-4 border-t border-foreground/15 py-6">
 						{t.hero.proof.map((p) => (
-							<div>
-								<dd class="text-[clamp(24px,3.6vw,48px)] leading-none font-extrabold tracking-tight">{p.n}</dd>
+							<div class="flex flex-col-reverse justify-end">
 								<dt class="mt-1.5 text-[13px] leading-snug text-foreground/65">{p.l}</dt>
+								<dd class="text-[clamp(24px,3.6vw,48px)] leading-none font-extrabold tracking-tight">{p.n}</dd>
 							</div>
 						))}
 					</dl>
