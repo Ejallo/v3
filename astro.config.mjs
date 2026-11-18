@@ -12,6 +12,8 @@ export default defineConfig({
   site: onPages ? 'https://ejallo.github.io' : undefined,
   base: onPages ? '/v3' : '/',
   integrations: [react()],
+  // Inline the CSS into each page: one less render-blocking request
+  build: { inlineStylesheets: 'always' },
 
   vite: {
     plugins: [tailwindcss()]
