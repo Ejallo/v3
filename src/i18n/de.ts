@@ -7,7 +7,7 @@ export const de: Dict = {
   meta: {
     title: "Google Ads & SEO Freelancer für KMU | VVdigital",
     description:
-      "Google Ads, SEO und Social Ads für kleine und mittlere Unternehmen in Deutschland. Kommunikation schriftlich per Messenger. Direkt anfragen oder mit einer kostenlosen SEO-Analyse starten.",
+      "Google Ads, SEO und Social Ads für kleine und mittlere Unternehmen in Deutschland. Direkt anfragen oder mit einer kostenlosen SEO-Analyse starten.",
   },
   skip: "Zum Inhalt",
   menu: "Menü",
@@ -113,7 +113,7 @@ export const de: Dict = {
     meta: {
       title: "Google Ads & SEO Referenzen: Kundenergebnisse | VVdigital",
       description:
-        "Echte Google-Ads- und SEO-Projekte: wie viel Kunden in Werbung investiert haben, wie viel sie verdient haben und was dafür getan wurde. Zahlen aus Google Ads, Analytics und Search Console.",
+        "Echte Google-Ads- und SEO-Projekte: Werbebudget, Umsatz und was dafür getan wurde. Zahlen aus Google Ads, Analytics und Search Console.",
     },
     home: "Startseite",
     h1: "Ergebnisse",

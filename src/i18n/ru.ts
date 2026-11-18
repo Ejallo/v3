@@ -113,7 +113,7 @@ export const ru = {
     meta: {
       title: "Кейсы Google Ads и SEO: результаты клиентов | VVdigital",
       description:
-        "Реальные проекты Google Ads и SEO: сколько клиенты потратили на рекламу, сколько заработали и что для этого сделано. Цифры из Google Ads, Analytics и Search Console.",
+        "Реальные проекты Google Ads и SEO: сколько клиенты потратили, сколько заработали и что сделано. Цифры из Google Ads, Analytics и Search Console.",
     },
     home: "Главная",
     h1: "Кейсы",

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
 
@@ -19,7 +19,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { DICT, SiteFooter, SiteHeader, wrap, type Lang } from "@/components/SiteChrome"
-import { FORM_ENDPOINT } from "@/config"
+import { FORM_ENDPOINT, TURNSTILE_SITE_KEY } from "@/config"
+import { useTurnstile } from "@/lib/turnstile"
 
 export type { Lang }
 
@@ -59,6 +60,9 @@ export function Landing({
   const [sending, setSending] = useState(false)
   const form = t.contact[mode]
   const orderTopics = [...TOPICS, t.contact.audit]
+  const formRef = useRef<HTMLFormElement>(null)
+  const captchaRef = useRef<HTMLDivElement>(null)
+  const captcha = useTurnstile(TURNSTILE_SITE_KEY, lang, captchaRef, formRef)
 
   // Any link with data-form="order" | "free" (hero, header, case, configurator)
   // opens the matching tab of the contact form before the browser jumps to #contact.
@@ -110,10 +114,16 @@ export function Landing({
     }
     setSending(true)
     try {
+      const data: Record<string, FormDataEntryValue> = Object.fromEntries(new FormData(formEl))
+      if (TURNSTILE_SITE_KEY) {
+        const token = await captcha.token()
+        if (!token) throw new Error("captcha")
+        data["cf-turnstile-response"] = token
+      }
       const res = await fetch(FORM_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(Object.fromEntries(new FormData(formEl))),
+        body: JSON.stringify(data),
       })
       const body = await res.json().catch(() => null)
       if (!res.ok || !body?.ok) throw new Error(body?.error ?? String(res.status))
@@ -122,6 +132,7 @@ export function Landing({
     } catch {
       toast.error(t.contact.errorTitle, { description: t.contact.errorText })
     } finally {
+      captcha.reset()
       setSending(false)
     }
   }
@@ -228,6 +239,7 @@ export function Landing({
             </div>
             {/* method/action make the form work as a plain POST before React loads, so data never lands in the URL */}
             <form
+              ref={formRef}
               method="post"
               action={FORM_ENDPOINT || undefined}
               onSubmit={handleSubmit}
@@ -339,6 +351,8 @@ export function Landing({
                   <span>{t.contact.free.ack}</span>
                 </label>
               )}
+              {/* Turnstile: invisible unless Cloudflare asks for a click; takes no space while empty */}
+              {TURNSTILE_SITE_KEY && <div ref={captchaRef} className="ts-box" />}
               <Button
                 type="submit"
                 size="lg"

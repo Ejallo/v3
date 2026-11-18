@@ -17,7 +17,7 @@ interface Props {
 
 const { lang, path, title, description, noindex = false } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-// The final domain once it is set; until then the GitHub Pages address (or the dev server).
+// The final domain; falls back to the configured site (or the dev server) if SITE_URL is empty.
 const root = SITE_URL || new URL(`${base}/`, Astro.site ?? Astro.url).href.replace(/\/$/, '');
 const urlOf = (l: Lang) => `${root}${l === 'de' ? '/de' : ''}${path}`;
 const robots = INDEXABLE && !noindex ? 'index, follow' : noindex && INDEXABLE ? 'noindex, follow' : 'noindex, nofollow';

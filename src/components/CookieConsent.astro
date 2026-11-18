@@ -5,6 +5,7 @@
 //   window.addEventListener('vv:consent', e => e.detail)  // fires on every save
 //   window.vvConsent.open() -> reopen the card (footer link)
 import { homeOf, type Lang } from './SiteChrome';
+import { ASK_CONSENT } from '../config';
 
 interface Props {
 	lang: Lang;
@@ -41,6 +42,7 @@ const btn = 'h-10 flex-1 cursor-pointer rounded-sm px-4 text-sm font-bold';
 
 <div
 	id="vv-consent"
+	data-ask={ASK_CONSENT ? '1' : undefined}
 	role="dialog"
 	aria-label={texts.label}
 	class="hidden fixed bottom-4 left-4 z-50 w-[min(420px,calc(100vw-2rem))] rounded-sm border border-border bg-muted p-4 text-sm shadow-2xl"
@@ -121,6 +123,15 @@ const btn = 'h-10 flex-1 cursor-pointer rounded-sm px-4 text-sm font-bold';
 		settings.classList.toggle('flex');
 	});
 
+	// Any element with data-vv-consent-open (footer link) reopens the card, hydrated or not.
+	document.addEventListener('click', (e) => {
+		if (!(e.target as Element | null)?.closest('[data-vv-consent-open]')) return;
+		show();
+		// Keyboard users land in the card they just opened
+		document.getElementById('vv-consent-reject')?.focus();
+	});
+
 	(window as any).vvConsent = { get: read, open: show };
-	if (!read()) show();
+	// Asks new visitors only while the site loads something that needs consent (ASK_CONSENT in config.ts).
+	if (box.dataset.ask && !read()) show();
 </script>

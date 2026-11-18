@@ -720,3 +720,9 @@
     font-size: 20px;
   }
 }
+
+/* Turnstile box in the contact form: takes no space (and no form gap) until the widget
+   becomes visible; src/lib/turnstile.ts sets data-shown */
+.ts-box:not([data-shown]) {
+  display: contents;
+}

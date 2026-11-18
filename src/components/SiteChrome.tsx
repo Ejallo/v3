@@ -20,7 +20,7 @@ export const DICT: Record<Lang, Dict> = { ru, de }
 export const base = import.meta.env.BASE_URL.replace(/\/$/, "")
 export const wrap = "mx-auto w-full max-w-[1240px] px-4 sm:px-8"
 
-/** Home page of a language, e.g. "/" or "/de/" (with the GitHub Pages base). */
+/** Home page of a language, e.g. "/" or "/de/" (with the base path, if any). */
 export const homeOf = (lang: Lang) => `${base}${lang === "ru" ? "/" : "/de/"}`
 
 const LANG_LABELS: Record<Lang, string> = { ru: "RU", de: "DE" }
@@ -141,9 +141,10 @@ export function SiteFooter({ lang }: { lang: Lang }) {
           <a href={`${homeOf(lang)}datenschutz/`} className="underline-offset-4 hover:text-foreground hover:underline">
             {t.footer.privacy}
           </a>
+          {/* Opened by CookieConsent.astro via data-vv-consent-open: works on static pages without React */}
           <button
             type="button"
-            onClick={() => (window as any).vvConsent?.open()}
+            data-vv-consent-open
             className="cursor-pointer underline-offset-4 hover:text-foreground hover:underline"
           >
             {t.footer.cookies}

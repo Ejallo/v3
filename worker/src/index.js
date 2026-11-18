@@ -2,7 +2,8 @@
 // Receives the form (JSON from fetch, or a plain HTML form post without JS),
 // validates it and forwards it to a Telegram chat. Nothing is stored here.
 //
-// Secrets (wrangler secret put): TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+// Secrets (wrangler secret put): TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
+//   TURNSTILE_SECRET (optional: when set, every submission must carry a valid Cloudflare Turnstile token)
 // Vars (wrangler.toml): ALLOWED_ORIGINS, FALLBACK_PATH
 // Binding (wrangler.toml): RATE_LIMITER
 
@@ -69,6 +70,8 @@ function validate(raw) {
     note: clean(raw.note),
   }
   if (!TYPES.has(data.type)) return { error: "type" }
+  // The free review needs the terms checkbox; the browser's `required` alone is not a check.
+  if (data.type === "free" && !clean(raw.ack)) return { error: "ack" }
   if (!LANGS.has(data.lang)) data.lang = "ru"
   if (!CONTACT_RULES[data.contactType]) data.contactType = "email"
   if (data.site.length < 3 || data.site.length > LIMITS.site) return { error: "site" }
@@ -100,10 +103,29 @@ async function sendToTelegram(env, text) {
     body: JSON.stringify({
       chat_id: env.TELEGRAM_CHAT_ID,
       text,
-      disable_web_page_preview: true,
+      link_preview_options: { is_disabled: true },
     }),
   })
   if (!res.ok) throw new Error(`telegram ${res.status}`)
+}
+
+// Cloudflare Turnstile: the Origin header is trivial to fake outside a browser, the token is not.
+// Skipped while TURNSTILE_SECRET is not set, so the Worker can be deployed before the widget exists.
+async function passesTurnstile(env, token, ip) {
+  if (!env.TURNSTILE_SECRET) return true
+  if (!token || token.length > 2048) return false
+  const body = new FormData()
+  body.append("secret", env.TURNSTILE_SECRET)
+  body.append("response", token)
+  if (ip) body.append("remoteip", ip)
+  try {
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body })
+    const out = await res.json()
+    return out.success === true
+  } catch (e) {
+    console.error("turnstile", e)
+    return false
+  }
 }
 
 // Where a plain (no-JS) form post goes back to. Only ever the allowed origin,
@@ -141,9 +163,9 @@ export default {
     const reply = (ok, status, error) =>
       wantsJson ? json(ok ? { ok: true } : { ok: false, error }, status, origin) : backTo(request, origin, env, ok ? "1" : "0")
 
+    const ip = request.headers.get("CF-Connecting-IP") || ""
     if (env.RATE_LIMITER) {
-      const ip = request.headers.get("CF-Connecting-IP") || "unknown"
-      const { success } = await env.RATE_LIMITER.limit({ key: ip })
+      const { success } = await env.RATE_LIMITER.limit({ key: ip || "unknown" })
       if (!success) return reply(false, 429, "rate")
     }
 
@@ -153,12 +175,16 @@ export default {
     } catch {
       return reply(false, 400, "body")
     }
+    // JSON may be null, a number or an array: only a plain object is a form.
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return reply(false, 400, "body")
 
     // Honeypot: a bot filled the hidden field. Answer "ok" so it doesn't retry.
     if (clean(raw.hp_zx)) return reply(true, 200)
 
     const { data, error } = validate(raw)
     if (error) return reply(false, 422, error)
+
+    if (!(await passesTurnstile(env, clean(raw["cf-turnstile-response"]), ip))) return reply(false, 403, "captcha")
 
     try {
       await sendToTelegram(env, message(data))

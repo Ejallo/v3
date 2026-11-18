@@ -2,9 +2,13 @@ name = "vvdigital-form"
 main = "src/index.js"
 compatibility_date = "2026-11-01"
 
+# Served on the site's own domain; the personal *.workers.dev address is switched off.
+workers_dev = false
+routes = [{ pattern = "form.vvdigital.de", custom_domain = true }]
+
 [vars]
-# Sites allowed to post the form. Add the final domain here before launch.
-ALLOWED_ORIGINS = "https://vvdigital.de,https://www.vvdigital.de,https://ejallo.github.io,http://localhost:4321"
+# Sites allowed to post the form.
+ALLOWED_ORIGINS = "https://vvdigital.de,https://www.vvdigital.de"
 # Where a no-JS form post returns when the browser sends no Referer.
 FALLBACK_PATH = "/"
 
@@ -14,5 +18,22 @@ name = "RATE_LIMITER"
 namespace_id = "1001"
 
   [ratelimits.simple]
+  limit = 5
+  period = 60
+
+# Local testing only: `npx wrangler dev --env dev`. Not deployed.
+[env.dev]
+workers_dev = true
+routes = []
+
+[env.dev.vars]
+ALLOWED_ORIGINS = "http://localhost:4321,http://localhost:8788"
+FALLBACK_PATH = "/"
+
+[[env.dev.ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [env.dev.ratelimits.simple]
   limit = 5
   period = 60

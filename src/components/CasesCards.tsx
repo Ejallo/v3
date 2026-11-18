@@ -67,7 +67,7 @@ function Counter({ text, play }: { text: string; play: boolean }) {
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [play])
+  }, [play, animate, target])
 
   if (!m) return <>{text}</>
   const num = String(v).replace(/\B(?=(\d{3})+(?!\d))/g, sep)
