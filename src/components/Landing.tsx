@@ -95,7 +95,7 @@ export function Landing({
   // After a no-JS form post the Worker sends the visitor back with ?sent=1 or ?sent=0.
   useEffect(() => {
     const sent = new URLSearchParams(window.location.search).get("sent")
-    if (sent === "1") toast.success(t.contact.sentTitle, { description: t.contact.sentText })
+    if (sent === "1") toast.success(t.contact.sentTitle)
     if (sent === "0") toast.error(t.contact.errorTitle, { description: t.contact.errorText })
     if (sent) {
       const url = new URL(window.location.href)
@@ -128,7 +128,7 @@ export function Landing({
       const body = await res.json().catch(() => null)
       if (!res.ok || !body?.ok) throw new Error(body?.error ?? String(res.status))
       formEl.reset()
-      toast.success(t.contact.sentTitle, { description: t.contact.sentText })
+      toast.success(t.contact.sentTitle)
     } catch {
       toast.error(t.contact.errorTitle, { description: t.contact.errorText })
     } finally {

@@ -403,7 +403,6 @@ export const de: Dict = {
     noteHint: "(bitte beschreiben Sie Ihr Anliegen genauer: Ziel, Budget, Zeitrahmen, bisherige Versuche)",
     sending: "Wird gesendet…",
     sentTitle: "Anfrage gesendet",
-    sentText: "Ich antworte an die angegebene Adresse.",
     errorTitle: "Senden fehlgeschlagen",
     errorText: "Bitte versuchen Sie es in einer Minute noch einmal.",
     draftTitle: "Das Formular ist noch nicht verbunden",
