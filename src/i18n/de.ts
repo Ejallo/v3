@@ -21,6 +21,7 @@ export const de: Dict = {
     { href: "#prices", label: "Preise" },
     { href: "#steps", label: "Ablauf" },
     { href: "#faq", label: "Fragen" },
+    { href: "#contacts", label: "Kontakt" },
   ],
   hero: {
     slogan: ["Erst", "rechnen.", "Dann ausgeben."],
@@ -409,6 +410,7 @@ export const de: Dict = {
     draftText: "Der Versand funktioniert in Kürze.",
   },
   footer: {
+    direct: "Direkt schreiben",
     left: "VVdigital, Deutschland",
     legalLabel: "Rechtliches",
     imprint: "Impressum",

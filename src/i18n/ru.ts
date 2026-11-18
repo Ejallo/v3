@@ -20,6 +20,7 @@ export const ru = {
     { href: "#prices", label: "Цены" },
     { href: "#steps", label: "Как работаем" },
     { href: "#faq", label: "Вопросы" },
+    { href: "#contacts", label: "Контакты" },
   ],
   hero: {
     slogan: ["Сначала", "считаем.", "Потом тратим."],
@@ -412,6 +413,7 @@ export const ru = {
     draftText: "Отправка заработает в ближайшее время.",
   },
   footer: {
+    direct: "Написать напрямую",
     left: "VVdigital, Германия",
     legalLabel: "Правовая информация",
     imprint: "Impressum",

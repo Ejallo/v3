@@ -28,3 +28,13 @@ export const PAGES = ["/", "/de/", "/cases/", "/de/cases/"]
 
 /** The final domain, used for sitemap.xml and robots.txt once INDEXABLE is on. Fill in before launch. */
 export const SITE_URL = "https://vvdigital.de"
+
+/**
+ * Direct contacts in the footer. Empty telegram/whatsapp: the button shows but links nowhere yet.
+ * telegram: user name without "@"; whatsapp: number in international format, digits only, e.g. "4915112345678".
+ */
+export const CONTACTS = {
+  telegram: "",
+  whatsapp: "",
+  email: "hallo@vvdigital.de",
+}

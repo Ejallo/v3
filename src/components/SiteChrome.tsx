@@ -1,5 +1,6 @@
-import { MenuIcon } from "lucide-react"
+import { MailIcon, MenuIcon } from "lucide-react"
 
+import { TelegramIcon, WhatsAppIcon } from "@/components/BrandIcons"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/sheet"
 import { de } from "@/i18n/de"
 import { ru, type Dict } from "@/i18n/ru"
+import { CONTACTS } from "@/config"
 
 export type Lang = "ru" | "de"
 
@@ -42,6 +44,9 @@ function LangSwitch({ current, hrefs }: { current: Lang; hrefs: Record<Lang, str
     </div>
   )
 }
+
+/** The contacts block sits in the footer of every page, so that link stays on the current page. */
+const navHref = (home: string, href: string) => (href === "#contacts" ? href : home + href)
 
 /**
  * Site header. On the home page the section links are plain anchors ("#prices");
@@ -75,7 +80,7 @@ export function SiteHeader({
             {t.nav.map((item) => (
               <a
                 key={item.href}
-                href={home + item.href}
+                href={navHref(home, item.href)}
                 className="text-[15px] font-medium underline-offset-4 hover:underline"
               >
                 {item.label}
@@ -110,7 +115,7 @@ export function SiteHeader({
                   {[...t.nav, { href: "#contact", label: t.write }].map((item) => (
                     <SheetClose asChild key={item.href}>
                       <a
-                        href={home + item.href}
+                        href={navHref(home, item.href)}
                         data-form={item.href === "#contact" ? "order" : undefined}
                         className="border-b border-border py-4 text-lg font-medium"
                       >
@@ -128,10 +133,46 @@ export function SiteHeader({
   )
 }
 
+const contactBtn =
+  "inline-flex h-13 items-center gap-2.5 rounded-xl px-[18px] text-base font-bold transition-opacity hover:opacity-90"
+
+/** A contact button; without a target (contact not filled in yet) it renders as plain text. */
+function ContactButton({ href, className, children }: { href?: string; className: string; children: React.ReactNode }) {
+  return href ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={`${contactBtn} ${className}`}>
+      {children}
+    </a>
+  ) : (
+    <span className={`${contactBtn} ${className}`}>{children}</span>
+  )
+}
+
 export function SiteFooter({ lang }: { lang: Lang }) {
   const t = DICT[lang]
+  const telegram = CONTACTS.telegram.replace(/^@/, "")
+  const whatsapp = CONTACTS.whatsapp.replace(/\D/g, "")
   return (
     <footer className="border-t border-border bg-card text-muted-foreground">
+      <div
+        id="contacts"
+        className={`${wrap} flex scroll-mt-16 flex-wrap items-center justify-between gap-6 border-b border-border py-9`}
+      >
+        <p className="text-[clamp(22px,2vw,30px)] font-extrabold tracking-[-0.02em] text-foreground">{t.footer.direct}</p>
+        <div className="flex flex-wrap gap-3">
+          <ContactButton href={telegram ? `https://t.me/${telegram}` : undefined} className="bg-[#229ED9] text-white">
+            <TelegramIcon className="size-5.5" />
+            Telegram
+          </ContactButton>
+          <ContactButton href={whatsapp ? `https://wa.me/${whatsapp}` : undefined} className="bg-[#25D366] text-white">
+            <WhatsAppIcon className="size-5.5" />
+            WhatsApp
+          </ContactButton>
+          <a href={`mailto:${CONTACTS.email}`} className={`${contactBtn} bg-primary text-primary-foreground`}>
+            <MailIcon aria-hidden="true" className="size-5.5" />
+            {CONTACTS.email}
+          </a>
+        </div>
+      </div>
       <div className={`${wrap} flex flex-col gap-2 py-6 text-sm sm:flex-row sm:justify-between`}>
         <p>{t.footer.left}</p>
         <nav aria-label={t.footer.legalLabel} className="flex gap-5">
