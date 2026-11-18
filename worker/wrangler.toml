@@ -11,6 +11,8 @@ routes = [{ pattern = "form.vvdigital.de", custom_domain = true }]
 ALLOWED_ORIGINS = "https://vvdigital.de,https://www.vvdigital.de"
 # Where a no-JS form post returns when the browser sends no Referer.
 FALLBACK_PATH = "/"
+# "true": reject submissions without a valid Turnstile token. Anything else: dry run, result goes into the message.
+TURNSTILE_ENFORCE = "false"
 
 # Max 5 submissions per minute from one IP (per Cloudflare location).
 [[ratelimits]]

@@ -3,7 +3,9 @@
 // validates it and forwards it to a Telegram chat. Nothing is stored here.
 //
 // Secrets (wrangler secret put): TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
-//   TURNSTILE_SECRET (optional: when set, every submission must carry a valid Cloudflare Turnstile token)
+//   TURNSTILE_SECRET (optional: enables the Cloudflare Turnstile check)
+// Vars: TURNSTILE_ENFORCE = "true" rejects submissions that fail the check; otherwise the result is only
+//   added to the Telegram message (a dry run to see that real visitors pass before blocking anyone).
 // Vars (wrangler.toml): ALLOWED_ORIGINS, FALLBACK_PATH
 // Binding (wrangler.toml): RATE_LIMITER
 
@@ -110,10 +112,10 @@ async function sendToTelegram(env, text) {
 }
 
 // Cloudflare Turnstile: the Origin header is trivial to fake outside a browser, the token is not.
-// Skipped while TURNSTILE_SECRET is not set, so the Worker can be deployed before the widget exists.
-async function passesTurnstile(env, token, ip) {
-  if (!env.TURNSTILE_SECRET) return true
-  if (!token || token.length > 2048) return false
+// Returns "off" while TURNSTILE_SECRET is not set, otherwise "ok", "missing" or "fail".
+async function checkTurnstile(env, token, ip) {
+  if (!env.TURNSTILE_SECRET) return "off"
+  if (!token || token.length > 2048) return "missing"
   const body = new FormData()
   body.append("secret", env.TURNSTILE_SECRET)
   body.append("response", token)
@@ -121,10 +123,10 @@ async function passesTurnstile(env, token, ip) {
   try {
     const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body })
     const out = await res.json()
-    return out.success === true
+    return out.success === true ? "ok" : "fail"
   } catch (e) {
     console.error("turnstile", e)
-    return false
+    return "fail"
   }
 }
 
@@ -184,10 +186,15 @@ export default {
     const { data, error } = validate(raw)
     if (error) return reply(false, 422, error)
 
-    if (!(await passesTurnstile(env, clean(raw["cf-turnstile-response"]), ip))) return reply(false, 403, "captcha")
+    const captcha = await checkTurnstile(env, clean(raw["cf-turnstile-response"]), ip)
+    const enforce = env.TURNSTILE_ENFORCE === "true"
+    if (enforce && captcha !== "ok" && captcha !== "off") return reply(false, 403, "captcha")
 
     try {
-      await sendToTelegram(env, message(data))
+      const note = !enforce && captcha !== "off" ? `
+
+Turnstile: ${captcha}` : ""
+      await sendToTelegram(env, message(data) + note)
     } catch (e) {
       console.error(e)
       return reply(false, 502, "send")
