@@ -101,6 +101,7 @@ export const ru = {
     h2: "Мои кейсы",
     prev: "Предыдущий кейс",
     next: "Следующий кейс",
+    allShort: "Все кейсы",
     all: { label: "Смотреть все кейсы", href: "/cases/" },
     // Cards of the cases block on the home page (CasesCards.tsx); colors and chart points live there.
     cards: [

@@ -50,8 +50,8 @@ const reducedMotion = () =>
 function Counter({ text, play }: { text: string; play: boolean }) {
   const m = text.match(/^(\D*?)(\d(?:[\d\s.]*\d)?)(\D*)$/)
   const target = m ? Number(m[2].replace(/[\s.]/g, "")) : 0
-  // Keep the thousands separator of the source text: "." in German, a space in Russian.
-  const sep = m?.[2].includes(".") ? "." : " "
+  // Keep the thousands separator of the source text (a space, a no-break space or "."); none = no grouping.
+  const sep = m?.[2].match(/\D/)?.[0] ?? ""
   // Idle state shows the final number; a hover replays the count from 0.
   const animate = play && !!m && !reducedMotion()
   const [v, setV] = useState(animate ? 0 : target)
@@ -70,7 +70,7 @@ function Counter({ text, play }: { text: string; play: boolean }) {
   }, [play, animate, target])
 
   if (!m) return <>{text}</>
-  const num = String(v).replace(/\B(?=(\d{3})+(?!\d))/g, sep)
+  const num = sep ? String(v).replace(/\B(?=(\d{3})+(?!\d))/g, sep) : String(v)
   return (
     <>
       {m[1]}
@@ -157,13 +157,18 @@ export function CasesCards({
     <div className="tm-cases">
       <div className="tm-cases__head">
         <h2 className={titleClass}>{title}</h2>
-        <div className="tm-cases__arrows">
-          <button className="tm-cases__arrow" type="button" aria-label={t.prev} disabled={edge.start} onClick={() => scroll(-1)}>
-            ←
-          </button>
-          <button className="tm-cases__arrow" type="button" aria-label={t.next} disabled={edge.end} onClick={() => scroll(1)}>
-            →
-          </button>
+        <div className="tm-cases__actions">
+          <a className="tm-cases__allbtn" href={href}>
+            {t.allShort}
+          </a>
+          <div className="tm-cases__arrows">
+            <button className="tm-cases__arrow" type="button" aria-label={t.prev} disabled={edge.start} onClick={() => scroll(-1)}>
+              ←
+            </button>
+            <button className="tm-cases__arrow" type="button" aria-label={t.next} disabled={edge.end} onClick={() => scroll(1)}>
+              →
+            </button>
+          </div>
         </div>
       </div>
 
