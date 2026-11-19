@@ -14,7 +14,10 @@ export const TURNSTILE_SITE_KEY: string = import.meta.env.PUBLIC_TURNSTILE_SITE_
  * Show the cookie card to new visitors. Off while the site loads nothing that needs consent;
  * turn on in the same change that adds analytics or ad tags. The footer link opens the card either way.
  */
-export const ASK_CONSENT = false
+export const ASK_CONSENT = true
+
+/** Google Tag Manager container. Loaded only after the visitor allows statistics or marketing (CookieConsent.astro). */
+export const GTM_ID = "GTM-5DSKWXDM"
 
 /**
  * Launch switch. false while the site is a draft:
@@ -34,7 +37,7 @@ export const SITE_URL = "https://vvdigital.de"
  * telegram: user name without "@"; whatsapp: number in international format, digits only, e.g. "4915112345678".
  */
 export const CONTACTS = {
-  telegram: "",
-  whatsapp: "",
+  telegram: "vvietier",
+  whatsapp: "491704815614",
   email: "hallo@vvdigital.de",
 }

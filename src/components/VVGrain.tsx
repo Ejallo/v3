@@ -84,8 +84,14 @@ export function VVGrain() {
   const [mode, setMode] = useState<"wait" | "worker" | "main">("wait")
   useEffect(() => {
     let idle = 0
+    // The worker renders off the main thread, so it starts right away; only the
+    // main-thread fallback still waits for the page to load and the browser to idle.
+    if (canOffscreen()) {
+      setMode("worker")
+      return
+    }
     const start = () => {
-      const go = () => setMode(canOffscreen() ? "worker" : "main")
+      const go = () => setMode("main")
       idle = window.requestIdleCallback
         ? window.requestIdleCallback(go, { timeout: 1500 })
         : window.setTimeout(go, 200)

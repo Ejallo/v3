@@ -5,7 +5,7 @@
 //   window.addEventListener('vv:consent', e => e.detail)  // fires on every save
 //   window.vvConsent.open() -> reopen the card (footer link)
 import { homeOf, type Lang } from './SiteChrome';
-import { ASK_CONSENT } from '../config';
+import { ASK_CONSENT, GTM_ID } from '../config';
 
 interface Props {
 	lang: Lang;
@@ -15,24 +15,24 @@ const { lang } = Astro.props;
 const texts = {
 	ru: {
 		label: 'Настройки cookies',
-		text: 'Мы включаем статистику и рекламные cookies только с вашего согласия. Без них сайт работает так же.',
+		text: 'Статистику (Google Analytics) и рекламу (Google Ads) я включаю только с вашего согласия. Без них сайт работает так же.',
 		more: 'Подробнее в Datenschutz',
 		reject: 'Отклонить',
 		accept: 'Принять',
 		settings: 'Настроить',
-		analytics: 'Статистика',
-		marketing: 'Реклама',
+		analytics: 'Статистика (Google Analytics)',
+		marketing: 'Реклама (Google Ads)',
 		save: 'Сохранить выбор',
 	},
 	de: {
 		label: 'Cookie-Einstellungen',
-		text: 'Statistik- und Werbe-Cookies setzen wir nur mit Ihrer Einwilligung. Ohne sie funktioniert die Seite genauso.',
+		text: 'Statistik (Google Analytics) und Werbung (Google Ads) aktiviere ich nur mit Ihrer Einwilligung. Ohne sie funktioniert die Seite genauso.',
 		more: 'Mehr in der Datenschutzerklärung',
 		reject: 'Ablehnen',
 		accept: 'Akzeptieren',
 		settings: 'Einstellungen',
-		analytics: 'Statistik',
-		marketing: 'Werbung',
+		analytics: 'Statistik (Google Analytics)',
+		marketing: 'Werbung (Google Ads)',
 		save: 'Auswahl speichern',
 	},
 }[lang];
@@ -43,6 +43,7 @@ const btn = 'h-10 flex-1 cursor-pointer rounded-sm px-4 text-sm font-bold';
 <div
 	id="vv-consent"
 	data-ask={ASK_CONSENT ? '1' : undefined}
+	data-gtm={GTM_ID || undefined}
 	role="dialog"
 	aria-label={texts.label}
 	class="hidden fixed bottom-4 left-4 z-50 w-[min(420px,calc(100vw-2rem))] rounded-sm border border-border bg-muted p-4 text-sm shadow-2xl"
@@ -65,7 +66,8 @@ const btn = 'h-10 flex-1 cursor-pointer rounded-sm px-4 text-sm font-bold';
 		</button>
 	</div>
 	<div class="mt-4 flex gap-2">
-		<button id="vv-consent-reject" type="button" class={`${btn} border border-foreground/30 text-foreground hover:bg-foreground/5`}>
+		<!-- Reject and accept look the same: refusing must be as easy as agreeing -->
+		<button id="vv-consent-reject" type="button" class={`${btn} bg-primary text-primary-foreground hover:bg-primary/85`}>
 			{texts.reject}
 		</button>
 		<button id="vv-consent-accept" type="button" class={`${btn} bg-primary text-primary-foreground hover:bg-primary/85`}>
@@ -130,6 +132,40 @@ const btn = 'h-10 flex-1 cursor-pointer rounded-sm px-4 text-sm font-bold';
 		// Keyboard users land in the card they just opened
 		document.getElementById('vv-consent-reject')?.focus();
 	});
+
+	// Google Tag Manager, only after consent. Until the visitor allows statistics or marketing,
+	// nothing is requested from Google. Consent Mode v2 tells the tags what was allowed;
+	// a later change in the card is passed on as an update.
+	const w = window as any;
+	const gtmId = box.dataset.gtm;
+	let gtmLoaded = false;
+	function gtag(..._args: unknown[]) {
+		// gtag expects the arguments object itself, as in Google's snippet
+		// eslint-disable-next-line prefer-rest-params
+		w.dataLayer.push(arguments);
+	}
+	const state = (c: Choice) => {
+		const ads = c.marketing ? 'granted' : 'denied';
+		return { analytics_storage: c.analytics ? 'granted' : 'denied', ad_storage: ads, ad_user_data: ads, ad_personalization: ads };
+	};
+	const applyConsent = (c: Choice | null) => {
+		if (!gtmId || !c) return;
+		w.dataLayer = w.dataLayer || [];
+		if (gtmLoaded) {
+			gtag('consent', 'update', state(c));
+			return;
+		}
+		if (!c.analytics && !c.marketing) return;
+		gtag('consent', 'default', state(c));
+		w.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+		const s = document.createElement('script');
+		s.async = true;
+		s.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(gtmId)}`;
+		document.head.appendChild(s);
+		gtmLoaded = true;
+	};
+	window.addEventListener('vv:consent', (e) => applyConsent((e as CustomEvent<Choice>).detail));
+	applyConsent(read());
 
 	(window as any).vvConsent = { get: read, open: show };
 	// Asks new visitors only while the site loads something that needs consent (ASK_CONSENT in config.ts).

@@ -18,7 +18,15 @@ export default defineConfig({
   security: {
     csp: {
       scriptDirective: {
-        resources: ["'self'", 'https://challenges.cloudflare.com'],
+        resources: [
+          "'self'",
+          'https://challenges.cloudflare.com',
+          // Google Tag Manager, Analytics and Ads (after cookie consent only)
+          'https://*.googletagmanager.com',
+          'https://www.googleadservices.com',
+          'https://www.google.com',
+          'https://googleads.g.doubleclick.net',
+        ],
       },
       // React and Radix set style attributes; hashes can't cover those, so styles stay inline-allowed.
       styleDirective: {
