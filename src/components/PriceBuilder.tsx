@@ -16,18 +16,29 @@ type Service = {
   price: number
   // When the service it points to is picked, this one is free and shown as "included".
   coveredBy?: Id
+  // A one-off fee charged on top of the monthly price (campaign setup).
+  setupFee?: number
+  // Fixed one-off price, shown without the "from" prefix.
+  flat?: boolean
 }
 
 const SERVICES: Service[] = [
-  { id: "google", kind: "month", price: 590 },
-  { id: "seo", kind: "month", price: 690 },
-  { id: "social", kind: "month", price: 490 },
-  { id: "audit", kind: "once", price: 490, coveredBy: "google" },
-  { id: "tracking", kind: "once", price: 390 },
-  { id: "start", kind: "once", price: 290 },
+  { id: "google", kind: "month", price: 290, setupFee: 390 },
+  { id: "seo", kind: "month", price: 330 },
+  { id: "social", kind: "month", price: 290 },
+  { id: "audit", kind: "once", price: 130, coveredBy: "google", flat: true },
+  { id: "tracking", kind: "once", price: 50, coveredBy: "google", flat: true },
 ]
 
-type Text = { name: string; desc: string; inc?: string; incLine?: string; coveredDesc?: string }
+type Text = {
+  name: string
+  desc: string
+  inc?: string
+  incLine?: string
+  coveredDesc?: string
+  setupLine?: string
+  note?: string
+}
 
 const eur = { style: "currency", currency: "EUR", maximumFractionDigits: 0 } as const
 
@@ -48,7 +59,9 @@ export function PriceBuilder({
   const active = SERVICES.filter((s) => picked.includes(s.id) && !isCovered(s))
   const covered = SERVICES.filter(isCovered)
   const monthly = active.filter((s) => s.kind === "month").reduce((sum, s) => sum + s.price, 0)
-  const once = active.filter((s) => s.kind === "once").reduce((sum, s) => sum + s.price, 0)
+  const once =
+    active.filter((s) => s.kind === "once").reduce((sum, s) => sum + s.price, 0) +
+    active.reduce((sum, s) => sum + (s.setupFee ?? 0), 0)
   const auditAlone = active.some((s) => s.id === "audit")
   const groups = [
     { kind: "month", legend: t.monthlyLegend },
@@ -106,13 +119,15 @@ export function PriceBuilder({
                     </span>
                     {tx.inc && <span className="text-[13px] font-semibold text-primary">{tx.inc}</span>}
                   </span>
-                  <span
-                    className={cn(
-                      "w-full pl-10 text-[17px] font-semibold whitespace-nowrap sm:w-auto sm:pl-0",
-                      cov && "text-primary"
+                  <span className="flex w-full flex-col gap-0.5 pl-10 sm:w-auto sm:items-end sm:pl-0">
+                    <span className={cn("text-[17px] font-semibold whitespace-nowrap", cov && "text-primary")}>
+                      {cov ? t.included : s.flat ? priceLabel(s) : `${t.from} ${priceLabel(s)}`}
+                    </span>
+                    {s.setupFee && !cov && (
+                      <span className="text-[13px] whitespace-nowrap text-muted-foreground">
+                        + {fmt(s.setupFee)} {t.setupShort}
+                      </span>
                     )}
-                  >
-                    {cov ? t.included : `${t.from} ${priceLabel(s)}`}
                   </span>
                 </label>
               )
@@ -140,6 +155,12 @@ export function PriceBuilder({
                     <span>{tx.name}</span>
                     <span className="whitespace-nowrap text-muted-foreground">{priceLabel(s)}</span>
                   </span>
+                  {s.setupFee && tx.setupLine && (
+                    <span className="flex justify-between gap-3">
+                      <span>+ {tx.setupLine}</span>
+                      <span className="whitespace-nowrap text-muted-foreground">{fmt(s.setupFee)}</span>
+                    </span>
+                  )}
                   {tx.incLine && (
                     <span className="flex justify-between gap-3">
                       <span>+ {tx.incLine}</span>
@@ -183,6 +204,11 @@ export function PriceBuilder({
           </div>
         )}
         {auditAlone && <p className="text-[13px] leading-snug text-primary">{t.auditNote}</p>}
+        {active.map((s) => text(s.id).note).filter(Boolean).map((note) => (
+          <p key={note} className="text-[13px] leading-snug text-muted-foreground">
+            {note}
+          </p>
+        ))}
         <p className="text-[13px] leading-snug text-muted-foreground">{t.budgetNote}</p>
 
         <Button size="lg" className="mt-1 h-12 text-base font-semibold" onClick={() => onSubmit(picked)}>

@@ -53,7 +53,7 @@ const SPRING = 11 // angular frequency, 1/s; settles in roughly 0.45 s
 // Where the form's centre is on screen (share of viewport height from the top)
 // when the tip lands. Below the middle, so even a fast flick, which the spring
 // trails by a fraction of a second, finishes while the form is still centred.
-const LAND_AT = 0.62
+const LAND_AT = 0.72 // 0.62 landed about 0.2 s too late at normal scroll speed
 // Scroll needed per pixel of ribbon that does not go down (the loop, the sideways run).
 // Going down, the tip moves 1:1 with the page, so it never races ahead of the reader.
 const SIDEWAYS_RATE = 0.6

@@ -147,7 +147,6 @@ export function Landing({
         <section id="services" className="relative z-1">
           <div className={`${wrap} py-16 lg:py-28`}>
             <h2 className={h2}>{t.services.h2}</h2>
-            <p className="mt-5 max-w-[56ch] text-xl leading-snug text-muted-foreground">{t.services.lead}</p>
             <Tabs
               defaultValue="google"
               orientation="vertical"
@@ -233,9 +232,11 @@ export function Landing({
           >
             <div>
               <h2 className={h2}>{form.h2}</h2>
-              <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-muted-foreground">
-                {form.lead}
-              </p>
+              {form.lead && (
+                <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-muted-foreground">
+                  {form.lead}
+                </p>
+              )}
             </div>
             {/* method/action make the form work as a plain POST before React loads, so data never lands in the URL */}
             <form
