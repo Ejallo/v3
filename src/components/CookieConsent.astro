@@ -15,8 +15,9 @@ const { lang } = Astro.props;
 const texts = {
 	ru: {
 		label: 'Настройки cookies',
-		text: 'Статистику (Google Analytics) и рекламу (Google Ads) я включаю только с вашего согласия. Без них сайт работает так же.',
-		more: 'Подробнее в Datenschutz',
+		title: 'Мы используем cookie',
+		text: 'Cookie помогают улучшать работу сайта и аналитику. Подробнее в',
+		more: 'политике конфиденциальности',
 		reject: 'Отклонить',
 		accept: 'Принять',
 		settings: 'Настроить',
@@ -26,8 +27,9 @@ const texts = {
 	},
 	de: {
 		label: 'Cookie-Einstellungen',
-		text: 'Statistik (Google Analytics) und Werbung (Google Ads) aktiviere ich nur mit Ihrer Einwilligung. Ohne sie funktioniert die Seite genauso.',
-		more: 'Mehr in der Datenschutzerklärung',
+		title: 'Wir verwenden Cookies',
+		text: 'Cookies helfen uns, die Website zu verbessern und die Nutzung zu analysieren. Mehr dazu in der',
+		more: 'Datenschutzerklärung',
 		reject: 'Ablehnen',
 		accept: 'Akzeptieren',
 		settings: 'Einstellungen',
@@ -48,9 +50,10 @@ const btn = 'h-10 flex-1 cursor-pointer rounded-sm px-4 text-sm font-bold';
 	aria-label={texts.label}
 	class="hidden fixed bottom-4 left-4 z-50 w-[min(420px,calc(100vw-2rem))] rounded-sm border border-border bg-muted p-4 text-sm shadow-2xl"
 >
+	<p class="mb-1.5 font-bold text-foreground">{texts.title}</p>
 	<p class="leading-relaxed text-foreground/80">
 		{texts.text}{' '}
-		<a href={privacyHref} class="text-primary underline underline-offset-4">{texts.more}</a>
+		<a href={privacyHref} class="text-primary underline underline-offset-4">{texts.more}</a>.
 	</p>
 	<div id="vv-consent-settings" class="mt-3 hidden flex-col gap-2">
 		<label class="flex items-center gap-2">
