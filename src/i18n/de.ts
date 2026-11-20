@@ -123,6 +123,7 @@ export const de: Dict = {
     all: "Alle",
     was: "Ausgangslage",
     did: "Was ich getan habe",
+    more: "Mehr in Notion",
     cta: {
       h2: "Möchten Sie ein solches Ergebnis?",
       order: "Projekt anfragen",
@@ -133,6 +134,7 @@ export const de: Dict = {
         channel: "Google Ads",
         client: "Onlineshop für Ersatzteile, Ukraine",
         when: "10.03.–06.10.2026",
+        notion: "https://voracious-triangle-1cc.notion.site/259233a16e8f8017a875d67db4dd16f7",
         figure: "×13,16",
         metric: "Jeder Werbe-Euro brachte 13,16 € Umsatz",
         stats: [
@@ -162,6 +164,7 @@ export const de: Dict = {
         channel: "Google Ads",
         client: "Klinik mit mehreren Fachrichtungen, Polen",
         when: "Mai 2024 – Oktober 2026",
+        notion: "https://voracious-triangle-1cc.notion.site/401233a16e8f80978f92cbd382f8368a",
         figure: "×5,97",
         metric: "Rückfluss je investiertem Złoty",
         stats: [
@@ -193,6 +196,7 @@ export const de: Dict = {
         channel: "SEO",
         client: "Klinik mit mehreren Fachrichtungen, Posen",
         when: "Dezember 2025 – Mai 2026",
+        notion: "https://voracious-triangle-1cc.notion.site/405233a16e8f81b9b721d221c2b535de",
         figure: "+87 %",
         metric: "mehr Besucher aus Google auf den Arztseiten",
         stats: [
@@ -225,6 +229,7 @@ export const de: Dict = {
         channel: "SEO",
         client: "Onlineshop für Ersatzteile, Ukraine",
         when: "Oktober 2025 – August 2026",
+        notion: "https://voracious-triangle-1cc.notion.site/413233a16e8f8192bd8bc06b9f6d9e17",
         figure: "+47 %",
         metric: "Umsatz aus der Google-Suche im Jahresvergleich",
         stats: [
@@ -254,6 +259,7 @@ export const de: Dict = {
         channel: "Google Ads",
         client: "Online-Dokumentenservice, Polen",
         when: "September 2025 – Oktober 2026",
+        notion: "https://voracious-triangle-1cc.notion.site/401233a16e8f8069938bf77361536d45",
         figure: "109 000 zł",
         small: true,
         metric: "mindestens brachte die Werbung an Online-Zahlungen",

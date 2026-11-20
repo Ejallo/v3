@@ -123,6 +123,7 @@ export const ru = {
     all: "Все",
     was: "Было",
     did: "Что сделал",
+    more: "Подробнее в Notion",
     cta: {
       h2: "Хотите такой же результат?",
       order: "Заказать",
@@ -133,6 +134,7 @@ export const ru = {
         channel: "Google Ads",
         client: "Интернет-магазин запчастей, Украина",
         when: "10.03—06.10.2026",
+        notion: "https://voracious-triangle-1cc.notion.site/259233a16e8f8017a875d67db4dd16f7",
         figure: "×13,16",
         metric: "Каждый евро рекламы принёс 13,16 € продаж",
         stats: [
@@ -162,6 +164,7 @@ export const ru = {
         channel: "Google Ads",
         client: "Многопрофильная клиника, Польша",
         when: "май 2024 — октябрь 2026",
+        notion: "https://voracious-triangle-1cc.notion.site/401233a16e8f80978f92cbd382f8368a",
         figure: "×5,97",
         metric: "вернул каждый злотый в рекламе",
         stats: [
@@ -193,6 +196,7 @@ export const ru = {
         channel: "SEO",
         client: "Многопрофильная клиника, Познань",
         when: "декабрь 2025 — май 2026",
+        notion: "https://voracious-triangle-1cc.notion.site/405233a16e8f81b9b721d221c2b535de",
         figure: "+87 %",
         metric: "переходов из Google на страницы врачей",
         stats: [
@@ -225,6 +229,7 @@ export const ru = {
         channel: "SEO",
         client: "Интернет-магазин запчастей, Украина",
         when: "октябрь 2025 — август 2026",
+        notion: "https://voracious-triangle-1cc.notion.site/413233a16e8f8192bd8bc06b9f6d9e17",
         figure: "+47 %",
         metric: "дохода из поиска Google за год",
         stats: [
@@ -254,6 +259,7 @@ export const ru = {
         channel: "Google Ads",
         client: "Онлайн-сервис документов, Польша",
         when: "сентябрь 2025 — октябрь 2026",
+        notion: "https://voracious-triangle-1cc.notion.site/401233a16e8f8069938bf77361536d45",
         figure: "109 000 zł",
         small: true,
         metric: "минимум принесла реклама онлайн-оплатами",
@@ -450,6 +456,8 @@ export type CasePageItem = {
   channel: string
   client: string
   when: string
+  /** Public Notion page with the full case */
+  notion?: string
   figure: string
   /** Long figures (a sum with a currency) get a smaller size */
   small?: boolean

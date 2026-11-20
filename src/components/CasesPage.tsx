@@ -77,6 +77,11 @@ export function CasesPage({ lang }: { lang: Lang }) {
                         <li key={d}>{d}</li>
                       ))}
                     </ol>
+                    {c.notion && (
+                      <a className="cp-more" href={c.notion} target="_blank" rel="noopener">
+                        {p.more} <span aria-hidden="true">↗</span>
+                      </a>
+                    )}
                   </div>
                 </div>
               </article>

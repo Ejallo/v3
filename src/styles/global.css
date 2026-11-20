@@ -652,6 +652,26 @@
   font-size: 13px;
   font-weight: 800;
 }
+.cp-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  margin-top: 24px;
+  padding: 0 20px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+.cp-more:hover {
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+}
+.cp-more:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
 .cp-cta {
   display: flex;
   flex-wrap: wrap;
