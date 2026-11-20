@@ -123,7 +123,7 @@ export const de: Dict = {
     all: "Alle",
     was: "Ausgangslage",
     did: "Was ich getan habe",
-    more: "Mehr in Notion",
+    more: "Mehr erfahren",
     cta: {
       h2: "Möchten Sie ein solches Ergebnis?",
       order: "Projekt anfragen",
