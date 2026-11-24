@@ -61,30 +61,118 @@ const p = t.prices;
     color: var(--grey);
     font-size: 14px;
   }
-  /* Packages: three slanted cards, L is the red one */
+  /* Packages: a staircase of thick slanted slabs, growing S < M < L */
   .sec :global(.pr-pk) {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 26px;
-    padding: 0 20px;
+    gap: 44px;
+    align-items: end;
+    padding: 0 40px 18px;
   }
   .sec :global(.pk) {
+    --lift: 0px;
+    position: relative;
+    isolation: isolate;
+    transform: skewX(var(--sk)) translateY(var(--lift));
+    transition: transform 0.55s cubic-bezier(0.2, 0.9, 0.25, 1.2);
+  }
+  /* slab thickness: a darker copy offset behind the face */
+  .sec :global(.pk::before) {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: translate(18px, 18px);
+    background: #1c1c1c;
+    border: 1px solid rgba(154, 160, 166, 0.25);
+    transition:
+      transform 0.55s cubic-bezier(0.2, 0.9, 0.25, 1.2),
+      background 0.3s;
+  }
+  .sec :global(.pk__face) {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     background: #000;
-    border: 1px solid var(--line-strong);
-    transform: skewX(var(--sk));
+    border: 1px solid rgba(154, 160, 166, 0.45);
+    transition:
+      box-shadow 0.45s,
+      border-color 0.3s;
+  }
+  /* Stair heights. The extra height of M and L sits above the text, so the text
+     rows line up across all three slabs and the buttons share one bottom line. */
+  .sec :global(.pk) {
+    --rise: 0px;
+  }
+  .sec :global(.pk:nth-child(2)) {
+    --rise: 80px;
+  }
+  .sec :global(.pk:nth-child(3)) {
+    --rise: 160px;
+  }
+  .sec :global(.pk__face) {
+    min-height: calc(560px + var(--rise));
+  }
+  .sec :global(.pk__step) {
+    position: absolute;
+    top: 18px;
+    right: 30px;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 150px;
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(253, 253, 253, 0.16);
+    transform: skewX(calc(var(--sk) * -1));
+    pointer-events: none;
+    transition: -webkit-text-stroke-color 0.4s;
   }
   .sec :global(.pk__in) {
+    position: relative;
+    flex: 1;
     transform: skewX(calc(var(--sk) * -1));
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-    padding: 30px 34px 30px 44px;
-    height: 100%;
+    padding: calc(32px + var(--rise)) 34px 32px 48px;
   }
-  .sec :global(.pk--top) {
+  .sec :global(.pk__ideal) {
+    margin-top: auto;
+  }
+  .sec :global(.pk--top .pk__face) {
     background: var(--red);
     border-color: var(--red);
+  }
+  .sec :global(.pk--top::before) {
+    background: #6e0204;
+    border-color: #6e0204;
+  }
+  /* Hover / focus: the slab lifts off its base and gets a white glow */
+  @media (hover: hover) {
+    .sec :global(.pk:hover) {
+      --lift: -16px;
+    }
+    .sec :global(.pk:hover::before) {
+      transform: translate(26px, 34px);
+    }
+    .sec :global(.pk:hover .pk__face) {
+      border-color: var(--fg);
+      box-shadow:
+        0 0 0 2px var(--fg),
+        0 0 46px rgba(253, 253, 253, 0.35),
+        0 0 120px rgba(253, 253, 253, 0.12);
+    }
+    .sec :global(.pk:hover .pk__step) {
+      -webkit-text-stroke-color: rgba(253, 253, 253, 0.55);
+    }
+  }
+  .sec :global(.pk:focus-within .pk__face) {
+    border-color: var(--fg);
+    box-shadow:
+      0 0 0 2px var(--fg),
+      0 0 46px rgba(253, 253, 253, 0.35);
   }
   .sec :global(.pk__combo) {
     font-size: 13px;
@@ -244,8 +332,19 @@ const p = t.prices;
       grid-template-columns: 1fr;
     }
     .sec :global(.pr-pk) {
-      padding: 0 26px;
-      gap: 16px;
+      padding: 0 40px 12px 26px;
+      gap: 34px;
+    }
+    /* one column: no stair heights */
+    .sec :global(.pr-pk .pk) {
+      --rise: 0px !important;
+    }
+    .sec :global(.pk .pk__face) {
+      min-height: 0 !important;
+    }
+    .sec :global(.pk__step) {
+      top: auto;
+      bottom: 14px;
     }
   }
   @media (max-width: 700px) {
@@ -262,12 +361,24 @@ const p = t.prices;
       font-size: 13px;
     }
     /* tall cards: a smaller slant so they stay inside the screen */
+    .sec :global(.pr-pk) {
+      padding: 0 22px 10px 12px;
+    }
     .sec :global(.pk) {
       transform: skewX(-4deg);
     }
-    .sec :global(.pk__in) {
+    .sec :global(.pk::before) {
+      transform: translate(10px, 10px);
+    }
+    .sec :global(.pk__in),
+    .sec :global(.pk__step) {
       transform: skewX(4deg);
+    }
+    .sec :global(.pk__in) {
       padding: 24px 22px 24px 26px;
+    }
+    .sec :global(.pk__step) {
+      font-size: 120px;
     }
   }
 </style>

@@ -75,6 +75,8 @@ export default function Pricing({ lang, t, from }: Props) {
         <div className="pr-pk">
           {PACKAGES.map((p, i) => (
             <article className={`pk${i === 2 ? ' pk--top' : ''}`} key={p.name}>
+              <div className="pk__face">
+              <span className="pk__step" aria-hidden="true">{p.name.charAt(0)}</span>
               <div className="pk__in">
                 <p className="pk__combo">{p.combo[lang]}</p>
                 <h3>{p.name}</h3>
@@ -94,6 +96,7 @@ export default function Pricing({ lang, t, from }: Props) {
                   {t.idealFor}: {p.ideal[lang]}
                 </p>
                 <Btn variant={i === 2 ? 'light' : 'ghost'}>{t.choose}</Btn>
+              </div>
               </div>
             </article>
           ))}

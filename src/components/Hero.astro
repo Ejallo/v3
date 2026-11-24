@@ -36,13 +36,6 @@ const { t } = Astro.props;
     </div>
   </div>
 
-  <div class="wrap hero__facts">
-    <ul>
-      <li><b>{BUSINESS.hours.weekdays}</b>{t.hero.hoursLong}</li>
-      <li><b>{t.hero.parkingTitle}</b>{t.hero.parkingText}</li>
-      <li><b>{t.hero.measureTitle}</b>{t.hero.measureText}</li>
-    </ul>
-  </div>
 </section>
 
 <style>
@@ -118,24 +111,6 @@ const { t } = Astro.props;
     margin-top: 38px;
     padding-left: 8px;
   }
-  .hero__facts {
-    padding-bottom: clamp(24px, 3vw, 44px);
-  }
-  .hero__facts ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px 44px;
-    font-size: 14px;
-    color: var(--grey);
-  }
-  .hero__facts b {
-    display: block;
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(18px, 1.4vw, 24px);
-    color: var(--fg);
-    line-height: 1.2;
-  }
 
   /* Phone: photo on top in a slanted frame, text below on black */
   @media (max-width: 900px) {
@@ -176,13 +151,6 @@ const { t } = Astro.props;
     }
     .hero__cta :global(.fbtn) {
       padding: 0 14px;
-    }
-    .hero__facts ul {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px 20px;
-      border-top: 1px solid var(--line);
-      padding-top: 22px;
     }
   }
 </style>
