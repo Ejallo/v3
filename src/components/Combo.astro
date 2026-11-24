@@ -13,7 +13,7 @@ const c = t.combo;
 
 <section class="combo">
   <div class="combo__bg" aria-hidden="true">
-    <Picture src={bg} alt="" widths={[800, 1400, 2000]} sizes="(max-width: 900px) 100vw, 50vw" formats={['avif', 'webp']} quality={60} />
+    <Picture src={bg} alt="" widths={[800, 1400, 2000]} sizes="(max-width: 900px) 100vw, 55vw" formats={['avif', 'webp']} quality={80} />
   </div>
   <div class="wrap combo__grid">
     <div class="combo__txt">
@@ -24,7 +24,7 @@ const c = t.combo;
     </div>
     <ol class="combo__steps">
       {c.steps.map((st, i) => (
-        <li class:list={{ last: i === c.steps.length - 1 }} style={`--i:${i}`}>
+        <li class:list={["neon", { last: i === c.steps.length - 1 }]} style={`--i:${i}`}>
           <div>
             <b>{st.title}</b>
             <small>{st.text}</small>

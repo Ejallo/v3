@@ -35,16 +35,16 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
       {s.items.map((it, i) => {
         const img = photos[i];
         return (
-          <li class="tile">
+          <li class="tile neon">
             <div class="tile__img">
               {img ? (
                 <Picture
                   src={img}
                   alt=""
-                  widths={[480, 720, 960]}
-                  sizes="(max-width: 900px) 80vw, 34vw"
+                  widths={[600, 900, 1200, 1600]}
+                  sizes="(max-width: 700px) 110vw, (max-width: 1100px) 65vw, 46vw"
                   formats={['avif', 'webp']}
-                  quality={66}
+                  quality={82}
                   style={`object-position:${positions[i]}`}
                 />
               ) : (
@@ -80,12 +80,6 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
     </ul>
   </div>
 
-  <div class="wrap">
-    <div class="svc-hint">
-      <p>{s.hint}</p>
-      <FlowButton href="#objednat" variant="light" size="sm">{s.hintCta}</FlowButton>
-    </div>
-  </div>
 </section>
 
 <style>
@@ -111,52 +105,6 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
     background: #000;
     transform: skewX(var(--sk));
     overflow: hidden;
-    transition: box-shadow 0.6s;
-  }
-  /* Neon outline: a white light slowly runs around the card edge on hover */
-  @property --neon {
-    syntax: '<angle>';
-    inherits: false;
-    initial-value: 0deg;
-  }
-  .tile::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    padding: 2px;
-    background: conic-gradient(
-      from var(--neon),
-      rgba(253, 253, 253, 0.25) 0deg,
-      rgba(253, 253, 253, 0.25) 230deg,
-      #fff 300deg,
-      rgba(253, 253, 253, 0.25) 360deg
-    );
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s;
-    animation: neon-run 3.6s linear infinite paused;
-  }
-  @keyframes neon-run {
-    to {
-      --neon: 360deg;
-    }
-  }
-  @media (hover: hover) {
-    .tile:hover {
-      box-shadow:
-        0 0 26px rgba(253, 253, 253, 0.22),
-        0 0 70px rgba(253, 253, 253, 0.08);
-    }
-    .tile:hover::after {
-      opacity: 1;
-      animation-play-state: running;
-    }
   }
   .tile__img {
     position: relative;
@@ -246,21 +194,6 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
     text-transform: uppercase;
     color: var(--muted);
   }
-  .svc-hint {
-    margin-top: clamp(80px, 8vw, 120px);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px 24px;
-    flex-wrap: wrap;
-    padding: 24px 0;
-    border-top: 1px solid var(--line);
-  }
-  .svc-hint p {
-    font-family: var(--display);
-    font-weight: 500;
-    font-size: clamp(17px, 1.4vw, 22px);
-  }
 
   @media (max-width: 1100px) {
     .tiles {
@@ -301,9 +234,6 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
     }
     .tile__price {
       font-size: 20px;
-    }
-    .svc-hint {
-      margin-top: 40px;
     }
   }
 </style>

@@ -75,7 +75,7 @@ export default function Pricing({ lang, t, from }: Props) {
         <div className="pr-pk">
           {PACKAGES.map((p, i) => (
             <article className={`pk${i === 2 ? ' pk--top' : ''}`} key={p.name}>
-              <div className="pk__face">
+              <div className="pk__face neon">
               <span className="pk__step" aria-hidden="true">{p.name.charAt(0)}</span>
               <div className="pk__in">
                 <p className="pk__combo">{p.combo[lang]}</p>

@@ -25,7 +25,7 @@ const strip = [
   [g4, 6],
   [g5, 5],
 ] as const;
-const baProps = { widths: [600, 1000, 1400, 1880], sizes: '(max-width: 900px) 100vw, 62vw', quality: 72 };
+const baProps = { widths: [600, 1000, 1400, 1880], sizes: '(max-width: 900px) 100vw, 62vw', quality: 85 };
 ---
 
 <section class="sec" id="realizace">
@@ -44,8 +44,8 @@ const baProps = { widths: [600, 1000, 1400, 1880], sizes: '(max-width: 900px) 10
       </div>
       <ul class="works__strip">
         {strip.map(([img, alt]) => (
-          <li>
-            <Picture src={img} alt={w.alts.gallery[alt]} widths={[300, 500]} sizes="(max-width: 900px) 40vw, 16vw" formats={['avif', 'webp']} quality={64} loading="lazy" />
+          <li class="neon">
+            <Picture src={img} alt={w.alts.gallery[alt]} widths={[400, 600, 900]} sizes="(max-width: 900px) 40vw, 22vw" formats={['avif', 'webp']} quality={82} loading="lazy" />
           </li>
         ))}
         <li class="works__ig">
@@ -152,20 +152,29 @@ const baProps = { widths: [600, 1000, 1400, 1880], sizes: '(max-width: 900px) 10
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
+  /* slanted tiles via skew (not clip-path) so the neon edge follows the shape */
   .works__strip li {
     aspect-ratio: 1;
-    clip-path: polygon(12% 0, 100% 0, 88% 100%, 0 100%);
+    transform: skewX(var(--sk));
     overflow: hidden;
     background: #151515;
   }
   .works__strip :global(img) {
-    width: 100%;
+    position: absolute;
+    top: 0;
+    left: -14%;
+    width: 128%;
+    max-width: none;
     height: 100%;
     object-fit: cover;
+    transform: skewX(calc(var(--sk) * -1));
     transition: scale 0.8s cubic-bezier(0.19, 1, 0.22, 1);
   }
   .works__strip li:hover :global(img) {
     scale: 1.06;
+  }
+  .works__ig > div {
+    transform: skewX(calc(var(--sk) * -1));
   }
   .works__strip .works__ig {
     display: flex;

@@ -1,7 +1,6 @@
 ---
 import type { Dict } from '@/i18n/cs';
 import Pricing from './Pricing';
-import FlowButton from './FlowButton.astro';
 
 interface Props {
   t: Dict;
@@ -18,14 +17,6 @@ const p = t.prices;
 
     <Pricing client:visible lang={t.lang as 'cs' | 'ru'} t={p} from={t.services.from} />
 
-    <div class="calc">
-      <div class="stripes" aria-hidden="true"><i></i><i></i><i></i></div>
-      <div class="calc__txt">
-        <h3>{p.calcTitle}</h3>
-        <p>{p.calcText}</p>
-      </div>
-      <FlowButton href="#objednat" variant="light">{p.calcCta}</FlowButton>
-    </div>
   </div>
 </section>
 
@@ -57,7 +48,7 @@ const p = t.prices;
     border-bottom-color: var(--red);
   }
   .sec :global(.pr-lead) {
-    margin-top: 28px;
+    margin-top: 0;
     color: var(--grey);
     font-size: 14px;
   }
@@ -67,7 +58,7 @@ const p = t.prices;
     grid-template-columns: repeat(3, 1fr);
     gap: 44px;
     align-items: end;
-    padding: 0 40px 18px;
+    padding: 0 40px 150px;
   }
   .sec :global(.pk) {
     --lift: 0px;
@@ -76,18 +67,9 @@ const p = t.prices;
     transform: skewX(var(--sk)) translateY(var(--lift));
     transition: transform 0.55s cubic-bezier(0.2, 0.9, 0.25, 1.2);
   }
-  /* slab thickness: a darker copy offset behind the face */
-  .sec :global(.pk::before) {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    transform: translate(18px, 18px);
-    background: #1c1c1c;
-    border: 1px solid rgba(154, 160, 166, 0.25);
-    transition:
-      transform 0.55s cubic-bezier(0.2, 0.9, 0.25, 1.2),
-      background 0.3s;
+  /* glossy floor: a faded mirror image of the slab below it */
+  .sec :global(.pk) {
+    -webkit-box-reflect: below 12px linear-gradient(transparent 80%, rgba(255, 255, 255, 0.2));
   }
   .sec :global(.pk__face) {
     position: relative;
@@ -145,34 +127,8 @@ const p = t.prices;
     background: var(--red);
     border-color: var(--red);
   }
-  .sec :global(.pk--top::before) {
-    background: #6e0204;
-    border-color: #6e0204;
-  }
-  /* Hover / focus: the slab lifts off its base and gets a white glow */
-  @media (hover: hover) {
-    .sec :global(.pk:hover) {
-      --lift: -16px;
-    }
-    .sec :global(.pk:hover::before) {
-      transform: translate(26px, 34px);
-    }
-    .sec :global(.pk:hover .pk__face) {
-      border-color: var(--fg);
-      box-shadow:
-        0 0 0 2px var(--fg),
-        0 0 46px rgba(253, 253, 253, 0.35),
-        0 0 120px rgba(253, 253, 253, 0.12);
-    }
-    .sec :global(.pk:hover .pk__step) {
-      -webkit-text-stroke-color: rgba(253, 253, 253, 0.55);
-    }
-  }
-  .sec :global(.pk:focus-within .pk__face) {
-    border-color: var(--fg);
-    box-shadow:
-      0 0 0 2px var(--fg),
-      0 0 46px rgba(253, 253, 253, 0.35);
+  .sec :global(.pk:hover .pk__step) {
+    -webkit-text-stroke-color: rgba(253, 253, 253, 0.5);
   }
   .sec :global(.pk__combo) {
     font-size: 13px;
@@ -303,29 +259,6 @@ const p = t.prices;
   .sec :global(.pr-special > p) {
     margin-bottom: 8px;
   }
-  .calc {
-    margin-top: clamp(48px, 5vw, 80px);
-    display: flex;
-    align-items: center;
-    gap: 20px 36px;
-    flex-wrap: wrap;
-    padding-top: 32px;
-    border-top: 1px solid var(--line);
-  }
-  .calc .stripes {
-    height: 54px;
-  }
-  .calc__txt {
-    flex: 1;
-    min-width: 240px;
-  }
-  .calc h3 {
-    font-size: clamp(22px, 1.8vw, 30px);
-  }
-  .calc p {
-    margin-top: 6px;
-    color: var(--muted);
-  }
   @media (max-width: 1100px) {
     .sec :global(.pr-pk),
     .sec :global(.pr-progs) {
@@ -334,6 +267,12 @@ const p = t.prices;
     .sec :global(.pr-pk) {
       padding: 0 40px 12px 26px;
       gap: 34px;
+    }
+    .sec :global(.pk) {
+      -webkit-box-reflect: none;
+    }
+    .sec :global(.pr-lead) {
+      margin-top: 28px;
     }
     /* one column: no stair heights */
     .sec :global(.pr-pk .pk) {
@@ -366,9 +305,6 @@ const p = t.prices;
     }
     .sec :global(.pk) {
       transform: skewX(-4deg);
-    }
-    .sec :global(.pk::before) {
-      transform: translate(10px, 10px);
     }
     .sec :global(.pk__in),
     .sec :global(.pk__step) {

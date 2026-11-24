@@ -20,19 +20,19 @@ const services = t.services.items.map((i) => i.title);
       <p class="ct__promise">{c.promise}</p>
       <ul class="qc">
         <li>
-          <a href={BUSINESS.phoneHref}>
+          <a class="neon" href={BUSINESS.phoneHref}>
             <Phone size={20} strokeWidth={1.6} aria-hidden="true" />
             <span><small>{c.phone}</small><b>{BUSINESS.phone}</b></span>
           </a>
         </li>
         <li>
-          <a href={BUSINESS.whatsapp} target="_blank" rel="noopener">
+          <a class="neon" href={BUSINESS.whatsapp} target="_blank" rel="noopener">
             <MessageCircle size={20} strokeWidth={1.6} aria-hidden="true" />
             <span><small>WhatsApp</small><b>{c.write}</b></span>
           </a>
         </li>
         <li>
-          <a href={BUSINESS.telegram} target="_blank" rel="noopener">
+          <a class="neon" href={BUSINESS.telegram} target="_blank" rel="noopener">
             <Send size={20} strokeWidth={1.6} aria-hidden="true" />
             <span><small>Telegram</small><b>{c.write}</b></span>
           </a>
@@ -130,10 +130,10 @@ const services = t.services.items.map((i) => i.title);
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 16px 0;
+    padding: 16px 14px;
     text-decoration: none;
   }
-  .qc a:hover b {
+  .qc a:hover :global(svg) {
     color: var(--red);
   }
   .qc :global(svg) {

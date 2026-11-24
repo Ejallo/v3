@@ -247,3 +247,69 @@ strong {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* One hover language for everything clickable: the card lifts a little and a white
+   light slowly runs around its edge. Text-only blocks stay still. On touch screens
+   the same light shows while the card is pressed. */
+@property --neon {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.neon {
+  position: relative;
+  top: 0;
+  transition:
+    top 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.2),
+    box-shadow 0.5s;
+}
+
+.neon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--neon),
+    rgba(253, 253, 253, 0.28) 0deg,
+    rgba(253, 253, 253, 0.28) 220deg,
+    #fff 300deg,
+    rgba(253, 253, 253, 0.28) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s;
+  animation: neon-run 3.6s linear infinite paused;
+}
+
+@keyframes neon-run {
+  to {
+    --neon: 360deg;
+  }
+}
+
+@media (hover: hover) {
+  .neon:hover {
+    top: -8px;
+    box-shadow:
+      0 0 26px rgba(253, 253, 253, 0.22),
+      0 0 70px rgba(253, 253, 253, 0.08);
+  }
+  .neon:hover::after {
+    opacity: 1;
+    animation-play-state: running;
+  }
+}
+
+.neon:active::after,
+.neon:focus-within::after {
+  opacity: 1;
+  animation-play-state: running;
+}

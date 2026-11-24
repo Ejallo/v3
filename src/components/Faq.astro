@@ -43,7 +43,27 @@ const jsonLd = {
     border-top: 1px solid var(--line);
   }
   details {
+    position: relative;
     border-bottom: 1px solid var(--line);
+  }
+  /* hover: a white bar slides in on the left */
+  details::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 22px;
+    width: 4px;
+    height: 0;
+    background: var(--fg);
+    transform: skewX(var(--sk));
+    transition: height 0.35s cubic-bezier(0.2, 0.9, 0.25, 1.2);
+  }
+  details:hover::before,
+  details[open]::before {
+    height: 30px;
+  }
+  details[open]::before {
+    background: var(--red);
   }
   summary {
     list-style: none;
