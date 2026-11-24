@@ -68,15 +68,11 @@ export default function ContactForm({ t, services, lang }: Props) {
         <span>{t.gdpr}</span>
       </label>
       <div className="cf__foot">
-        <button className="fbtn fbtn--primary fbtn--arrow" type="submit" disabled={state === 'sending'}>
-          <svg className="fbtn__a fbtn__a--in" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
-          <span className="fbtn__t">{state === 'sending' ? t.sending : t.submit}</span>
+        <button className="fbtn fbtn--primary" type="submit" disabled={state === 'sending'}>
           <span className="fbtn__c" aria-hidden="true" />
-          <svg className="fbtn__a fbtn__a--out" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
+          <span className="fbtn__in">
+            <span className="fbtn__t">{state === 'sending' ? t.sending : t.submit}</span>
+          </span>
         </button>
         <p className="cf__msg" role="status" aria-live="polite">
           {state === 'ok' && t.ok}

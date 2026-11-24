@@ -1,6 +1,5 @@
 ---
 import { Picture } from 'astro:assets';
-import { MapPin, Clock, SquareParking, Gauge, Camera, FlaskConical } from 'lucide-react';
 import type { Dict } from '@/i18n/cs';
 import { BUSINESS } from '@/config';
 import FlowButton from './FlowButton.astro';
@@ -10,56 +9,43 @@ interface Props {
   t: Dict;
 }
 const { t } = Astro.props;
-const badgeIcons = [Gauge, Camera, FlaskConical];
 ---
 
 <section class="hero">
-  <div class="hero__bg" aria-hidden="true">
+  <div class="hero__win" aria-hidden="true">
     <Picture
       src={heroImg}
       alt=""
-      widths={[640, 960, 1400, 1920, 2400]}
-      sizes="100vw"
+      widths={[640, 960, 1400, 1920, 2560]}
+      sizes="(max-width: 900px) 100vw, 64vw"
       formats={['avif', 'webp']}
       loading="eager"
       fetchpriority="high"
-      quality={70}
+      quality={72}
     />
   </div>
+  <div class="stripes hero__stripes" aria-hidden="true"><i></i><i></i><i></i></div>
+
   <div class="wrap hero__txt">
-    <p class="hero__eyebrow"><span class="dot"></span>{t.hero.eyebrow}</p>
     <h1>{t.hero.title}</h1>
+    <p class="hero__addr">{BUSINESS.street}, {BUSINESS.city}</p>
     <p class="hero__sub">{t.hero.sub}</p>
-    <ul class="hero__tags">
-      {t.hero.tags.map((tag) => <li>{tag}</li>)}
-    </ul>
     <div class="hero__cta">
       <FlowButton href="#objednat" variant="primary">{t.nav.book}</FlowButton>
-      <FlowButton href={BUSINESS.phoneHref} variant="ghost" arrow={false}>{t.nav.call}</FlowButton>
+      <FlowButton href={BUSINESS.phoneHref} arrow={false}>{t.nav.call}</FlowButton>
     </div>
-    <ul class="hero__info">
-      <li><MapPin size={16} strokeWidth={1.75} aria-hidden="true" />{BUSINESS.city} · {BUSINESS.street}</li>
-      <li><Clock size={16} strokeWidth={1.75} aria-hidden="true" />{t.hero.hours} {BUSINESS.hours.weekdays}</li>
-      <li><SquareParking size={16} strokeWidth={1.75} aria-hidden="true" />{t.hero.parking}</li>
-    </ul>
   </div>
-  <div class="wrap hero__bot">
-    <ul class="hero__badges">
-      {t.hero.badges.map((b, i) => {
-        const Icon = badgeIcons[i];
-        return (
-          <li>
-            <Icon size={20} strokeWidth={1.6} aria-hidden="true" />
-            {b}
-          </li>
-        );
-      })}
+
+  <div class="wrap hero__facts">
+    <ul>
+      <li><b>{BUSINESS.hours.weekdays}</b>{t.hero.hoursLong}</li>
+      <li><b>{t.hero.parkingTitle}</b>{t.hero.parkingText}</li>
+      <li><b>{t.hero.measureTitle}</b>{t.hero.measureText}</li>
     </ul>
   </div>
 </section>
 
 <style>
-  /* Full-bleed photo behind the first screen; the sticky header sits on top of it. */
   .hero {
     position: relative;
     isolation: isolate;
@@ -71,160 +57,132 @@ const badgeIcons = [Gauge, Camera, FlaskConical];
     flex-direction: column;
     justify-content: center;
   }
-  /* Photo shifted right so the car (and the plate) clear the text column. */
-  .hero__bg {
+  /* The photo sits in a slanted window on the right */
+  .hero__win {
     position: absolute;
-    inset: 0 0 0 16%;
     z-index: -1;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 64%;
+    clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 100%);
   }
-  .hero__bg :global(img) {
+  .hero__win :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 55%;
+    object-position: 46% 50%;
   }
-  /* Darker on the left where the text is, clear on the right where the car is. */
-  .hero__bg::after {
-    content: '';
+  /* Logo stripes run down along the window edge */
+  .hero__stripes {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.75) 26%, rgba(0, 0, 0, 0.15) 62%, rgba(0, 0, 0, 0.1) 100%);
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: calc(36% + 6.5vw);
+    transform: translateX(-100%);
+  }
+  .hero__stripes i {
+    height: 100%;
+    width: 9px;
+    transform: skewX(-12.5deg);
+    transform-origin: bottom;
   }
   .hero__txt {
-    padding-top: clamp(48px, 7vw, 120px);
-    padding-bottom: 40px;
-  }
-  .hero__txt > * {
-    max-width: 860px;
-  }
-  .hero__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--display);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 24px;
-  }
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--red);
+    padding-top: clamp(32px, 5vw, 80px);
+    padding-bottom: clamp(32px, 4vw, 56px);
   }
   h1 {
-    font-size: clamp(40px, 5.6vw, 92px);
-    text-transform: uppercase;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    max-width: 14ch;
-    border-left: 4px solid var(--red);
-    padding-left: clamp(18px, 2vw, 28px);
+    font-size: clamp(46px, 5.8vw, 112px);
+    font-weight: 800;
+    line-height: 0.92;
+    max-width: 9ch;
+  }
+  .hero__addr {
+    margin-top: 26px;
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(17px, 1.3vw, 22px);
+    color: var(--grey);
   }
   .hero__sub {
-    margin-top: 28px;
-    font-size: clamp(16px, 1.25vw, 19px);
-    color: #e2e5e8;
-    max-width: 56ch;
-  }
-  .hero__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 28px;
-  }
-  .hero__tags li {
-    border: 1px solid var(--line-strong);
-    border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 13.5px;
-    background: rgba(0, 0, 0, 0.35);
+    margin-top: 16px;
+    max-width: 38ch;
+    color: var(--muted);
+    font-size: clamp(16px, 1.15vw, 19px);
   }
   .hero__cta {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 36px;
+    gap: 14px;
+    margin-top: 38px;
+    padding-left: 8px;
   }
-  .hero__info {
+  .hero__facts {
+    padding-bottom: clamp(24px, 3vw, 44px);
+  }
+  .hero__facts ul {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px 28px;
-    margin-top: 36px;
+    gap: 16px 44px;
     font-size: 14px;
-    color: var(--muted);
-  }
-  .hero__info li {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .hero__info :global(svg) {
     color: var(--grey);
   }
-  .hero__bot {
-    padding-bottom: clamp(24px, 3vw, 48px);
-  }
-  .hero__badges {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-  }
-  .hero__badges li {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 22px 24px;
+  .hero__facts b {
+    display: block;
     font-family: var(--display);
     font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .hero__badges li + li {
-    border-left: 1px solid var(--line);
-  }
-  .hero__badges :global(svg) {
-    color: var(--red);
-    flex: none;
+    font-size: clamp(18px, 1.4vw, 24px);
+    color: var(--fg);
+    line-height: 1.2;
   }
 
+  /* Phone: photo on top in a slanted frame, text below on black */
   @media (max-width: 900px) {
     .hero {
       min-height: auto;
       justify-content: flex-start;
     }
-    /* Phone: the car sits on top, the text below it on black. */
-    .hero__bg {
-      left: 0;
-      bottom: auto;
-      height: calc(var(--header-h) + 105vw);
+    .hero__win {
+      position: relative;
+      z-index: 0;
+      width: 100%;
+      height: 74vw;
+      margin-top: calc(-1 * var(--header-h));
+      clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
     }
-    .hero__bg :global(img) {
-      object-position: 50% 58%;
+    .hero__win :global(img) {
+      object-position: 50% 40%;
     }
-    .hero__bg::after {
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 22%, rgba(0, 0, 0, 0) 55%, #000 100%);
+    .hero__stripes {
+      position: relative;
+      z-index: 1;
+      left: auto;
+      transform: none;
+      height: 60px;
+      margin: -34px 0 0 calc(var(--gutter) + 6px);
+      gap: 9px;
+    }
+    .hero__stripes i {
+      width: 6px;
     }
     .hero__txt {
-      padding-top: 78vw;
+      padding-top: 18px;
     }
-    .hero__badges {
-      grid-template-columns: 1fr;
+    .hero__cta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
-    .hero__badges li {
-      padding: 16px 18px;
+    .hero__cta :global(.fbtn) {
+      padding: 0 14px;
     }
-    .hero__badges li + li {
-      border-left: 0;
+    .hero__facts ul {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 20px;
       border-top: 1px solid var(--line);
+      padding-top: 22px;
     }
   }
 </style>

@@ -1,7 +1,6 @@
 ---
-// CSS-only take on the 21st.dev "FlowButton" (MIT, @xubohuah), recoloured to the brand kit:
-// on hover a circle grows from the centre, the pill turns into a rounded rectangle,
-// the arrow slides out on the right and a second one slides in on the left.
+// Slanted parallelogram button with the 21st.dev "FlowButton" hover (MIT, @xubohuah):
+// a fill grows from the centre and the arrow slides through. Recoloured to the brand kit.
 interface Props {
   href: string;
   variant?: 'primary' | 'ghost' | 'light';
@@ -15,24 +14,26 @@ const { href, variant = 'ghost', size = 'md', arrow = true, class: cls = '', tar
 ---
 
 <a href={href} class:list={['fbtn', `fbtn--${variant}`, `fbtn--${size}`, { 'fbtn--arrow': arrow }, cls]} target={target} rel={rel}>
-  {arrow && (
-    <svg class="fbtn__a fbtn__a--in" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  )}
-  <span class="fbtn__t"><slot /></span>
   <span class="fbtn__c" aria-hidden="true"></span>
-  {arrow && (
-    <svg class="fbtn__a fbtn__a--out" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  )}
+  <span class="fbtn__in">
+    {arrow && (
+      <svg class="fbtn__a fbtn__a--in" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    )}
+    <span class="fbtn__t"><slot /></span>
+    {arrow && (
+      <svg class="fbtn__a fbtn__a--out" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    )}
+  </span>
 </a>
 
 <style is:global>
   .fbtn {
     --fb-fg: var(--fg);
-    --fb-border: rgba(253, 253, 253, 0.45);
+    --fb-border: rgba(253, 253, 253, 0.5);
     --fb-bg: transparent;
     --fb-fill: var(--fg);
     --fb-on-fill: #000;
@@ -40,45 +41,35 @@ const { href, variant = 'ghost', size = 'md', arrow = true, class: cls = '', tar
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
     overflow: hidden;
     isolation: isolate;
     border: 1.5px solid var(--fb-border);
-    border-radius: 100px;
     background: var(--fb-bg);
     color: var(--fb-fg);
-    padding: 15px 34px;
+    min-height: 56px;
+    padding: 0 34px;
     font-family: var(--display);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
+    transform: skewX(var(--sk));
     transition:
-      border-radius 0.6s cubic-bezier(0.23, 1, 0.32, 1),
       color 0.6s cubic-bezier(0.23, 1, 0.32, 1),
       border-color 0.6s cubic-bezier(0.23, 1, 0.32, 1),
       scale 0.15s ease-out;
   }
   .fbtn--sm {
-    padding: 11px 24px;
-    font-size: 12.5px;
-  }
-  .fbtn--arrow {
-    padding-left: 30px;
-    padding-right: 52px;
-  }
-  .fbtn--sm.fbtn--arrow {
-    padding-left: 22px;
-    padding-right: 42px;
+    min-height: 44px;
+    padding: 0 22px;
+    font-size: 13px;
   }
   .fbtn--primary {
     --fb-bg: var(--red);
     --fb-border: var(--red);
-    --fb-fill: var(--fg);
-    --fb-on-fill: #000;
   }
   .fbtn--light {
     --fb-bg: var(--fg);
@@ -87,14 +78,16 @@ const { href, variant = 'ghost', size = 'md', arrow = true, class: cls = '', tar
     --fb-fill: var(--red);
     --fb-on-fill: var(--fg);
   }
-  .fbtn__t {
+  .fbtn__in {
     position: relative;
     z-index: 1;
-    translate: -6px 0;
-    transition: translate 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transform: skewX(calc(var(--sk) * -1));
   }
-  .fbtn:not(.fbtn--arrow) .fbtn__t {
-    translate: none;
+  .fbtn__t {
+    transition: translate 0.8s cubic-bezier(0.23, 1, 0.32, 1);
   }
   .fbtn__c {
     position: absolute;
@@ -106,62 +99,50 @@ const { href, variant = 'ghost', size = 'md', arrow = true, class: cls = '', tar
     background: var(--fb-fill);
     opacity: 0;
     translate: -50% -50%;
-    z-index: 0;
     transition:
       width 0.8s cubic-bezier(0.19, 1, 0.22, 1),
       opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1);
   }
   .fbtn__a {
-    position: absolute;
-    top: 50%;
     width: 16px;
     height: 16px;
-    translate: 0 -50%;
-    z-index: 1;
     fill: none;
     stroke: currentColor;
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
-    transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .fbtn__a--out {
-    right: 22px;
+    transition:
+      translate 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.4s;
   }
   .fbtn__a--in {
-    left: -30%;
-  }
-  .fbtn--sm .fbtn__a--out {
-    right: 17px;
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    translate: -40px 0;
   }
   @media (hover: hover) {
     .fbtn:hover {
-      border-radius: 12px;
       color: var(--fb-on-fill);
       border-color: var(--fb-fill);
     }
     .fbtn:hover .fbtn__c {
-      width: 160%;
+      width: 170%;
       opacity: 1;
     }
     .fbtn--arrow:hover .fbtn__t {
-      translate: 10px 0;
+      translate: 26px 0;
     }
-    .fbtn:hover .fbtn__a--out {
-      right: -30%;
+    .fbtn--arrow:hover .fbtn__a--out {
+      translate: 40px 0;
+      opacity: 0;
     }
-    .fbtn:hover .fbtn__a--in {
-      left: 20px;
-    }
-    .fbtn--sm:hover .fbtn__a--in {
-      left: 15px;
+    .fbtn--arrow:hover .fbtn__a--in {
+      translate: 0 0;
+      opacity: 1;
     }
   }
   .fbtn:active {
     scale: 0.96;
-  }
-  .fbtn:focus-visible {
-    outline: 2px solid var(--fg);
-    outline-offset: 3px;
   }
 </style>

@@ -16,7 +16,6 @@ const jsonLd = {
 <section class="sec" id="faq">
   <div class="wrap faq">
     <div>
-      <p class="sec-label">07 / {f.label}</p>
       <h2 class="sec-title">{f.title}</h2>
     </div>
     <div class="faq__list">
@@ -48,6 +47,7 @@ const jsonLd = {
   }
   summary {
     list-style: none;
+    text-transform: uppercase;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -56,7 +56,7 @@ const jsonLd = {
     cursor: pointer;
     font-family: var(--display);
     font-weight: 600;
-    font-size: clamp(16px, 1.3vw, 19px);
+    font-size: clamp(16px, 1.35vw, 21px);
   }
   summary::-webkit-details-marker {
     display: none;
@@ -67,7 +67,7 @@ const jsonLd = {
     width: 34px;
     height: 34px;
     border: 1px solid var(--line-strong);
-    border-radius: 50%;
+    transform: skewX(var(--sk));
     transition:
       rotate 0.4s,
       border-color 0.3s,
@@ -86,9 +86,12 @@ const jsonLd = {
   }
   summary i::after {
     rotate: 90deg;
+    transition: rotate 0.3s;
+  }
+  details[open] summary i::after {
+    rotate: 0deg;
   }
   details[open] summary i {
-    rotate: 45deg;
     background: var(--red);
     border-color: var(--red);
   }

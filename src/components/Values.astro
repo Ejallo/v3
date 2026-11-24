@@ -10,61 +10,77 @@ const icons = [Gauge, FlaskConical, ClipboardCheck];
 ---
 
 <section class="values" aria-label="Remauto">
-  <div class="wrap values__grid">
-    {t.values.map((v, i) => {
-      const Icon = icons[i];
-      return (
-        <article class="val">
-          <span class="val__n">0{i + 1}</span>
-          <Icon size={28} strokeWidth={1.4} aria-hidden="true" />
-          <h3>{v.title}</h3>
-          <p>{v.text}</p>
-        </article>
-      );
-    })}
+  <div class="wrap">
+    <ul class="values__row">
+      {t.values.map((v, i) => {
+        const Icon = icons[i];
+        return (
+          <li>
+            <Icon size={30} strokeWidth={1.4} aria-hidden="true" />
+            <div>
+              <h3>{v.title}</h3>
+              <p>{v.text}</p>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   </div>
 </section>
 
 <style>
   .values {
-    padding: 0 0 clamp(64px, 8vw, 120px);
+    padding: clamp(40px, 5vw, 80px) 0 clamp(56px, 7vw, 110px);
   }
-  .values__grid {
+  .values__row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
   }
-  .val {
+  .values__row li {
     position: relative;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: clamp(24px, 2.6vw, 40px);
     display: flex;
-    flex-direction: column;
-    gap: 14px;
+    gap: 18px;
+    padding: clamp(24px, 2.6vw, 40px) clamp(20px, 2.4vw, 40px);
   }
-  .val__n {
+  /* slanted dividers between items */
+  .values__row li + li::before {
+    content: '';
     position: absolute;
-    top: clamp(24px, 2.6vw, 40px);
-    right: clamp(24px, 2.6vw, 40px);
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--grey);
+    left: 0;
+    top: 18%;
+    bottom: 18%;
+    width: 1px;
+    background: var(--line-strong);
+    transform: skewX(var(--sk));
   }
-  .val h3 {
-    font-size: clamp(18px, 1.5vw, 22px);
-    text-transform: uppercase;
-    margin-top: 8px;
+  .values__row :global(svg) {
+    flex: none;
+    color: var(--red);
+    margin-top: 2px;
   }
-  .val p {
+  .values__row h3 {
+    font-size: clamp(17px, 1.3vw, 22px);
+    line-height: 1.1;
+  }
+  .values__row p {
+    margin-top: 10px;
     color: var(--muted);
-    font-size: 15.5px;
+    font-size: 15px;
   }
   @media (max-width: 900px) {
-    .values__grid {
+    .values__row {
       grid-template-columns: 1fr;
+    }
+    .values__row li {
+      padding: 22px 0;
+    }
+    .values__row li + li {
+      border-top: 1px solid var(--line);
+    }
+    .values__row li + li::before {
+      display: none;
     }
   }
 </style>

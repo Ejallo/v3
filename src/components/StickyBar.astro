@@ -10,8 +10,8 @@ const { t } = Astro.props;
 ---
 
 <div class="sticky">
-  <a href={BUSINESS.phoneHref}><Phone size={18} strokeWidth={1.8} aria-hidden="true" />{t.sticky.call}</a>
-  <a href="#objednat" class="sticky__r">{t.sticky.book}</a>
+  <a href={BUSINESS.phoneHref}><span><Phone size={18} strokeWidth={1.8} aria-hidden="true" />{t.sticky.call}</span></a>
+  <a href="#objednat" class="sticky__r"><span>{t.sticky.book}</span></a>
 </div>
 
 <style>
@@ -33,7 +33,6 @@ const { t } = Astro.props;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--line-strong);
-      border-radius: 18px;
     }
     .sticky a {
       display: flex;
@@ -41,14 +40,20 @@ const { t } = Astro.props;
       justify-content: center;
       gap: 8px;
       height: 48px;
-      border-radius: 12px;
       border: 1px solid var(--line-strong);
+      transform: skewX(var(--sk));
       text-decoration: none;
       font-family: var(--display);
       font-weight: 600;
       font-size: 14px;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+    }
+    .sticky a > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transform: skewX(calc(var(--sk) * -1));
     }
     .sticky .sticky__r {
       background: var(--red);

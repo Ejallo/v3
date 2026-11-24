@@ -17,144 +17,118 @@ const { t } = Astro.props;
 const s = t.services;
 // Same order as services.items; null = no interior photo yet.
 const photos = [wash, polish, ceramic, null, ppf, extra];
-const positions = ['50% 55%', '40% 45%', '55% 40%', '50% 50%', '50% 55%', '50% 60%'];
-const filters = Object.entries(s.filters) as [string, string][];
+const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 50%', '45% 55%', '50% 62%'];
 ---
 
-<section class="sec" id="sluzby">
+<section class="sec sec--panel" id="sluzby">
   <div class="wrap">
     <div class="sec-head">
-      <div>
-        <p class="sec-label">01 / {s.label}</p>
-        <h2 class="sec-title">{s.title}</h2>
-      </div>
-      <div class="chips" role="group" aria-label={s.label} data-filters>
-        {filters.map(([key, label]) => (
-          <button class="chip" type="button" data-f={key} aria-pressed={key === 'all' ? 'true' : 'false'}>
-            {label}
-          </button>
-        ))}
-      </div>
+      <h2 class="sec-title">{s.title}</h2>
+      <p class="sec-lead">{s.lead}</p>
     </div>
+  </div>
 
-    <div class="svc-grid" data-svc-grid>
+  <div class="tiles-scroll">
+    <ul class="tiles">
       {s.items.map((it, i) => {
         const img = photos[i];
         return (
-          <article class="svc" data-cat={it.cat}>
-            <div class="svc__img">
-              <span class="svc__n">0{i + 1}</span>
+          <li class="tile">
+            <div class="tile__img">
               {img ? (
                 <Picture
                   src={img}
                   alt=""
-                  widths={[400, 640, 900]}
-                  sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                  widths={[480, 720, 960]}
+                  sizes="(max-width: 900px) 80vw, 34vw"
                   formats={['avif', 'webp']}
-                  quality={68}
+                  quality={66}
                   style={`object-position:${positions[i]}`}
                 />
               ) : (
-                <div class="svc__ph">
-                  <Armchair size={40} strokeWidth={1.2} aria-hidden="true" />
+                <div class="tile__ph">
+                  <Armchair size={44} strokeWidth={1.2} aria-hidden="true" />
                   <span class="todo">{s.noPhoto} · {t.todo}</span>
                 </div>
               )}
             </div>
-            <div class="svc__body">
+            <div class="tile__body">
               <h3>{it.title}</h3>
               <ul>
-                {it.list.map((li) => (
+                {it.list.slice(0, 3).map((li) => (
                   <li>{li}</li>
                 ))}
               </ul>
-              {'note' in it && it.note && <p class="svc__note">{it.note}</p>}
-              <div class="svc__foot">
-                <p class="svc__price">
+              <div class="tile__foot">
+                <p class="tile__price">
                   {it.price ? (
                     <>
                       <small>{s.from}</small> <span class="price-num">{kc(it.price)}</span>
                     </>
                   ) : (
-                    <span class="svc__ind">{s.individual}</span>
+                    <span class="tile__ind">{s.individual}</span>
                   )}
                 </p>
-                <FlowButton href="#objednat" size="sm">{s.more}</FlowButton>
+                <FlowButton href="#objednat" size="sm" arrow={false}>{s.more}</FlowButton>
               </div>
             </div>
-          </article>
+          </li>
         );
       })}
-    </div>
+    </ul>
+  </div>
 
+  <div class="wrap">
     <div class="svc-hint">
-      <p><span class="dot"></span>{s.hint}</p>
+      <p>{s.hint}</p>
       <FlowButton href="#objednat" variant="light" size="sm">{s.hintCta}</FlowButton>
     </div>
   </div>
 </section>
 
-<script>
-  const wrap = document.querySelector<HTMLElement>('[data-filters]');
-  const cards = document.querySelectorAll<HTMLElement>('[data-svc-grid] [data-cat]');
-  wrap?.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-f]');
-    if (!btn) return;
-    const f = btn.dataset.f;
-    wrap.querySelectorAll('[data-f]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-    cards.forEach((c) => (c.hidden = f !== 'all' && c.dataset.cat !== f));
-  });
-</script>
-
 <style>
-  .svc-grid {
+  .tiles-scroll {
+    max-width: var(--wrap);
+    margin: 0 auto;
+    padding: 0 calc(var(--gutter) + 30px);
+  }
+  .tiles {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 28px 26px;
   }
-  .svc {
+  /* Staggered: the middle column sits lower */
+  .tile:nth-child(3n + 2) {
+    translate: 0 56px;
+  }
+  .tile {
     display: flex;
     flex-direction: column;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    background: #000;
+    transform: skewX(var(--sk));
     overflow: hidden;
-    transition: border-color 0.3s;
   }
-  .svc:hover {
-    border-color: var(--line-strong);
-  }
-  .svc[hidden] {
-    display: none;
-  }
-  .svc__img {
+  .tile__img {
     position: relative;
-    aspect-ratio: 16 / 10;
-    background: var(--surface-2);
+    aspect-ratio: 16 / 11;
     overflow: hidden;
+    background: #151515;
   }
-  .svc__img :global(img) {
-    width: 100%;
+  .tile__img :global(img) {
+    position: absolute;
+    top: 0;
+    left: -18%;
+    width: 136%;
+    max-width: none;
     height: 100%;
     object-fit: cover;
-    transition: scale 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    transform: skewX(calc(var(--sk) * -1));
+    transition: scale 0.9s cubic-bezier(0.19, 1, 0.22, 1);
   }
-  .svc:hover .svc__img :global(img) {
-    scale: 1.04;
+  .tile:hover .tile__img :global(img) {
+    scale: 1.05;
   }
-  .svc__n {
-    position: absolute;
-    z-index: 1;
-    top: 14px;
-    left: 14px;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 999px;
-    padding: 3px 10px;
-    font-family: var(--display);
-    font-size: 12px;
-    font-weight: 600;
-  }
-  .svc__ph {
+  .tile__ph {
     position: absolute;
     inset: 0;
     display: flex;
@@ -163,96 +137,119 @@ const filters = Object.entries(s.filters) as [string, string][];
     justify-content: center;
     gap: 14px;
     color: var(--grey);
+    transform: skewX(calc(var(--sk) * -1));
   }
-  .svc__body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 26px 26px 24px;
+  .tile__body {
     flex: 1;
-  }
-  .svc h3 {
-    font-size: 19px;
-    text-transform: uppercase;
-    line-height: 1.2;
-  }
-  .svc ul {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    font-size: 15px;
+    gap: 14px;
+    padding: 24px 26px 24px 40px;
+    transform: skewX(calc(var(--sk) * -1));
+    border-top: 3px solid var(--red);
+  }
+  .tile h3 {
+    font-size: clamp(19px, 1.45vw, 25px);
+    line-height: 1.05;
+  }
+  .tile ul {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14.5px;
     color: var(--muted);
   }
-  .svc li {
+  .tile ul li {
     position: relative;
     padding-left: 18px;
   }
-  .svc li::before {
+  .tile ul li::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 0.72em;
-    width: 8px;
-    height: 1px;
-    background: var(--grey);
+    top: 0.45em;
+    width: 6px;
+    height: 12px;
+    background: var(--red);
+    transform: skewX(var(--sk));
   }
-  .svc__note {
-    font-size: 13.5px;
-    color: var(--grey);
-  }
-  .svc__foot {
+  .tile__foot {
     margin-top: auto;
-    padding-top: 18px;
-    border-top: 1px solid var(--line);
+    padding-top: 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
   }
-  .svc__price {
-    font-size: 22px;
+  .tile__price {
+    font-size: 24px;
   }
-  .svc__price small {
+  .tile__price small {
     font-size: 13px;
     color: var(--grey);
   }
-  .svc__ind {
-    font-size: 15px;
-    font-weight: 500;
+  .tile__ind {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    text-transform: uppercase;
     color: var(--muted);
   }
   .svc-hint {
-    margin-top: 16px;
+    margin-top: clamp(80px, 8vw, 120px);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px 24px;
     flex-wrap: wrap;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 20px 26px;
+    padding: 24px 0;
+    border-top: 1px solid var(--line);
   }
   .svc-hint p {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 16px;
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(17px, 1.4vw, 22px);
   }
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--red);
-    flex: none;
-  }
+
   @media (max-width: 1100px) {
-    .svc-grid {
+    .tiles {
       grid-template-columns: repeat(2, 1fr);
     }
+    .tile:nth-child(3n + 2) {
+      translate: none;
+    }
+    .tile:nth-child(even) {
+      translate: 0 40px;
+    }
   }
+  /* Phone: swipeable row of slanted cards */
   @media (max-width: 700px) {
-    .svc-grid {
-      grid-template-columns: 1fr;
+    .tiles-scroll {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 0 0 12px;
+      scrollbar-width: none;
+    }
+    .tiles-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .tiles {
+      display: flex;
+      gap: 14px;
+      padding: 0 calc(var(--gutter) + 22px);
+      width: max-content;
+    }
+    .tile,
+    .tile:nth-child(even) {
+      translate: none;
+      width: 78vw;
+      scroll-snap-align: center;
+    }
+    .tile__body {
+      padding: 20px 20px 20px 30px;
+    }
+    .svc-hint {
+      margin-top: 40px;
     }
   }
 </style>

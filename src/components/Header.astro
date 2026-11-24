@@ -27,8 +27,8 @@ const links = [
     <div class="hdr__r">
       <a class="hdr__tel" href={BUSINESS.phoneHref}>{BUSINESS.phone}</a>
       <div class="lang" role="group" aria-label="Language">
-        <a href={url('')} aria-current={t.lang === 'cs' ? 'true' : undefined} hreflang="cs">CZ</a>
-        <a href={url('ru/')} aria-current={t.lang === 'ru' ? 'true' : undefined} hreflang="ru">RU</a>
+        <a href={url('')} aria-current={t.lang === 'cs' ? 'true' : undefined} hreflang="cs"><span>CZ</span></a>
+        <a href={url('ru/')} aria-current={t.lang === 'ru' ? 'true' : undefined} hreflang="ru"><span>RU</span></a>
       </div>
       <FlowButton href="#objednat" variant="primary" size="sm" class="hdr__cta">{t.nav.book}</FlowButton>
       <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="mnav" data-burger>
@@ -118,17 +118,21 @@ const links = [
   .lang {
     display: flex;
     border: 1px solid var(--line-strong);
-    border-radius: 999px;
     padding: 3px;
+    transform: skewX(var(--sk));
   }
   .lang a {
+    display: inline-block;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 999px;
+    padding: 5px 11px;
     color: var(--grey);
+  }
+  .lang a > span {
+    display: inline-block;
+    transform: skewX(calc(var(--sk) * -1));
   }
   .lang a[aria-current='true'] {
     background: var(--fg);
@@ -139,8 +143,7 @@ const links = [
     width: 44px;
     height: 44px;
     border: 1px solid var(--line-strong);
-    border-radius: 12px;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.4);
     cursor: pointer;
     position: relative;
   }
@@ -183,8 +186,8 @@ const links = [
   }
   .mnav a {
     font-family: var(--display);
-    font-weight: 600;
-    font-size: 26px;
+    font-weight: 700;
+    font-size: 30px;
     text-transform: uppercase;
     text-decoration: none;
     padding: 14px 0;

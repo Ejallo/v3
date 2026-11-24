@@ -1,24 +1,23 @@
-@import '@fontsource-variable/montserrat/wght.css';
-@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/tektur/wght.css';
+@import '@fontsource-variable/geologica/wght.css';
 
-/* Brand kit: black background, white text, grey lines, red only as an accent (≤10 %).
-   No gradients, no blue or green. */
+/* Brand kit: black, white, grey lines, red accent only. The slant (--sk) and the five
+   red stripes from the logo are the visual motif of the whole site. */
 :root {
   --bg: #000;
   --fg: #fdfdfd;
   --grey: #9aa0a6;
-  --muted: #b9bec3;
-  --line: rgba(154, 160, 166, 0.28);
-  --line-strong: rgba(154, 160, 166, 0.55);
+  --muted: #c3c7cb;
+  --line: rgba(154, 160, 166, 0.25);
+  --line-strong: rgba(154, 160, 166, 0.5);
   --red: #c80407;
-  --red-hover: #e0080b;
-  --surface: #0a0a0a;
-  --surface-2: #121212;
-  --display: 'Montserrat Variable', 'Montserrat', system-ui, sans-serif;
-  --body: 'Inter Variable', 'Inter', system-ui, sans-serif;
-  --wrap: 1680px;
-  --gutter: clamp(16px, 4vw, 56px);
-  --radius: 14px;
+  --panel: #0d0d0d;
+  --display: 'Tektur Variable', 'Tektur', system-ui, sans-serif;
+  --body: 'Geologica Variable', 'Geologica', system-ui, sans-serif;
+  --wrap: 1600px;
+  --gutter: clamp(16px, 4vw, 64px);
+  --sk: -12deg;
+  --cut: clamp(36px, 6vw, 110px);
   --header-h: 72px;
   color-scheme: dark;
 }
@@ -30,6 +29,7 @@
 }
 
 html {
+  overflow-x: clip;
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--header-h) + 12px);
   -webkit-text-size-adjust: 100%;
@@ -40,10 +40,11 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--body);
+  font-weight: 300;
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  overflow-x: clip;
 }
 
 img {
@@ -70,8 +71,9 @@ h3,
 h4 {
   font-family: var(--display);
   font-weight: 700;
-  line-height: 1.08;
+  line-height: 0.95;
   margin: 0;
+  text-transform: uppercase;
   letter-spacing: -0.01em;
 }
 
@@ -83,6 +85,11 @@ ul {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+b,
+strong {
+  font-weight: 600;
 }
 
 :focus-visible {
@@ -116,70 +123,71 @@ ul {
 
 /* Section scaffolding */
 .sec {
+  position: relative;
   padding: clamp(72px, 9vw, 140px) 0;
-  border-top: 1px solid var(--line);
+}
+
+/* Panel with a slanted top edge */
+.sec--panel {
+  background: var(--panel);
+  clip-path: polygon(0 0, 100% var(--cut), 100% 100%, 0 100%);
+  padding-top: calc(var(--cut) + clamp(48px, 6vw, 100px));
 }
 
 .sec-head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 24px 40px;
+  gap: 20px 48px;
   flex-wrap: wrap;
-  margin-bottom: clamp(32px, 4vw, 56px);
-}
-
-.sec-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  font-family: var(--display);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--grey);
-  margin-bottom: 18px;
-}
-
-/* Brand "red line" accent */
-.sec-label::before {
-  content: '';
-  width: 28px;
-  height: 2px;
-  background: var(--red);
+  margin-bottom: clamp(32px, 4vw, 64px);
 }
 
 .sec-title {
-  font-size: clamp(30px, 4vw, 56px);
-  text-transform: uppercase;
-  max-width: 18ch;
+  font-size: clamp(36px, 4.4vw, 80px);
+  font-weight: 800;
+  max-width: 13ch;
+}
+
+.sec-lead {
+  max-width: 42ch;
+  color: var(--muted);
+  font-size: clamp(15px, 1.1vw, 17px);
 }
 
 .muted {
   color: var(--muted);
 }
 
-/* Chips (filters, body type switch) */
+/* Slanted pill used for filters and switches */
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+  padding-left: 6px;
 }
 
 .chip {
   appearance: none;
   border: 1px solid var(--line-strong);
   background: transparent;
-  border-radius: 999px;
-  padding: 9px 18px;
+  padding: 10px 20px;
+  font-family: var(--display);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   cursor: pointer;
+  transform: skewX(var(--sk));
   transition:
     background 0.25s,
     color 0.25s,
     border-color 0.25s;
+}
+
+.chip > span {
+  display: inline-block;
+  transform: skewX(calc(var(--sk) * -1));
 }
 
 .chip:hover {
@@ -189,7 +197,21 @@ ul {
 .chip[aria-pressed='true'] {
   background: var(--fg);
   border-color: var(--fg);
-  color: var(--bg);
+  color: #000;
+}
+
+/* Red stripes from the logo */
+.stripes {
+  display: flex;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.stripes i {
+  display: block;
+  width: 8px;
+  background: var(--red);
+  transform: skewX(var(--sk));
 }
 
 /* Yellow "fill me in" marker — temporary, removed once real data is in */
@@ -203,7 +225,6 @@ ul {
   letter-spacing: 0;
   text-transform: none;
   padding: 1px 7px;
-  border-radius: 4px;
   line-height: 1.5;
   vertical-align: middle;
 }

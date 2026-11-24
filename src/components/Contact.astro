@@ -16,7 +16,6 @@ const services = t.services.items.map((i) => i.title);
 <section class="sec" id="objednat">
   <div class="wrap ct">
     <div class="ct__side">
-      <p class="sec-label">08 / {c.label}</p>
       <h2 class="sec-title">{c.title}</h2>
       <p class="ct__promise">{c.promise}</p>
       <ul class="qc">
@@ -57,11 +56,10 @@ const services = t.services.items.map((i) => i.title);
   </div>
 </section>
 
-<section class="sec" id="kontakt">
+<section class="sec sec--panel" id="kontakt">
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <p class="sec-label">09 / {c.whereLabel}</p>
         <h2 class="sec-title">{c.whereTitle}</h2>
       </div>
     </div>
@@ -188,8 +186,7 @@ const services = t.services.items.map((i) => i.title);
     width: 100%;
     background: #000;
     border: 1px solid var(--line-strong);
-    border-radius: 10px;
-    padding: 13px 14px;
+    padding: 14px 14px;
     font-size: 16px;
     transition: border-color 0.2s;
   }
