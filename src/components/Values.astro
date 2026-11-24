@@ -1,0 +1,70 @@
+---
+import { Gauge, FlaskConical, ClipboardCheck } from 'lucide-react';
+import type { Dict } from '@/i18n/cs';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const icons = [Gauge, FlaskConical, ClipboardCheck];
+---
+
+<section class="values" aria-label="Remauto">
+  <div class="wrap values__grid">
+    {t.values.map((v, i) => {
+      const Icon = icons[i];
+      return (
+        <article class="val">
+          <span class="val__n">0{i + 1}</span>
+          <Icon size={28} strokeWidth={1.4} aria-hidden="true" />
+          <h3>{v.title}</h3>
+          <p>{v.text}</p>
+        </article>
+      );
+    })}
+  </div>
+</section>
+
+<style>
+  .values {
+    padding: 0 0 clamp(64px, 8vw, 120px);
+  }
+  .values__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .val {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(24px, 2.6vw, 40px);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .val__n {
+    position: absolute;
+    top: clamp(24px, 2.6vw, 40px);
+    right: clamp(24px, 2.6vw, 40px);
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--grey);
+  }
+  .val h3 {
+    font-size: clamp(18px, 1.5vw, 22px);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .val p {
+    color: var(--muted);
+    font-size: 15.5px;
+  }
+  @media (max-width: 900px) {
+    .values__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

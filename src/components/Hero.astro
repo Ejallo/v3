@@ -1,0 +1,228 @@
+---
+import { Picture } from 'astro:assets';
+import { MapPin, Clock, SquareParking, Gauge, Camera, FlaskConical } from 'lucide-react';
+import type { Dict } from '@/i18n/cs';
+import { BUSINESS } from '@/config';
+import FlowButton from './FlowButton.astro';
+import heroImg from '@/assets/photos/m3-doorway.jpg';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const badgeIcons = [Gauge, Camera, FlaskConical];
+---
+
+<section class="hero">
+  <div class="hero__bg" aria-hidden="true">
+    <Picture
+      src={heroImg}
+      alt=""
+      widths={[640, 960, 1400, 1920, 2400]}
+      sizes="100vw"
+      formats={['avif', 'webp']}
+      loading="eager"
+      fetchpriority="high"
+      quality={70}
+    />
+  </div>
+  <div class="wrap hero__txt">
+    <p class="hero__eyebrow"><span class="dot"></span>{t.hero.eyebrow}</p>
+    <h1>{t.hero.title}</h1>
+    <p class="hero__sub">{t.hero.sub}</p>
+    <ul class="hero__tags">
+      {t.hero.tags.map((tag) => <li>{tag}</li>)}
+    </ul>
+    <div class="hero__cta">
+      <FlowButton href="#objednat" variant="primary">{t.nav.book}</FlowButton>
+      <FlowButton href={BUSINESS.phoneHref} variant="ghost" arrow={false}>{t.nav.call}</FlowButton>
+    </div>
+    <ul class="hero__info">
+      <li><MapPin size={16} strokeWidth={1.75} aria-hidden="true" />{BUSINESS.city} · {BUSINESS.street}</li>
+      <li><Clock size={16} strokeWidth={1.75} aria-hidden="true" />{t.hero.hours} {BUSINESS.hours.weekdays}</li>
+      <li><SquareParking size={16} strokeWidth={1.75} aria-hidden="true" />{t.hero.parking}</li>
+    </ul>
+  </div>
+  <div class="wrap hero__bot">
+    <ul class="hero__badges">
+      {t.hero.badges.map((b, i) => {
+        const Icon = badgeIcons[i];
+        return (
+          <li>
+            <Icon size={20} strokeWidth={1.6} aria-hidden="true" />
+            {b}
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* Full-bleed photo behind the first screen; the sticky header sits on top of it. */
+  .hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 100svh;
+    margin-top: calc(-1 * var(--header-h));
+    padding-top: var(--header-h);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .hero__bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 55%;
+  }
+  /* Darker on the left where the text is, clear on the right where the car is. */
+  .hero__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.7) 32%, rgba(0, 0, 0, 0.15) 62%, rgba(0, 0, 0, 0.1) 100%);
+  }
+  .hero__txt {
+    padding-top: clamp(48px, 7vw, 120px);
+    padding-bottom: 40px;
+  }
+  .hero__txt > * {
+    max-width: 860px;
+  }
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  h1 {
+    font-size: clamp(40px, 5.6vw, 92px);
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    max-width: 14ch;
+    border-left: 4px solid var(--red);
+    padding-left: clamp(18px, 2vw, 28px);
+  }
+  .hero__sub {
+    margin-top: 28px;
+    font-size: clamp(16px, 1.25vw, 19px);
+    color: #e2e5e8;
+    max-width: 56ch;
+  }
+  .hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 28px;
+  }
+  .hero__tags li {
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13.5px;
+    background: rgba(0, 0, 0, 0.35);
+  }
+  .hero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 36px;
+  }
+  .hero__info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 36px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .hero__info li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero__info :global(svg) {
+    color: var(--grey);
+  }
+  .hero__bot {
+    padding-bottom: clamp(24px, 3vw, 48px);
+  }
+  .hero__badges {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .hero__badges li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 24px;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .hero__badges li + li {
+    border-left: 1px solid var(--line);
+  }
+  .hero__badges :global(svg) {
+    color: var(--red);
+    flex: none;
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      min-height: auto;
+      justify-content: flex-start;
+    }
+    /* Phone: the car sits on top, the text below it on black. */
+    .hero__bg {
+      bottom: auto;
+      height: calc(var(--header-h) + 105vw);
+    }
+    .hero__bg :global(img) {
+      object-position: 70% 58%;
+    }
+    .hero__bg::after {
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 22%, rgba(0, 0, 0, 0) 55%, #000 100%);
+    }
+    .hero__txt {
+      padding-top: 78vw;
+    }
+    .hero__badges {
+      grid-template-columns: 1fr;
+    }
+    .hero__badges li {
+      padding: 16px 18px;
+    }
+    .hero__badges li + li {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+</style>

@@ -1,0 +1,67 @@
+---
+import '@/styles/global.css';
+import type { Dict } from '@/i18n/cs';
+import { BUSINESS, INDEXABLE } from '@/config';
+import { url } from '@/lib/url';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const site = Astro.site ? new URL(import.meta.env.BASE_URL.replace(/\/?$/, '/'), Astro.site).href : '';
+const csHref = site;
+const ruHref = site + 'ru/';
+const canonical = t.lang === 'ru' ? ruHref : csHref;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AutoWash',
+  name: BUSINESS.name,
+  url: canonical,
+  telephone: BUSINESS.phone.replace(/\s/g, ''),
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: BUSINESS.street,
+    postalCode: BUSINESS.zip.replace(/\s/g, ''),
+    addressLocality: 'Praha',
+    addressRegion: 'Praha 9',
+    addressCountry: 'CZ',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: BUSINESS.geo.lat, longitude: BUSINESS.geo.lng },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '17:00',
+    },
+  ],
+  priceRange: '900–6000 CZK',
+};
+---
+
+<!doctype html>
+<html lang={t.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{t.meta.title}</title>
+    <meta name="description" content={t.meta.description} />
+    {!INDEXABLE && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="cs" href={csHref} />
+    <link rel="alternate" hreflang="ru" href={ruHref} />
+    <link rel="alternate" hreflang="x-default" href={csHref} />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={t.meta.title} />
+    <meta property="og:description" content={t.meta.description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={t.lang === 'ru' ? 'ru_RU' : 'cs_CZ'} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,258 @@
+---
+import { Picture } from 'astro:assets';
+import { Armchair } from 'lucide-react';
+import type { Dict } from '@/i18n/cs';
+import { kc } from '@/i18n/prices';
+import FlowButton from './FlowButton.astro';
+import wash from '@/assets/photos/wash-pressure.jpg';
+import polish from '@/assets/photos/headlight-foam.jpg';
+import ceramic from '@/assets/photos/glass-light.jpg';
+import ppf from '@/assets/photos/porsche-wash.jpg';
+import extra from '@/assets/photos/hero-m3-studio.jpg';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const s = t.services;
+// Same order as services.items; null = no interior photo yet.
+const photos = [wash, polish, ceramic, null, ppf, extra];
+const positions = ['50% 55%', '40% 45%', '55% 40%', '50% 50%', '50% 55%', '50% 60%'];
+const filters = Object.entries(s.filters) as [string, string][];
+---
+
+<section class="sec" id="sluzby">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="sec-label">01 / {s.label}</p>
+        <h2 class="sec-title">{s.title}</h2>
+      </div>
+      <div class="chips" role="group" aria-label={s.label} data-filters>
+        {filters.map(([key, label]) => (
+          <button class="chip" type="button" data-f={key} aria-pressed={key === 'all' ? 'true' : 'false'}>
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div class="svc-grid" data-svc-grid>
+      {s.items.map((it, i) => {
+        const img = photos[i];
+        return (
+          <article class="svc" data-cat={it.cat}>
+            <div class="svc__img">
+              <span class="svc__n">0{i + 1}</span>
+              {img ? (
+                <Picture
+                  src={img}
+                  alt=""
+                  widths={[400, 640, 900]}
+                  sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                  formats={['avif', 'webp']}
+                  quality={68}
+                  style={`object-position:${positions[i]}`}
+                />
+              ) : (
+                <div class="svc__ph">
+                  <Armchair size={40} strokeWidth={1.2} aria-hidden="true" />
+                  <span class="todo">{s.noPhoto} · {t.todo}</span>
+                </div>
+              )}
+            </div>
+            <div class="svc__body">
+              <h3>{it.title}</h3>
+              <ul>
+                {it.list.map((li) => (
+                  <li>{li}</li>
+                ))}
+              </ul>
+              {'note' in it && it.note && <p class="svc__note">{it.note}</p>}
+              <div class="svc__foot">
+                <p class="svc__price">
+                  {it.price ? (
+                    <>
+                      <small>{s.from}</small> <span class="price-num">{kc(it.price)}</span>
+                    </>
+                  ) : (
+                    <span class="svc__ind">{s.individual}</span>
+                  )}
+                </p>
+                <FlowButton href="#objednat" size="sm">{s.more}</FlowButton>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    <div class="svc-hint">
+      <p><span class="dot"></span>{s.hint}</p>
+      <FlowButton href="#objednat" variant="light" size="sm">{s.hintCta}</FlowButton>
+    </div>
+  </div>
+</section>
+
+<script>
+  const wrap = document.querySelector<HTMLElement>('[data-filters]');
+  const cards = document.querySelectorAll<HTMLElement>('[data-svc-grid] [data-cat]');
+  wrap?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-f]');
+    if (!btn) return;
+    const f = btn.dataset.f;
+    wrap.querySelectorAll('[data-f]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    cards.forEach((c) => (c.hidden = f !== 'all' && c.dataset.cat !== f));
+  });
+</script>
+
+<style>
+  .svc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .svc {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .svc:hover {
+    border-color: var(--line-strong);
+  }
+  .svc[hidden] {
+    display: none;
+  }
+  .svc__img {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .svc__img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .svc:hover .svc__img :global(img) {
+    scale: 1.04;
+  }
+  .svc__n {
+    position: absolute;
+    z-index: 1;
+    top: 14px;
+    left: 14px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-family: var(--display);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .svc__ph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--grey);
+  }
+  .svc__body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 26px 26px 24px;
+    flex: 1;
+  }
+  .svc h3 {
+    font-size: 19px;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .svc ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .svc li {
+    position: relative;
+    padding-left: 18px;
+  }
+  .svc li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 8px;
+    height: 1px;
+    background: var(--grey);
+  }
+  .svc__note {
+    font-size: 13.5px;
+    color: var(--grey);
+  }
+  .svc__foot {
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .svc__price {
+    font-size: 22px;
+  }
+  .svc__price small {
+    font-size: 13px;
+    color: var(--grey);
+  }
+  .svc__ind {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .svc-hint {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+    flex-wrap: wrap;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 26px;
+  }
+  .svc-hint p {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    flex: none;
+  }
+  @media (max-width: 1100px) {
+    .svc-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 700px) {
+    .svc-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

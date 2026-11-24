@@ -1,0 +1,228 @@
+@import '@fontsource-variable/montserrat/wght.css';
+@import '@fontsource-variable/inter/wght.css';
+
+/* Brand kit: black background, white text, grey lines, red only as an accent (≤10 %).
+   No gradients, no blue or green. */
+:root {
+  --bg: #000;
+  --fg: #fdfdfd;
+  --grey: #9aa0a6;
+  --muted: #b9bec3;
+  --line: rgba(154, 160, 166, 0.28);
+  --line-strong: rgba(154, 160, 166, 0.55);
+  --red: #c80407;
+  --red-hover: #e0080b;
+  --surface: #0a0a0a;
+  --surface-2: #121212;
+  --display: 'Montserrat Variable', 'Montserrat', system-ui, sans-serif;
+  --body: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --wrap: 1680px;
+  --gutter: clamp(16px, 4vw, 56px);
+  --radius: 14px;
+  --header-h: 72px;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 12px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--display);
+  font-weight: 700;
+  line-height: 1.08;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--red);
+  color: var(--fg);
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Section scaffolding */
+.sec {
+  padding: clamp(72px, 9vw, 140px) 0;
+  border-top: 1px solid var(--line);
+}
+
+.sec-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px 40px;
+  flex-wrap: wrap;
+  margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.sec-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 18px;
+}
+
+/* Brand "red line" accent */
+.sec-label::before {
+  content: '';
+  width: 28px;
+  height: 2px;
+  background: var(--red);
+}
+
+.sec-title {
+  font-size: clamp(30px, 4vw, 56px);
+  text-transform: uppercase;
+  max-width: 18ch;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* Chips (filters, body type switch) */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  appearance: none;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    color 0.25s,
+    border-color 0.25s;
+}
+
+.chip:hover {
+  border-color: var(--fg);
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+}
+
+/* Yellow "fill me in" marker — temporary, removed once real data is in */
+.todo {
+  display: inline-block;
+  background: #ffe24a;
+  color: #000;
+  font-family: var(--body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 1px 7px;
+  border-radius: 4px;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+.price-num {
+  font-family: var(--display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

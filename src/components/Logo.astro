@@ -1,0 +1,58 @@
+---
+// Redrawn from LOGO.jpg: five red stripes converging like a road, plus the wordmark.
+interface Props {
+  href: string;
+  class?: string;
+}
+const { href, class: cls = '' } = Astro.props;
+const stripes = [0, 1, 2, 3, 4].map((i) => {
+  const t = 58.5 + i * 14; // top x
+  const b = i * 40; // bottom x
+  return `${t},0 ${t + 9},0 ${b + 21},180 ${b},180`;
+});
+---
+
+<a href={href} class:list={['logo', cls]} aria-label="REMAUTO Detailing">
+  <svg class="logo__mark" viewBox="0 0 181 180" aria-hidden="true">
+    {stripes.map((p) => <polygon points={p} />)}
+  </svg>
+  <span class="logo__txt">
+    <b>REMAUTO</b>
+    <small>DETAILING</small>
+  </span>
+</a>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--fg);
+  }
+  .logo__mark {
+    width: 30px;
+    height: 30px;
+    fill: var(--red);
+    flex: none;
+  }
+  .logo__txt {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+  .logo__txt b {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 19px;
+    letter-spacing: 0.04em;
+  }
+  .logo__txt small {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 9.5px;
+    letter-spacing: 0.42em;
+    color: var(--grey);
+    margin-top: 5px;
+  }
+</style>

@@ -1,0 +1,88 @@
+---
+import type { Dict } from '@/i18n/cs';
+import { CHEMISTRY } from '@/i18n/prices';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const b = t.brands;
+---
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="sec-label">05 / {b.label}</p>
+        <h2 class="sec-title">{b.title}</h2>
+      </div>
+    </div>
+    <div class="br-grid">
+      <article class="br">
+        <h3>{b.chem}</h3>
+        <ul class="br__marks">
+          {CHEMISTRY.map((m) => <li>{m}</li>)}
+          <li class="br__etc">{b.etc}</li>
+        </ul>
+      </article>
+      <article class="br">
+        <h3>{b.tools}</h3>
+        <ul class="br__marks">
+          {b.toolsList.map((m) => <li>{m}</li>)}
+        </ul>
+      </article>
+      <article class="br">
+        <h3>{b.cars}</h3>
+        <p>{b.carsText}</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .br-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr 0.85fr;
+    gap: 16px;
+  }
+  .br {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(24px, 2.6vw, 40px);
+  }
+  .br h3 {
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 22px;
+  }
+  .br__marks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .br__marks li {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(15px, 1.2vw, 18px);
+    letter-spacing: 0.04em;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    padding: 10px 16px;
+  }
+  .br__marks .br__etc {
+    border-style: dashed;
+    font-weight: 500;
+    color: var(--grey);
+  }
+  .br p {
+    font-size: 17px;
+    color: var(--muted);
+  }
+  @media (max-width: 1000px) {
+    .br-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,89 @@
+---
+import type { Dict } from '@/i18n/cs';
+import { SOCIAL } from '@/config';
+import FlowButton from './FlowButton.astro';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const r = t.reviews;
+---
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="sec-label">06 / {r.label}</p>
+        <h2 class="sec-title">{r.title}</h2>
+      </div>
+      <div class="rv-cta">
+        {SOCIAL.googleReviews ? (
+          <FlowButton href={SOCIAL.googleReviews} size="sm" target="_blank" rel="noopener">{r.all}</FlowButton>
+        ) : (
+          <span class="todo">{r.all} (Google) · {t.todo}</span>
+        )}
+        {SOCIAL.googleWriteReview ? (
+          <FlowButton href={SOCIAL.googleWriteReview} size="sm" arrow={false} target="_blank" rel="noopener">{r.write}</FlowButton>
+        ) : (
+          <span class="todo">{r.write} · {t.todo}</span>
+        )}
+      </div>
+    </div>
+    <div class="rv-grid">
+      {r.items.map((q) => (
+        <figure class="rv">
+          <div class="rv__stars" aria-label="5/5">★★★★★</div>
+          <blockquote>{q.text}</blockquote>
+          <figcaption>
+            <b>{q.name}</b> · {q.service}
+            <small>{r.source}</small>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .rv-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .rv-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 820px);
+  }
+  .rv {
+    margin: 0;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--red);
+    border-radius: var(--radius);
+    padding: clamp(24px, 3vw, 48px);
+  }
+  .rv__stars {
+    color: var(--fg);
+    letter-spacing: 4px;
+    font-size: 15px;
+  }
+  .rv blockquote {
+    margin: 18px 0 24px;
+    font-size: clamp(18px, 1.6vw, 24px);
+    line-height: 1.5;
+  }
+  .rv figcaption {
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .rv figcaption b {
+    color: var(--fg);
+  }
+  .rv figcaption small {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--grey);
+  }
+</style>

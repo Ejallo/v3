@@ -1,0 +1,219 @@
+---
+import { Picture } from 'astro:assets';
+import { Camera } from 'lucide-react';
+import type { Dict } from '@/i18n/cs';
+import { SOCIAL } from '@/config';
+import BeforeAfter from './BeforeAfter';
+import FlowButton from './FlowButton.astro';
+import before from '@/assets/photos/ba-before-al.jpg';
+import after from '@/assets/photos/ba-after-al.jpg';
+import g1 from '@/assets/photos/emblem-brush.jpg';
+import g2 from '@/assets/photos/headlight-foam.jpg';
+import g3 from '@/assets/photos/wash-pressure.jpg';
+import g4 from '@/assets/photos/grille-detail.jpg';
+import g5 from '@/assets/photos/wheel-detail.jpg';
+import g6 from '@/assets/photos/glass-light.jpg';
+import g7 from '@/assets/photos/porsche-wash.jpg';
+import g8 from '@/assets/photos/m3-doorway.jpg';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const w = t.works;
+const gallery = [g1, g2, g3, g4, g5, g6, g7, g8];
+const baProps = { widths: [600, 1000, 1400, 1880], sizes: '(max-width: 900px) 100vw, 60vw', quality: 72 };
+---
+
+<section class="sec" id="realizace">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="sec-label">03 / {w.label}</p>
+        <h2 class="sec-title">{w.title}</h2>
+      </div>
+    </div>
+
+    <div class="works__top">
+      <BeforeAfter client:visible beforeLabel={w.before} afterLabel={w.after} dragLabel={w.drag}>
+        <Picture slot="before" src={before} alt={w.alts.before} {...baProps} formats={['avif', 'webp']} draggable="false" />
+        <Picture slot="after" src={after} alt={w.alts.after} {...baProps} formats={['avif', 'webp']} draggable="false" />
+      </BeforeAfter>
+      <div class="works__cap">
+        <p class="works__drag">↔ {w.drag}</p>
+        <p class="works__title">{w.caption}</p>
+        <div class="works__ig">
+          <Camera size={22} strokeWidth={1.5} aria-hidden="true" />
+          <p>{w.igTitle}</p>
+          {SOCIAL.instagram ? (
+            <FlowButton href={SOCIAL.instagram} size="sm" target="_blank" rel="noopener">{w.igCta}</FlowButton>
+          ) : (
+            <span class="todo">Instagram · {t.todo}</span>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <ul class="gallery">
+      {gallery.map((img, i) => (
+        <li>
+          <Picture
+            src={img}
+            alt={w.alts.gallery[i]}
+            widths={[360, 540, 760]}
+            sizes="(max-width: 700px) 50vw, 25vw"
+            formats={['avif', 'webp']}
+            quality={66}
+            loading="lazy"
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .works__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 16px;
+  }
+  .works__top :global(.ba) {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: ew-resize;
+    touch-action: pan-y;
+    user-select: none;
+    background: var(--surface-2);
+  }
+  .works__top :global(.ba__layer) {
+    position: absolute;
+    inset: 0;
+  }
+  .works__top :global(.ba__layer img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 22%;
+    pointer-events: none;
+  }
+  .works__top :global(.ba__tag) {
+    position: absolute;
+    top: 16px;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.72);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-family: var(--display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .works__top :global(.ba__tag--l) {
+    left: 16px;
+  }
+  .works__top :global(.ba__tag--r) {
+    right: 16px;
+    background: var(--red);
+  }
+  .works__top :global(.ba__bar) {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--fg);
+    z-index: 3;
+  }
+  .works__top :global(.ba__knob) {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 0;
+    background: var(--fg);
+    color: #000;
+    display: grid;
+    place-items: center;
+    cursor: ew-resize;
+  }
+  .works__top :global(.ba__knob svg) {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .works__cap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(24px, 2.6vw, 40px);
+  }
+  .works__drag {
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+  .works__title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(22px, 2vw, 30px);
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+  .works__ig {
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .works__ig p {
+    font-size: 17px;
+    font-weight: 500;
+  }
+  .gallery {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .gallery li {
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .gallery :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .gallery li:hover :global(img) {
+    scale: 1.04;
+  }
+  @media (max-width: 900px) {
+    .works__top {
+      grid-template-columns: 1fr;
+    }
+    .gallery {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+  }
+</style>

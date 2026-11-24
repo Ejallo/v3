@@ -1,0 +1,109 @@
+---
+import type { Dict } from '@/i18n/cs';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const f = t.faq;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: f.items.map((i) => ({ '@type': 'Question', name: i.q, acceptedAnswer: { '@type': 'Answer', text: i.a } })),
+};
+---
+
+<section class="sec" id="faq">
+  <div class="wrap faq">
+    <div>
+      <p class="sec-label">07 / {f.label}</p>
+      <h2 class="sec-title">{f.title}</h2>
+    </div>
+    <div class="faq__list">
+      {f.items.map((i, n) => (
+        <details open={n === 0}>
+          <summary>
+            <span>{i.q}</span>
+            <i aria-hidden="true"></i>
+          </summary>
+          <p>{i.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</section>
+
+<style>
+  .faq {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 32px clamp(40px, 6vw, 120px);
+  }
+  .faq__list {
+    border-top: 1px solid var(--line);
+  }
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 0;
+    cursor: pointer;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(16px, 1.3vw, 19px);
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary i {
+    position: relative;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    transition:
+      rotate 0.4s,
+      border-color 0.3s,
+      background 0.3s;
+  }
+  summary i::before,
+  summary i::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 1.5px;
+    background: var(--fg);
+    translate: -50% -50%;
+  }
+  summary i::after {
+    rotate: 90deg;
+  }
+  details[open] summary i {
+    rotate: 45deg;
+    background: var(--red);
+    border-color: var(--red);
+  }
+  details p {
+    color: var(--muted);
+    padding: 0 60px 26px 0;
+    font-size: 16px;
+    max-width: 70ch;
+  }
+  @media (max-width: 900px) {
+    .faq {
+      grid-template-columns: 1fr;
+    }
+    details p {
+      padding-right: 0;
+    }
+  }
+</style>

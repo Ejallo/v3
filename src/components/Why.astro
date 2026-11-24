@@ -1,0 +1,79 @@
+---
+import type { Dict } from '@/i18n/cs';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+---
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="sec-label">02 / {t.why.label}</p>
+        <h2 class="sec-title">{t.why.title}</h2>
+      </div>
+    </div>
+    <div class="why-grid">
+      {t.why.items.map((w, i) => (
+        <article class="why">
+          <span class="why__n">0{i + 1}</span>
+          <h3>{w.title}</h3>
+          <p>{w.text}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+  .why {
+    padding: clamp(24px, 2.8vw, 44px);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: background 0.3s;
+  }
+  .why:hover {
+    background: var(--surface);
+  }
+  .why__n {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 3vw, 44px);
+    color: var(--grey);
+    line-height: 1;
+    margin-bottom: 18px;
+  }
+  .why:hover .why__n {
+    color: var(--red);
+  }
+  .why h3 {
+    font-size: clamp(17px, 1.35vw, 20px);
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .why p {
+    color: var(--muted);
+    font-size: 15.5px;
+  }
+  @media (max-width: 1000px) {
+    .why-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .why-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

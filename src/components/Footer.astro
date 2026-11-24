@@ -1,0 +1,154 @@
+---
+import type { Dict } from '@/i18n/cs';
+import { BUSINESS, SOCIAL } from '@/config';
+import { homeFor } from '@/lib/url';
+import Logo from './Logo.astro';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const links = [
+  ['#sluzby', t.nav.services],
+  ['#realizace', t.nav.works],
+  ['#cenik', t.nav.prices],
+  ['#faq', t.nav.faq],
+  ['#kontakt', t.nav.contact],
+];
+const social = [
+  ['Instagram', SOCIAL.instagram],
+  ['TikTok', SOCIAL.tiktok],
+  ['Facebook', SOCIAL.facebook],
+];
+---
+
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr__top">
+      <div class="ftr__brand">
+        <Logo href={homeFor(t.lang)} />
+        <p class="ftr__slogan">{t.footer.slogan}</p>
+        <a class="ftr__tel" href={BUSINESS.phoneHref}>{BUSINESS.phone}</a>
+        <p class="muted">{BUSINESS.street}, {BUSINESS.zip} {BUSINESS.city}</p>
+      </div>
+      <div>
+        <h3>{t.footer.sections}</h3>
+        <ul>{links.map(([h, l]) => <li><a href={h}>{l}</a></li>)}</ul>
+      </div>
+      <div>
+        <h3>{t.footer.social}</h3>
+        <ul>
+          {social.map(([name, href]) => (
+            <li>{href ? <a href={href} target="_blank" rel="noopener">{name}</a> : <span>{name} <span class="todo">{t.todo}</span></span>}</li>
+          ))}
+          <li><a href={BUSINESS.whatsapp} target="_blank" rel="noopener">WhatsApp</a></li>
+          <li><a href={BUSINESS.telegram} target="_blank" rel="noopener">Telegram</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>{t.footer.company}</h3>
+        <ul class="ftr__co">
+          <li>{BUSINESS.legalName}</li>
+          <li>IČO: {BUSINESS.ico || <span class="todo">{t.todo}</span>}</li>
+          <li>DIČ: {BUSINESS.dic || <span class="todo">{t.todo}</span>}</li>
+          <li>{BUSINESS.street}, {BUSINESS.zip} {BUSINESS.city}</li>
+        </ul>
+      </div>
+    </div>
+    <div class="ftr__bot">
+      <span>© 2026 {BUSINESS.legalName}</span>
+      <span class="ftr__legal">
+        <span>{t.footer.privacy} <span class="todo">{t.todo}</span></span>
+        <span>{t.footer.cookies} <span class="todo">{t.todo}</span></span>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    border-top: 1px solid var(--line);
+    padding: clamp(56px, 7vw, 96px) 0 32px;
+  }
+  .ftr__top {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+    gap: 40px;
+  }
+  .ftr__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .ftr__slogan {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(24px, 2.4vw, 34px);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+  .ftr__tel {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 18px;
+    text-decoration: none;
+  }
+  .ftr__tel:hover {
+    color: var(--red);
+  }
+  .ftr h3 {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 16px;
+  }
+  .ftr ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 15px;
+  }
+  .ftr ul a {
+    text-decoration: none;
+    color: var(--muted);
+  }
+  .ftr ul a:hover {
+    color: var(--fg);
+  }
+  .ftr__co {
+    color: var(--muted);
+  }
+  .ftr__bot {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    font-size: 13.5px;
+    color: var(--grey);
+  }
+  .ftr__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+  }
+  @media (max-width: 1000px) {
+    .ftr__top {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .ftr__top {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 700px) {
+    .ftr {
+      padding-bottom: 96px;
+    }
+  }
+</style>

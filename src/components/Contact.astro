@@ -1,0 +1,346 @@
+---
+import { Phone, MessageCircle, Send, Mail, MapPin, SquareParking, Car, Clock } from 'lucide-react';
+import type { Dict } from '@/i18n/cs';
+import { BUSINESS } from '@/config';
+import ContactForm from './ContactForm';
+import FlowButton from './FlowButton.astro';
+
+interface Props {
+  t: Dict;
+}
+const { t } = Astro.props;
+const c = t.contact;
+const services = t.services.items.map((i) => i.title);
+---
+
+<section class="sec" id="objednat">
+  <div class="wrap ct">
+    <div class="ct__side">
+      <p class="sec-label">08 / {c.label}</p>
+      <h2 class="sec-title">{c.title}</h2>
+      <p class="ct__promise">{c.promise}</p>
+      <ul class="qc">
+        <li>
+          <a href={BUSINESS.phoneHref}>
+            <Phone size={20} strokeWidth={1.6} aria-hidden="true" />
+            <span><small>{c.phone}</small><b>{BUSINESS.phone}</b></span>
+          </a>
+        </li>
+        <li>
+          <a href={BUSINESS.whatsapp} target="_blank" rel="noopener">
+            <MessageCircle size={20} strokeWidth={1.6} aria-hidden="true" />
+            <span><small>WhatsApp</small><b>{c.write}</b></span>
+          </a>
+        </li>
+        <li>
+          <a href={BUSINESS.telegram} target="_blank" rel="noopener">
+            <Send size={20} strokeWidth={1.6} aria-hidden="true" />
+            <span><small>Telegram</small><b>{c.write}</b></span>
+          </a>
+        </li>
+        <li>
+          {BUSINESS.email ? (
+            <a href={`mailto:${BUSINESS.email}`}>
+              <Mail size={20} strokeWidth={1.6} aria-hidden="true" />
+              <span><small>{c.email}</small><b>{BUSINESS.email}</b></span>
+            </a>
+          ) : (
+            <div class="qc__todo">
+              <Mail size={20} strokeWidth={1.6} aria-hidden="true" />
+              <span><small>{c.email}</small><span class="todo">e-mail · {t.todo}</span></span>
+            </div>
+          )}
+        </li>
+      </ul>
+    </div>
+    <ContactForm client:load t={c.form} services={services} lang={t.lang} />
+  </div>
+</section>
+
+<section class="sec" id="kontakt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="sec-label">09 / {c.whereLabel}</p>
+        <h2 class="sec-title">{c.whereTitle}</h2>
+      </div>
+    </div>
+    <div class="loc">
+      <div class="map" data-map>
+        <div class="map__ph">
+          <MapPin size={34} strokeWidth={1.4} aria-hidden="true" />
+          <p><b>REMAUTO Detailing</b><br />{BUSINESS.street}, {BUSINESS.zip} {BUSINESS.city}</p>
+          <button class="chip" type="button" data-map-load>{c.showMap}</button>
+          <small>{c.mapNote}</small>
+        </div>
+      </div>
+      <div class="loc__info">
+        <p class="loc__addr">{BUSINESS.street}<br />{BUSINESS.zip} {BUSINESS.city}</p>
+        <ul class="loc__list">
+          <li><Car size={18} strokeWidth={1.6} aria-hidden="true" />{c.near}</li>
+          <li><SquareParking size={18} strokeWidth={1.6} aria-hidden="true" />{c.parking}</li>
+          <li><Car size={18} strokeWidth={1.6} aria-hidden="true" />{c.pickup}</li>
+        </ul>
+        <div class="hours">
+          <h3><Clock size={16} strokeWidth={1.8} aria-hidden="true" />{c.hoursTitle}</h3>
+          <dl>
+            <dt>{c.weekdays}</dt>
+            <dd>{BUSINESS.hours.weekdays}</dd>
+            <dt>{c.weekend}</dt>
+            <dd>{BUSINESS.hours.weekend ?? c.closed}</dd>
+          </dl>
+        </div>
+        <FlowButton href={BUSINESS.mapsUrl} variant="primary" target="_blank" rel="noopener">{c.navigate}</FlowButton>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ src: BUSINESS.mapEmbed }}>
+  document.querySelector('[data-map-load]')?.addEventListener('click', () => {
+    const box = document.querySelector('[data-map]');
+    if (!box) return;
+    const f = document.createElement('iframe');
+    f.src = src;
+    f.title = 'Google Maps';
+    f.loading = 'lazy';
+    f.referrerPolicy = 'no-referrer-when-downgrade';
+    box.replaceChildren(f);
+  });
+</script>
+
+<style>
+  .ct {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 40px clamp(40px, 6vw, 120px);
+  }
+  .ct__promise {
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 17px;
+  }
+  .qc {
+    margin-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .qc li {
+    border-bottom: 1px solid var(--line);
+  }
+  .qc a,
+  .qc__todo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    text-decoration: none;
+  }
+  .qc a:hover b {
+    color: var(--red);
+  }
+  .qc :global(svg) {
+    color: var(--grey);
+    flex: none;
+  }
+  .qc span {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .qc small {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+  .qc b {
+    font-family: var(--display);
+    font-size: 18px;
+    transition: color 0.2s;
+  }
+  .ct :global(.cf) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(22px, 2.6vw, 40px);
+    align-content: start;
+  }
+  .ct :global(.cf__f) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ct :global(.cf__f--full),
+  .ct :global(.cf__gdpr),
+  .ct :global(.cf__foot) {
+    grid-column: 1 / -1;
+  }
+  .ct :global(.cf__f > span) {
+    font-size: 13px;
+    color: var(--grey);
+  }
+  .ct :global(.cf input:not([type='checkbox'])),
+  .ct :global(.cf select),
+  .ct :global(.cf textarea) {
+    width: 100%;
+    background: #000;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+  }
+  .ct :global(.cf input:focus),
+  .ct :global(.cf select:focus),
+  .ct :global(.cf textarea:focus) {
+    outline: none;
+    border-color: var(--fg);
+  }
+  .ct :global(.cf textarea) {
+    resize: vertical;
+  }
+  .ct :global(.cf__hp) {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+  }
+  .ct :global(.cf__gdpr) {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .ct :global(.cf__gdpr input) {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--red);
+    flex: none;
+  }
+  .ct :global(.cf__foot) {
+    display: flex;
+    align-items: center;
+    gap: 16px 24px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .ct :global(.cf__msg) {
+    font-size: 14.5px;
+    color: var(--muted);
+  }
+  .loc {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 16px;
+  }
+  .map {
+    min-height: 440px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .map :global(iframe) {
+    width: 100%;
+    height: 100%;
+    min-height: 440px;
+    border: 0;
+    filter: grayscale(1) invert(0.92) contrast(0.9);
+  }
+  .map__ph {
+    height: 100%;
+    min-height: 440px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+    padding: 24px;
+  }
+  .map__ph :global(svg) {
+    color: var(--red);
+  }
+  .map__ph small {
+    color: var(--grey);
+    font-size: 12.5px;
+  }
+  .loc__info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(24px, 2.6vw, 40px);
+  }
+  .loc__addr {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(22px, 2vw, 30px);
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .loc__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--muted);
+  }
+  .loc__list li {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .loc__list :global(svg) {
+    color: var(--grey);
+    flex: none;
+  }
+  .hours {
+    width: 100%;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+  .hours h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 12px;
+  }
+  .hours dl {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 16px;
+    margin: 0;
+  }
+  .hours dd {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 600;
+  }
+  @media (max-width: 1000px) {
+    .ct,
+    .loc {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 600px) {
+    .ct :global(.cf) {
+      grid-template-columns: 1fr;
+    }
+    .map,
+    .map__ph,
+    .map :global(iframe) {
+      min-height: 340px;
+    }
+  }
+</style>
