@@ -13,9 +13,17 @@ const PLATES = {
   'headlight-foam.jpg': [[1468, 1713], [1600, 1742], [1600, 1950], [1468, 1905]],
   'ba-before-al.jpg': [[762, 865], [1151, 862], [1151, 944], [762, 948]],
   'ba-after-al.jpg': [[755, 867], [1148, 866], [1148, 948], [755, 950]],
+  // split before/after shot: two halves either side of the white divider
+  'hero-main.jpg': [[[1043, 954], [1270, 954], [1270, 1070], [1043, 1070]], [[1289, 950], [1580, 950], [1580, 1072], [1289, 1072]]],
 };
 const inside = (x, y, p) => { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, yi] = p[i], [xj, yj] = p[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c; } return c; };
-for (const [file, poly] of Object.entries(PLATES)) {
+// Usage: node scripts/blank-plates.mjs [file ...]  (no args = all files)
+const only = process.argv.slice(2);
+for (const [file, entry] of Object.entries(PLATES)) {
+  if (only.length && !only.includes(file)) continue;
+  for (const poly of Array.isArray(entry[0][0]) ? entry : [entry]) await blank(file, poly);
+}
+async function blank(file, poly) {
   const path = `${dir}/${file}`;
   const src = fs.readFileSync(path);
   const { data, info } = await sharp(src).raw().toBuffer({ resolveWithObject: true });
