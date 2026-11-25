@@ -1,6 +1,7 @@
 ---
 import type { Dict } from '@/i18n/cs';
-import { SOCIAL } from '@/config';
+import { SOCIAL, INDEXABLE } from '@/config';
+import { GOOGLE_REVIEWS, DEMO } from '@/data/reviews';
 import FlowButton from './FlowButton.astro';
 
 interface Props {
@@ -9,10 +10,23 @@ interface Props {
 const { t } = Astro.props;
 const r = t.reviews;
 const q = r.items[0];
+
+// The server renders the single review. A small script then loads live Google reviews
+// (or the demo list in a DEMO_REVIEWS=1 build) and swaps in the tilted wall when 3+ pass the filter.
+const demo = process.env.DEMO_REVIEWS === '1' || (!INDEXABLE && GOOGLE_REVIEWS.demoWhileMockup);
+const demoTag = t.lang === 'cs' ? 'ukázkové recenze' : 'демо-отзывы';
+const cfg = {
+  lang: t.lang,
+  demo: demo ? DEMO : null,
+  apiKey: GOOGLE_REVIEWS.apiKey,
+  placeId: GOOGLE_REVIEWS.placeId,
+  minRating: GOOGLE_REVIEWS.minRating,
+  exclude: GOOGLE_REVIEWS.exclude,
+};
 ---
 
-<section class="sec sec--panel">
-  <div class="wrap rv">
+<section class="sec sec--panel" data-reviews={JSON.stringify(cfg)}>
+  <div class="wrap rv" data-rv-single>
     <h2 class="sec-title">{r.title}</h2>
     <figure class="rv__q">
       <div class="stripes" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -35,14 +49,202 @@ const q = r.items[0];
       </div>
     </figure>
   </div>
+
+  <div class="rw" data-rv-wall hidden>
+    <div class="wrap rw-top">
+      <h2 class="sec-title">{r.title}{demo && <span class="todo rw-demo">{demoTag}</span>}</h2>
+      <div class="rw-score" data-rw-score hidden>
+        <b data-rw-rating></b>
+        <span><i class="rw-stars" data-rw-stars></i><span data-rw-total></span></span>
+      </div>
+    </div>
+    <div class="rw-stage" data-rw-stage>
+      <div class="rw-plane" data-rw-plane></div>
+    </div>
+    <div class="wrap rv__cta rw-cta">
+    {SOCIAL.googleReviews ? (
+      <FlowButton href={SOCIAL.googleReviews} size="sm" target="_blank" rel="noopener">{r.all}</FlowButton>
+    ) : (
+      <span class="todo">{r.all} (Google) · {t.todo}</span>
+    )}
+    {SOCIAL.googleWriteReview ? (
+      <FlowButton href={SOCIAL.googleWriteReview} size="sm" arrow={false} target="_blank" rel="noopener">{r.write}</FlowButton>
+    ) : (
+      <span class="todo">{r.write} · {t.todo}</span>
+    )}
+    </div>
+  </div>
+
 </section>
 
+<script>
+  interface Review {
+    name: string;
+    text: string;
+    date?: string;
+    service?: string;
+    rating?: number;
+    url?: string;
+  }
+  interface Data {
+    rating?: number;
+    total?: number;
+    items: Review[];
+  }
+  interface Cfg {
+    lang: string;
+    demo: Data | null;
+    apiKey: string;
+    placeId: string;
+    minRating: number;
+    exclude: string[];
+  }
+
+  const CACHE = 'rw-google-v1';
+
+  async function loadGoogle(cfg: Cfg): Promise<Data | null> {
+    try {
+      const hit = sessionStorage.getItem(CACHE);
+      if (hit) return JSON.parse(hit);
+    } catch {}
+    const res = await fetch(
+      `https://places.googleapis.com/v1/places/${encodeURIComponent(cfg.placeId)}?languageCode=${cfg.lang}`,
+      { headers: { 'X-Goog-Api-Key': cfg.apiKey, 'X-Goog-FieldMask': 'rating,userRatingCount,reviews' } },
+    );
+    if (!res.ok) throw new Error(`Places API ${res.status}`);
+    const p = await res.json();
+    const data: Data = {
+      rating: p.rating,
+      total: p.userRatingCount,
+      items: (p.reviews || []).map((v: any) => ({
+        name: v.authorAttribution?.displayName || '',
+        url: v.authorAttribution?.uri,
+        // the review as the author wrote it, not Google's machine translation
+        text: (v.originalText?.text || v.text?.text || '').trim(),
+        date: v.publishTime,
+        rating: v.rating,
+      })),
+    };
+    try {
+      sessionStorage.setItem(CACHE, JSON.stringify(data));
+    } catch {}
+    return data;
+  }
+
+  function ago(iso: string | undefined, lang: string) {
+    if (!iso) return '';
+    const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
+    const days = Math.round((Date.now() - new Date(iso).getTime()) / 864e5);
+    if (days < 7) return rtf.format(-days, 'day');
+    if (days < 30) return rtf.format(-Math.round(days / 7), 'week');
+    if (days < 365) return rtf.format(-Math.round(days / 30), 'month');
+    return rtf.format(-Math.round(days / 365), 'year');
+  }
+
+  const el = (tag: string, cls?: string, text?: string) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text) n.textContent = text;
+    return n;
+  };
+  const stars = (n = 5) => '★'.repeat(Math.round(n));
+
+  function card(it: Review, lang: string, hidden: boolean) {
+    const c = el('article', 'rw-card');
+    if (hidden) c.setAttribute('aria-hidden', 'true');
+    const head = el('div', 'rw-head');
+    const ava = el('span', 'rw-ava');
+    ava.append(el('span', '', it.name.trim()[0] || '★'));
+    const who = el('span', 'rw-who');
+    const name = it.url ? el('a', 'rw-name', it.name) : el('b', 'rw-name', it.name);
+    if (it.url) Object.assign(name, { href: it.url, target: '_blank', rel: 'nofollow noopener' });
+    who.append(name);
+    const when = ago(it.date, lang);
+    who.append(el('small', '', when ? `${when} · Google` : 'Google'));
+    head.append(ava, who);
+    const meta = el('div', 'rw-meta');
+    meta.append(el('i', 'rw-stars', stars(it.rating)));
+    if (it.service) {
+      const tag = el('span', 'rw-tag');
+      tag.append(el('span', '', it.service));
+      meta.append(tag);
+    }
+    c.append(head, meta, el('p', '', it.text));
+    return c;
+  }
+
+  function showWall(sec: HTMLElement, data: Data, items: Review[], lang: string) {
+    const wall = sec.querySelector<HTMLElement>('[data-rv-wall]')!;
+    const plane = wall.querySelector<HTMLElement>('[data-rw-plane]')!;
+    if (data.rating) {
+      wall.querySelector<HTMLElement>('[data-rw-rating]')!.textContent = data.rating.toFixed(1);
+      wall.querySelector<HTMLElement>('[data-rw-stars]')!.textContent = stars(data.rating);
+      wall.querySelector<HTMLElement>('[data-rw-total]')!.textContent = `${data.total ?? items.length} · Google`;
+      wall.querySelector<HTMLElement>('[data-rw-score]')!.hidden = false;
+    }
+    const half = Math.ceil(items.length / 2);
+    // 6+ reviews: split between the two rows. Fewer: both rows carry all of them, the second
+    // one starting from the middle, so no row is the same card over and over.
+    const rows =
+      items.length >= 6
+        ? [items.slice(0, half), items.slice(half)]
+        : [items, [...items.slice(half), ...items.slice(0, half)]];
+    rows.forEach((row, k) => {
+      if (!row.length) return;
+      // repeat the cards until the row is far wider than the screen; the animation moves it by one copy
+      const reps = Math.max(4, Math.ceil(16 / row.length));
+      const line = el('div', k ? 'rw-row rw-row--rev' : 'rw-row');
+      line.style.setProperty('--n', String(reps));
+      line.style.setProperty('--dur', `${row.length * reps * 1.6}s`);
+      for (let copy = 0; copy < reps; copy++) row.forEach((it) => line.append(card(it, lang, copy > 0)));
+      plane.append(line);
+    });
+    sec.querySelector<HTMLElement>('[data-rv-single]')!.hidden = true;
+    wall.hidden = false;
+
+    // On touch screens a tap pauses the wall for a few seconds so a card can be read.
+    const stage = wall.querySelector<HTMLElement>('[data-rw-stage]')!;
+    let timer: number | undefined;
+    stage.addEventListener(
+      'touchstart',
+      () => {
+        stage.classList.add('is-held');
+        clearTimeout(timer);
+        timer = window.setTimeout(() => stage.classList.remove('is-held'), 4000);
+      },
+      { passive: true },
+    );
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-reviews]').forEach(async (sec) => {
+    const cfg: Cfg = JSON.parse(sec.dataset.reviews || '{}');
+    let data: Data | null = cfg.demo;
+    if (!data && cfg.apiKey && cfg.placeId) {
+      try {
+        data = await loadGoogle(cfg);
+      } catch (e) {
+        console.warn('Google reviews not loaded:', e); // the single review simply stays
+      }
+    }
+    if (!data) return;
+    const skip = cfg.exclude.map((n) => n.trim().toLowerCase());
+    const items = data.items.filter(
+      (it) => it.text && (it.rating ?? 5) >= cfg.minRating && !skip.includes(it.name.trim().toLowerCase()),
+    );
+    if (items.length >= 3) showWall(sec, data, items, cfg.lang);
+  });
+</script>
+
 <style>
+  /* ---------- single quote (fallback, fewer than 3 reviews) ---------- */
   .rv {
     display: grid;
     grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
     gap: 32px clamp(40px, 6vw, 120px);
     align-items: start;
+  }
+  .rv[hidden] {
+    display: none;
   }
   .rv__q {
     margin: 0;
@@ -76,12 +278,220 @@ const q = r.items[0];
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    align-items: center;
     margin-top: 32px;
     padding-left: 6px;
+  }
+  .rw-demo {
+    display: inline-block;
+    margin-left: 18px;
+    vertical-align: middle;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .rw-cta {
+    justify-content: center;
+    margin-top: 28px;
   }
   @media (max-width: 900px) {
     .rv {
       grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<style is:global>
+  /* ---------- tilted wall (cards are built by the script, so these styles are global; all rw- prefixed) ---------- */
+  .rw[hidden] {
+    display: none;
+  }
+  .rw-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 22px 32px;
+    flex-wrap: wrap;
+  }
+  .rw-score {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    color: var(--grey);
+    font-size: 14px;
+  }
+  .rw-score[hidden] {
+    display: none;
+  }
+  .rw-score > b {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(54px, 5vw, 96px);
+    line-height: 0.8;
+    color: var(--fg);
+  }
+  .rw-score > span {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rw-stars {
+    font-style: normal;
+    letter-spacing: 2px;
+    color: var(--fg);
+  }
+  .rw-stage {
+    position: relative;
+    height: clamp(560px, 40vw, 700px);
+    perspective: 1400px;
+    margin-top: 10px;
+    overflow: hidden;
+    /* soft fade at the sides (mask only, nothing visible is a gradient) */
+    -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  .rw-plane {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    transform-style: preserve-3d;
+    transform: translate(-50%, -50%) rotateX(26deg) rotateZ(-7deg);
+  }
+  .rw-row {
+    display: flex;
+    gap: 26px;
+    width: max-content;
+    transform-style: preserve-3d;
+    animation: rw-belt var(--dur) linear infinite;
+  }
+  .rw-row--rev {
+    animation-direction: reverse;
+    margin-left: -220px;
+  }
+  .rw-stage:hover .rw-row,
+  .rw-stage.is-held .rw-row {
+    animation-play-state: paused;
+  }
+  @keyframes rw-belt {
+    to {
+      transform: translateX(calc(-100% / var(--n)));
+    }
+  }
+  .rw-card {
+    position: relative;
+    flex: 0 0 auto;
+    width: min(400px, 76vw);
+    min-height: 300px;
+    padding: 30px 32px 30px 36px;
+    background: #060606;
+    border: 1px solid rgba(154, 160, 166, 0.4);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    transition:
+      transform 0.4s,
+      border-color 0.4s,
+      box-shadow 0.4s;
+  }
+  .rw-card::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+    width: 4px;
+    background: var(--red);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .rw-card:hover {
+    transform: translateZ(70px);
+    border-color: rgba(253, 253, 253, 0.8);
+    box-shadow: 0 60px 80px rgba(0, 0, 0, 0.9);
+  }
+  .rw-card:hover::before {
+    opacity: 1;
+  }
+  .rw-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .rw-ava {
+    flex: 0 0 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    font: 700 17px var(--display);
+    background: #1a1a1a;
+    border: 1px solid var(--line);
+    transform: skewX(var(--sk));
+  }
+  .rw-ava span {
+    transform: skewX(12deg);
+  }
+  .rw-name {
+    display: block;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--fg);
+    text-decoration: none;
+  }
+  a.rw-name:hover {
+    text-decoration: underline;
+  }
+  .rw-head small {
+    color: var(--grey);
+    font-size: 13px;
+  }
+  .rw-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .rw-tag {
+    font: 600 11px var(--display);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    transform: skewX(var(--sk));
+    white-space: nowrap;
+  }
+  .rw-tag span {
+    display: inline-block;
+    transform: skewX(12deg);
+  }
+  .rw-card p {
+    margin: 18px 0 0;
+    font: 500 18px/1.4 var(--display);
+    color: var(--fg);
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  @media (max-width: 760px) {
+    .rw-stage {
+      height: 620px;
+    }
+    .rw-plane {
+      transform: translate(-50%, -50%) rotateX(22deg) rotateZ(-8deg) scale(0.9);
+    }
+    .rw-card {
+      padding: 24px 24px 24px 28px;
+    }
+    .rw-card p {
+      font-size: 16.5px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rw-row {
+      animation: none;
     }
   }
 </style>

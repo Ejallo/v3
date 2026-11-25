@@ -27,7 +27,8 @@ export const SOCIAL = {
   instagram: '',
   tiktok: '',
   facebook: '',
-  googleReviews: '',
+  // Google Maps profile "Remauto s.r.o." (Spojovací 783/41), opened by its CID.
+  googleReviews: 'https://www.google.com/maps?cid=7744165680952593166',
   googleWriteReview: '',
 };
 
