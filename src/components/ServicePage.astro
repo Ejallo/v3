@@ -13,7 +13,7 @@ import Consent from './Consent.astro';
 import FlowButton from './FlowButton.astro';
 import PhotoSlot from './PhotoSlot.astro';
 import Rich from './Rich.astro';
-import { BUSINESS, INDEXABLE } from '@/config';
+import { INDEXABLE } from '@/config';
 import { url, homeFor } from '@/lib/url';
 import { LANGS, servicePath, UI, type Lang, type Service } from '@/data/services';
 
@@ -84,7 +84,6 @@ if (x.faq?.length) {
             <p class="sp-hero__lead">{x.lead}</p>
             <div class="sp-hero__btns">
               <FlowButton href="#objednat" variant="primary">{ui.book}</FlowButton>
-              <FlowButton href={BUSINESS.whatsapp} target="_blank" rel="noopener">{ui.photos}</FlowButton>
             </div>
             {x.draft && <p class="sp-draft"><span class="todo">{ui.draft}</span></p>}
           </div>
@@ -175,7 +174,7 @@ if (x.faq?.length) {
       </section>
     )}
 
-    <Prices t={t} tab={s.priceTab} title={h.prices} />
+    <Prices t={t} only={s.priceTab} rows={s.priceRows} title={h.prices} />
 
     {showBa && h.ba && (
       <section class="sec sp-sec">

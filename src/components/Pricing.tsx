@@ -4,7 +4,8 @@ import { EXTERIOR, INTERIOR, PACKAGES, SPECIAL, kc, withSurcharge, type Program 
 import { SURCHARGE, type BodyType } from '@/config';
 
 type Tab = 'packages' | 'exterior' | 'interior' | 'special';
-type Props = { lang: 'cs' | 'ru'; t: Dict['prices']; from: string; initialTab?: Tab };
+// `only` (service pages): show just this tab, without the tab switcher; `rows` picks lines of the special list.
+type Props = { lang: 'cs' | 'ru'; t: Dict['prices']; from: string; initialTab?: Tab; only?: Tab; rows?: number[] };
 
 function Btn({ children, href = '#objednat', variant = 'ghost' }: { children: string; href?: string; variant?: string }) {
   return (
@@ -17,9 +18,9 @@ function Btn({ children, href = '#objednat', variant = 'ghost' }: { children: st
   );
 }
 
-export default function Pricing({ lang, t, from, initialTab = 'packages' }: Props) {
+export default function Pricing({ lang, t, from, initialTab = 'packages', only, rows }: Props) {
   const [body, setBody] = useState<BodyType>('sedan');
-  const [tab, setTab] = useState<Tab>(initialTab);
+  const [tab, setTab] = useState<Tab>(only ?? initialTab);
   const s = SURCHARGE[body];
   const price = (n: number) => kc(withSurcharge(n, s));
   const tabs: [Tab, string][] = [
@@ -53,13 +54,13 @@ export default function Pricing({ lang, t, from, initialTab = 'packages' }: Prop
   return (
     <div className="pr">
       <div className="pr-bar">
-        <div className="chips" role="tablist">
+        {!only && <div className="chips" role="tablist">
           {tabs.map(([k, label]) => (
             <button key={k} type="button" role="tab" className="chip" aria-pressed={tab === k} aria-selected={tab === k} onClick={() => setTab(k)}>
               <span>{label}</span>
             </button>
           ))}
-        </div>
+        </div>}
         {tab !== 'special' && (
           <div className="pr-body" role="group">
             {(Object.keys(SURCHARGE) as BodyType[]).map((k) => (
@@ -108,7 +109,7 @@ export default function Pricing({ lang, t, from, initialTab = 'packages' }: Prop
         <div className="pr-special">
           <p className="muted">{t.specialNote}</p>
           <ul>
-            {SPECIAL.map((x) => (
+            {SPECIAL.filter((_, i) => !rows || rows.includes(i)).map((x) => (
               <li key={x.name.cs}>
                 <span>{x.name[lang]}</span>
                 <b>

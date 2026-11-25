@@ -47,6 +47,8 @@ export type Service = {
   /** Index of the matching card in t.services.items (main page tiles, form option, tile photo) */
   tile: number;
   priceTab: PriceTab;
+  /** Lines of the 'special' price list that belong to this service (index in SPECIAL); all when omitted */
+  priceRows?: number[];
   /** Photos the studio has to supply. Shown as placeholders until real files exist. Written in Russian for the team. */
   needPhotos: { hero: string; ba?: string[] };
 } & Record<Lang, ServiceText>;
@@ -101,7 +103,7 @@ const interior: Service = {
       { t: 'Po koupi ojetého auta', d: 'Po předchozím majiteli zůstává v sedadlech a kobercích špína i pach. Interiér je dobré vyčistit hned po koupi.' },
     ],
     optionsLead:
-      'Program volíme podle toho, jak moc je interiér zašpiněný. Když si nejste jistí, pošlete pár fotek a poradíme, co stačí.',
+      'Program volíme podle toho, jak moc je interiér zašpiněný. Když si nejste jistí, poradíme při prohlídce auta.',
     options: [
       {
         name: 'Program I · Udržovací čištění',
@@ -123,7 +125,7 @@ const interior: Service = {
       },
     ],
     process: [
-      { t: 'Poptávka a fotky', d: 'Napíšete nebo zavoláte a pošlete pár fotek interiéru. Navrhneme program a termín.' },
+      { t: 'Poptávka', d: 'Napíšete nebo zavoláte. Domluvíme termín a předběžně program.' },
       { t: 'Prohlídka a cena', d: 'Při převzetí projdeme interiér spolu s vámi. Ukážeme místa, kde skvrna nemusí zmizet úplně, a potvrdíme cenu.' },
       { t: 'Vysávání a příprava', d: 'Vyndáme koberečky, vysajeme interiér a kufr, předčistíme skvrny.' },
       { t: 'Tepování a péče', d: 'Tepujeme látky, čistíme párou, ošetříme kůži a plasty. Během práce vám posíláme fotky.' },
@@ -199,7 +201,7 @@ const interior: Service = {
       { t: 'После покупки б/у авто', d: 'После прошлого хозяина в сиденьях и коврах остаются грязь и запах. Салон лучше почистить сразу после покупки.' },
     ],
     optionsLead:
-      'Программу выбираем по тому, насколько загрязнён салон. Если не уверены, пришлите пару фото, подскажем, чего хватит.',
+      'Программу выбираем по тому, насколько загрязнён салон. Если не уверены, подскажем на осмотре машины.',
     options: [
       {
         name: 'Программа I · Поддерживающая уборка',
@@ -221,7 +223,7 @@ const interior: Service = {
       },
     ],
     process: [
-      { t: 'Заявка и фото', d: 'Пишете или звоните, присылаете пару фото салона. Предлагаем программу и время.' },
+      { t: 'Заявка', d: 'Пишете или звоните. Договариваемся о времени и предварительно о программе.' },
       { t: 'Осмотр и цена', d: 'При приёмке вместе проходим по салону. Показываем пятна, которые могут не уйти полностью, и подтверждаем цену.' },
       { t: 'Пылесос и подготовка', d: 'Достаём коврики, пылесосим салон и багажник, обрабатываем пятна.' },
       { t: 'Химчистка и уход', d: 'Чистим ткань экстрактором, поверхности паром, обрабатываем кожу и пластик. По ходу работы присылаем фото.' },
@@ -317,6 +319,7 @@ const ppf: Service = {
   id: 'ppf',
   tile: 4,
   priceTab: 'special',
+  priceRows: [3],
   needPhotos: { hero: 'Оклейка PPF или тонировка: плёнка на капоте/фаре либо затонированные стёкла, горизонтальное 3:2.' },
   cs: {
     slug: 'tonovani-autoskel-ppf-praha',
@@ -366,6 +369,7 @@ const polish: Service = {
   id: 'polish',
   tile: 1,
   priceTab: 'special',
+  priceRows: [0],
   needPhotos: {
     hero: 'Полировка кузова машинкой Rupes под светом студии, видна разница на панели, горизонтальное 3:2.',
     ba: ['Лак с голограммами и «паутинкой» до и после полировки, один ракурс', 'Мутная фара до и после, один ракурс'],
@@ -418,6 +422,7 @@ const ceramic: Service = {
   id: 'ceramic',
   tile: 2,
   priceTab: 'special',
+  priceRows: [1, 2],
   needPhotos: { hero: 'Нанесение керамики аппликатором на капот или капли воды на керамике, горизонтальное 3:2.' },
   cs: {
     slug: 'keramicka-ochrana-laku-praha',
@@ -538,7 +543,6 @@ export const UI: Record<Lang, {
   services: string;
   crumbs: string;
   book: string;
-  photos: string;
   details: string;
   for: string;
   time: string;
@@ -552,7 +556,6 @@ export const UI: Record<Lang, {
     services: 'Služby',
     crumbs: 'Drobečková navigace',
     book: 'Objednat se',
-    photos: 'Poslat fotky',
     details: 'Více o službě',
     for: 'Pro koho',
     time: 'Doba',
@@ -566,7 +569,6 @@ export const UI: Record<Lang, {
     services: 'Услуги',
     crumbs: 'Хлебные крошки',
     book: 'Записаться',
-    photos: 'Прислать фото',
     details: 'Подробнее',
     for: 'Для чего',
     time: 'Время',
