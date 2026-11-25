@@ -85,6 +85,7 @@ const cfg = {
     service?: string;
     rating?: number;
     url?: string;
+    photo?: string;
   }
   interface Data {
     rating?: number;
@@ -100,7 +101,7 @@ const cfg = {
     exclude: string[];
   }
 
-  const CACHE = 'rw-google-v1';
+  const CACHE = 'rw-google-v2';
 
   async function loadGoogle(cfg: Cfg): Promise<Data | null> {
     try {
@@ -119,6 +120,7 @@ const cfg = {
       items: (p.reviews || []).map((v: any) => ({
         name: v.authorAttribution?.displayName || '',
         url: v.authorAttribution?.uri,
+        photo: v.authorAttribution?.photoUri,
         // the review as the author wrote it, not Google's machine translation
         text: (v.originalText?.text || v.text?.text || '').trim(),
         date: v.publishTime,
@@ -154,7 +156,15 @@ const cfg = {
     if (hidden) c.setAttribute('aria-hidden', 'true');
     const head = el('div', 'rw-head');
     const ava = el('span', 'rw-ava');
-    ava.append(el('span', '', it.name.trim()[0] || '★'));
+    const letter = el('span', '', it.name.trim()[0] || '★');
+    ava.append(letter);
+    if (it.photo) {
+      // the author's Google avatar; the letter comes back if the image fails
+      const img = document.createElement('img');
+      Object.assign(img, { src: it.photo, alt: '', loading: 'lazy', referrerPolicy: 'no-referrer' });
+      img.onerror = () => img.replaceWith(letter);
+      letter.replaceWith(img);
+    }
     const who = el('span', 'rw-who');
     const name = it.url ? el('a', 'rw-name', it.name) : el('b', 'rw-name', it.name);
     if (it.url) Object.assign(name, { href: it.url, target: '_blank', rel: 'nofollow noopener' });
@@ -428,8 +438,18 @@ const cfg = {
     border: 1px solid var(--line);
     transform: skewX(var(--sk));
   }
+  .rw-ava {
+    overflow: hidden;
+  }
   .rw-ava span {
     transform: skewX(12deg);
+  }
+  .rw-ava img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* undo the frame's slant; scale so the photo still fills the corners */
+    transform: skewX(12deg) scale(1.3);
   }
   .rw-name {
     display: block;

@@ -16,6 +16,8 @@ export interface Review {
   rating?: number;
   /** author's Google profile (attribution link) */
   url?: string;
+  /** author's Google avatar */
+  photo?: string;
 }
 
 export const GOOGLE_REVIEWS = {
