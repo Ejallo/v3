@@ -190,25 +190,30 @@ const cs = {
   },
   faq: {
     label: 'FAQ',
-    title: 'Časté otázky',
+    title: 'Zeptejte se nás',
     items: [
       {
+        tag: 'Termín',
         q: 'Jak dlouho trvá leštění, tepování nebo keramika?',
         a: 'Mytí a péče o interiér trvají několik hodin, leštění s keramikou obvykle 2–3 dny. Přesný termín řekneme po prohlídce vozu.',
       },
       {
+        tag: 'Leštění',
         q: 'Není leštění pro lak nebezpečné?',
         a: 'Před leštěním měříme tloušťku laku a podle toho volíme postup. Sebereme jen tolik, kolik je potřeba k odstranění vad.',
       },
       {
+        tag: 'Ochrana',
         q: 'Jaký je rozdíl mezi voskem, polymerem a keramikou?',
         a: 'Vosk dodá lesk a krátkodobou ochranu. Polymer vydrží déle. Keramika vytvoří tvrdou vrstvu, která podle zvoleného přípravku chrání 1–5 let a usnadní mytí.',
       },
       {
+        tag: 'Mytí',
         q: 'Musím auto před příjezdem umýt?',
         a: 'Ne. Každá práce u nás začíná správným mytím a přípravou povrchu.',
       },
       {
+        tag: 'Prodej',
         q: 'Můžu se objednat na přípravu k prodeji nebo přijet na doporučení Remauto?',
         a: 'Ano. Připravíme vůz k prodeji samostatně i ve spolupráci s autosalonem Remauto. Stačí napsat nebo zavolat.',
       },

@@ -1,11 +1,20 @@
 ---
+import { getImage } from 'astro:assets';
 import type { Dict } from '@/i18n/cs';
+import time from '@/assets/photos/faq-time.jpg';
+import polish from '@/assets/photos/faq-polish.jpg';
+import ceramic from '@/assets/photos/faq-ceramic.jpg';
+import wash from '@/assets/photos/faq-wash.jpg';
+import sale from '@/assets/photos/faq-sale.jpg';
 
 interface Props {
   t: Dict;
 }
 const { t } = Astro.props;
 const f = t.faq;
+const photos = await Promise.all(
+  [time, polish, ceramic, wash, sale].map((src) => getImage({ src, width: 1400, format: 'webp', quality: 74 })),
+);
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -14,119 +23,264 @@ const jsonLd = {
 ---
 
 <section class="sec" id="faq">
-  <div class="wrap faq">
-    <div>
-      <h2 class="sec-title">{f.title}</h2>
-    </div>
-    <div class="faq__list">
+  <div class="wrap">
+    <h2 class="sec-title">{f.title}</h2>
+    <ul class="faq">
       {f.items.map((i, n) => (
-        <details open={n === 0}>
-          <summary>
-            <span>{i.q}</span>
-            <i aria-hidden="true"></i>
-          </summary>
-          <p>{i.a}</p>
-        </details>
+        <li class:list={['faq__item', { 'is-on': n === 0 }]}>
+          <button class="faq__q" type="button" aria-expanded={n === 0 ? 'true' : 'false'} aria-controls={`faq-a${n}`}>
+            <span class="faq__n" aria-hidden="true"><span>{n + 1}</span></span>
+            <span class="faq__qt">{i.q}</span>
+          </button>
+          <div class="faq__body" id={`faq-a${n}`}>
+            <div class="faq__card">
+              <img src={photos[n].src} alt="" loading="lazy" decoding="async" />
+              <div class="faq__ov">
+                <span class="faq__tag"><span>{i.tag}</span></span>
+                <p class="faq__a">{i.a.split(' ').map((w, k) => <span style={`--k:${k}`}>{w} </span>)}</p>
+              </div>
+            </div>
+          </div>
+        </li>
       ))}
-    </div>
+    </ul>
   </div>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 </section>
 
+<script>
+  const root = document.getElementById('faq');
+  if (root) {
+    const items = [...root.querySelectorAll<HTMLLIElement>('.faq__item')];
+    const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+    let cur = 0;
+    let lock = 0;
+    let timer: number | undefined;
+    const set = (i: number) => {
+      if (i === cur) return;
+      cur = i;
+      lock = Date.now();
+      items.forEach((li, k) => {
+        const on = k === i;
+        li.classList.toggle('is-on', on);
+        li.querySelector('.faq__q')?.setAttribute('aria-expanded', String(on));
+        const card = li.querySelector<HTMLElement>('.faq__card');
+        if (on && card) {
+          card.classList.remove('is-play');
+          void card.offsetWidth;
+          card.classList.add('is-play');
+        }
+      });
+    };
+    items.forEach((li, i) => {
+      const q = li.querySelector('.faq__q')!;
+      q.addEventListener('click', () => set(i));
+      if (fine) {
+        // Hover opens with a short delay; ignore hovers right after a switch so the list does not chain-open
+        q.addEventListener('mouseenter', () => {
+          clearTimeout(timer);
+          timer = window.setTimeout(() => {
+            if (Date.now() - lock > 650) set(i);
+          }, 160);
+        });
+        q.addEventListener('mouseleave', () => clearTimeout(timer));
+      }
+    });
+    items[0]?.querySelector('.faq__card')?.classList.add('is-play');
+  }
+</script>
+
 <style>
   .faq {
-    display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: 32px clamp(40px, 6vw, 120px);
-  }
-  .faq__list {
-    border-top: 1px solid var(--line);
-  }
-  details {
-    position: relative;
-    border-bottom: 1px solid var(--line);
-  }
-  /* hover: a white bar slides in on the left */
-  details::before {
-    content: '';
-    position: absolute;
-    left: -22px;
-    top: 22px;
-    width: 4px;
-    height: 0;
-    background: var(--fg);
-    transform: skewX(var(--sk));
-    transition: height 0.35s cubic-bezier(0.2, 0.9, 0.25, 1.2);
-  }
-  details:hover::before,
-  details[open]::before {
-    height: 30px;
-  }
-  details[open]::before {
-    background: var(--red);
-  }
-  summary {
     list-style: none;
-    text-transform: uppercase;
+    margin: 32px 0 0;
+    padding: 0;
+    max-width: 1240px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .faq__item {
+    border: 1px solid transparent;
+    transition: border-color 0.25s;
+  }
+  .faq__item.is-on {
+    border-color: rgba(253, 253, 253, 0.8);
+  }
+  .faq__q {
+    width: 100%;
+    display: flex;
     align-items: center;
-    gap: 24px;
-    padding: 24px 0;
+    gap: 18px;
+    padding: 16px 18px;
+    text-align: left;
+    background: none;
+    border: 0;
+    color: inherit;
     cursor: pointer;
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: clamp(16px, 1.35vw, 21px);
   }
-  summary::-webkit-details-marker {
-    display: none;
-  }
-  summary i {
-    position: relative;
+  .faq__n {
     flex: none;
-    width: 34px;
-    height: 34px;
-    border: 1px solid var(--line-strong);
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    background: #1a1a1a;
+    color: var(--grey);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13px;
     transform: skewX(var(--sk));
     transition:
-      rotate 0.4s,
-      border-color 0.3s,
-      background 0.3s;
+      background 0.25s,
+      color 0.25s;
   }
-  summary i::before,
-  summary i::after {
+  .faq__n > span {
+    transform: skewX(calc(var(--sk) * -1));
+  }
+  .faq__item.is-on .faq__n {
+    background: var(--red);
+    color: var(--fg);
+  }
+  .faq__qt {
+    font-family: var(--display);
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1.25;
+    font-size: clamp(15px, 1.25vw, 22px);
+    color: var(--grey);
+    transition: color 0.25s;
+  }
+  .faq__item.is-on .faq__qt,
+  .faq__q:hover .faq__qt {
+    color: var(--fg);
+  }
+  .faq__body {
+    display: none;
+    padding: 0 18px 18px;
+  }
+  .faq__item.is-on .faq__body {
+    display: block;
+  }
+  .faq__card {
+    position: relative;
+    aspect-ratio: 16 / 7;
+    overflow: hidden;
+    background: #0b0b0b;
+    border: 1px solid var(--line-strong);
+    animation: faq-in 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  .faq__card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .faq__card::after {
     content: '';
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 12px;
-    height: 1.5px;
-    background: var(--fg);
-    translate: -50% -50%;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.25) 35%, rgba(0, 0, 0, 0.85));
   }
-  summary i::after {
-    rotate: 90deg;
-    transition: rotate 0.3s;
+  .faq__ov {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    padding: clamp(18px, 2.4vw, 44px);
   }
-  details[open] summary i::after {
-    rotate: 0deg;
-  }
-  details[open] summary i {
+  .faq__tag {
+    display: inline-block;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     background: var(--red);
-    border-color: var(--red);
+    padding: 5px 12px;
+    transform: skewX(var(--sk));
+    margin-bottom: 16px;
   }
-  details p {
-    color: var(--muted);
-    padding: 0 60px 26px 0;
-    font-size: 16px;
-    max-width: 70ch;
+  .faq__tag > span {
+    display: inline-block;
+    transform: skewX(calc(var(--sk) * -1));
+  }
+  .faq__a {
+    margin: 0;
+    max-width: 30ch;
+    font-family: var(--body);
+    font-weight: 500;
+    font-size: clamp(18px, 1.9vw, 34px);
+    line-height: 1.28;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+  .faq__a > span {
+    display: inline-block;
+    white-space: pre;
+  }
+  .faq__card.is-play img {
+    animation: faq-kb 9s ease-out both;
+  }
+  .faq__card.is-play .faq__a > span {
+    animation: faq-flow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(0.25s + var(--k) * 0.045s);
+  }
+  .faq__card.is-play .faq__tag {
+    animation: faq-fade 0.4s 0.1s both;
+  }
+  @keyframes faq-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+  @keyframes faq-flow {
+    from {
+      opacity: 0;
+      filter: blur(12px);
+      transform: translateY(14px);
+    }
+  }
+  @keyframes faq-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes faq-kb {
+    from {
+      transform: scale(1.14);
+    }
+    to {
+      transform: scale(1.02);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .faq__card,
+    .faq__card.is-play img,
+    .faq__card.is-play .faq__a > span,
+    .faq__card.is-play .faq__tag {
+      animation: none;
+    }
   }
   @media (max-width: 900px) {
     .faq {
-      grid-template-columns: 1fr;
+      margin-top: 24px;
     }
-    details p {
-      padding-right: 0;
+    .faq__q {
+      padding: 14px 12px;
+      gap: 14px;
+    }
+    .faq__qt {
+      font-size: 15px;
+    }
+    .faq__body {
+      padding: 0 12px 12px;
+    }
+    .faq__card {
+      aspect-ratio: 4 / 3;
     }
   }
 </style>
