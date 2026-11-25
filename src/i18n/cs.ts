@@ -59,6 +59,8 @@ const cs = {
     individual: 'Cena individuálně',
     more: 'Objednat',
     noPhoto: 'Foto interiéru',
+    prev: 'Předchozí služba',
+    next: 'Další služba',
     items: [
       {
         cat: 'body',
@@ -127,7 +129,6 @@ const cs = {
       { title: 'Fotky z průběhu', text: 'Stav před a po i samotnou práci vám ukážeme přes Telegram nebo WhatsApp.' },
       { title: 'Rozpočet předem', text: 'Vůz si prohlédneme a rozsah i cenu domluvíme před začátkem práce. Žádná překvapení při předání.' },
       { title: 'Podle úkolu a rozpočtu', text: 'Nevnucujeme drahou keramiku na 5 let, když autu před prodejem stačí jednokrokové leštění a vosk.' },
-      { title: 'Praha 9, Spojovací 783/41', text: 'Hned u autosalonu Remauto, pohodlný příjezd a parkování.' },
     ],
   },
   works: {

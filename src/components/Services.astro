@@ -24,9 +24,23 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
 
 <section class="sec sec--panel" id="sluzby">
   <div class="wrap">
-    <div class="sec-head">
+    <div class="sec-head svc-head">
       <h2 class="sec-title">{s.title}</h2>
       <p class="sec-lead">{s.lead}</p>
+      <!-- Phone only: shows that the cards scroll sideways -->
+      <div class="svc-nav">
+        <div class="svc-nav__btns">
+          <button type="button" class="svc-nav__btn" data-dir="-1" aria-label={s.prev} disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+          </button>
+          <button type="button" class="svc-nav__btn" data-dir="1" aria-label={s.next}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
+        <div class="svc-nav__dots" aria-hidden="true">
+          {s.items.map((_, i) => <span class:list={[{ on: i === 0 }]} />)}
+        </div>
+      </div>
     </div>
   </div>
 
@@ -82,7 +96,52 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
 
 </section>
 
+<script>
+  // Phone carousel: arrows scroll one card, dots follow the card nearest the centre.
+  const scroller = document.querySelector<HTMLElement>('#sluzby .tiles-scroll');
+  const nav = document.querySelector<HTMLElement>('#sluzby .svc-nav');
+  if (scroller && nav) {
+    const cards = [...scroller.querySelectorAll<HTMLElement>('.tile')];
+    const dots = [...nav.querySelectorAll('.svc-nav__dots span')];
+    const [prev, next] = [...nav.querySelectorAll<HTMLButtonElement>('.svc-nav__btn')];
+    const current = () => {
+      const mid = scroller.getBoundingClientRect().left + scroller.clientWidth / 2;
+      let best = 0;
+      let dist = Infinity;
+      cards.forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - mid);
+        if (d < dist) [dist, best] = [d, i];
+      });
+      return best;
+    };
+    const update = () => {
+      const i = current();
+      dots.forEach((d, k) => d.classList.toggle('on', k === i));
+      prev.disabled = i === 0;
+      next.disabled = i === cards.length - 1;
+    };
+    let raf = 0;
+    scroller.addEventListener('scroll', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    }, { passive: true });
+    nav.querySelectorAll<HTMLButtonElement>('.svc-nav__btn').forEach((b) =>
+      b.addEventListener('click', () => {
+        const target = cards[Math.min(cards.length - 1, Math.max(0, current() + Number(b.dataset.dir)))];
+        // Scroll only the row, never the page
+        const delta = target.getBoundingClientRect().left + target.offsetWidth / 2 - (scroller.getBoundingClientRect().left + scroller.clientWidth / 2);
+        scroller.scrollBy({ left: delta, behavior: 'smooth' });
+      }),
+    );
+  }
+</script>
+
 <style>
+  .svc-nav {
+    display: none;
+  }
+
   .tiles-scroll {
     max-width: var(--wrap);
     margin: 0 auto;
@@ -234,6 +293,69 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
     }
     .tile__price {
       font-size: 20px;
+    }
+    /* Lead on the left, arrows + dots on the right */
+    .svc-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px 18px;
+      align-items: end;
+    }
+    .svc-head .sec-title {
+      grid-column: 1 / -1;
+    }
+    .svc-nav {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .svc-nav__btns {
+      display: flex;
+      gap: 8px;
+    }
+    .svc-nav__btn {
+      width: 46px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line, #9aa0a6);
+      background: #000;
+      color: var(--fg);
+      transform: skewX(var(--sk));
+      transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+    }
+    .svc-nav__btn[data-dir='1'] {
+      background: var(--red);
+      border-color: var(--red);
+    }
+    .svc-nav__btn:disabled {
+      opacity: 0.3;
+    }
+    .svc-nav__btn svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transform: skewX(calc(var(--sk) * -1));
+    }
+    .svc-nav__dots {
+      display: flex;
+      gap: 5px;
+    }
+    .svc-nav__dots span {
+      width: 10px;
+      height: 4px;
+      background: #3a3a3a;
+      transform: skewX(var(--sk));
+      transition: width 0.3s, background 0.3s;
+    }
+    .svc-nav__dots span.on {
+      width: 24px;
+      background: var(--red);
     }
   }
 </style>
