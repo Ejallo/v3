@@ -2,7 +2,7 @@
 const cs = {
   lang: 'cs',
   meta: {
-    title: 'Detailing vozů Praha 9 – mytí, leštění, keramika, tepování | REMAUTO Detailing',
+    title: 'Detailing Praha – čištění interiéru, mytí, leštění, keramika | REMAUTO Detailing',
     description:
       'Detailingové studio na Spojovací 783/41, Praha 9: šetrné ruční mytí, leštění laku, keramická ochrana, tepování interiéru, tónování a PPF. Cenu domluvíme předem.',
   },
@@ -20,7 +20,8 @@ const cs = {
   todo: 'doplnit',
   hero: {
     eyebrow: 'Detailing studio · Praha 9',
-    title: 'Detailing vašeho vozu v Praze',
+    title: 'Detailing v Praze',
+    imgAlt: 'BMW M3 před a po detailingovém mytí ve studiu REMAUTO, Praha 9',
     sub: 'Šetrné mytí, leštění, keramika, tepování interiéru, tónování a ochrana karoserie na Spojovací 783/41, Praha 9. Bez pásové výroby a zbytečného pozlátka.',
     tags: ['Leštění', 'Keramika', 'Tepování', 'Tónování', 'Ochrana karoserie'],
     hours: 'Po–Pá',
@@ -49,7 +50,7 @@ const cs = {
   ],
   services: {
     label: 'Služby',
-    title: 'Co pro váš vůz uděláme',
+    title: 'Služby detailingu v Praze',
     lead: 'Cenu potvrdíme při prohlídce a při předání se už nemění.',
     filters: { all: 'Vše', body: 'Karoserie a leštění', protect: 'Ochrana', interior: 'Interiér', extra: 'Další služby' },
     hint: 'Nevíte, co vůz potřebuje? Pošlete fotky a poradíme.',
@@ -61,45 +62,52 @@ const cs = {
     items: [
       {
         cat: 'body',
-        title: 'Detailingové mytí a péče o karoserii',
+        title: 'Ruční mytí a péče o karoserii',
         list: ['Vícefázové ruční mytí', 'Dekontaminace: asfalt, polétavá rez', 'Čištění disků a koncovek výfuku', 'Tvrdý vosk nebo hydropolymer'],
         price: 1000,
+        imgAlt: 'Mytí BMW M3 tlakovou vodou v detailingovém studiu, Praha 9',
       },
       {
         cat: 'body',
-        title: 'Leštění karoserie a světlometů',
+        title: 'Leštění karoserie a renovace světlometů',
         list: ['Jednokrokové i vícekrokové leštění', 'Odstranění škrábanců a hologramů', 'Leštění a ochrana světlometů'],
         price: 6000,
+        imgAlt: 'Světlomet BMW M3 v pěně během mytí',
       },
       {
         cat: 'protect',
-        title: 'Keramická ochrana a tekuté stěrače',
+        title: 'Keramická ochrana laku a tekuté stěrače',
         list: ['Keramika na karoserii na 1–5 let', 'Ochrana disků', 'Tekuté stěrače na skla'],
         price: 4500,
+        imgAlt: 'Mytí čelního skla Porsche',
         note: '1 rok od 4 500 Kč · 5 let od 6 000 Kč',
       },
       {
         cat: 'interior',
-        title: 'Tepování a detailing interiéru',
+        title: 'Čištění interiéru a tepování',
         list: ['Tepování sedadel, koberců a stropu (extraktor + pára)', 'Čištění a impregnace kůže', 'Odstranění pachů', 'Ochrana textilu a plastů'],
         price: 900,
+        imgAlt: 'Čištění volantu Mercedes mikrovláknem',
       },
       {
         cat: 'protect',
-        title: 'Tónování skel a ochranné fólie (PPF)',
+        title: 'Tónování autoskel a ochranné fólie (PPF)',
         list: ['Certifikované tónování s atestem 8SD', 'Polep rizikových míst fólií PPF', 'Ochrana prvků interiéru fólií'],
         price: null,
+        imgAlt: 'Porsche Macan během ručního mytí',
       },
       {
         cat: 'extra',
         title: 'Lokální opravy a příprava k prodeji',
         list: ['Lokální oprava odštěpků laku', 'Renovace disků', 'Příprava vozu k prodeji, i ve spolupráci s autosalonem Remauto'],
         price: null,
+        imgAlt: 'Červené BMW M3 ve studiu po detailingu',
       },
     ],
   },
   combo: {
     title: 'Komplex: Leštění + Ochrana',
+    imgAlt: 'Detailer nanáší ochranný přípravek na čelní sklo',
     text: 'Dáme karoserii do pořádku, rizikové zóny ochráníme keramikou nebo fólií a na skla naneseme tekuté stěrače. Vůz předáte jednou, vyjde to levněji a rychleji než každá služba zvlášť.',
     cta: 'Spočítat komplex',
     steps: [
@@ -112,6 +120,7 @@ const cs = {
   why: {
     label: 'Proč my',
     title: 'Proč k nám',
+    imgAlt: 'Čištění znaku BMW štětcem',
     items: [
       { title: 'Profesionální chemie a nářadí', text: 'Pracujeme s přípravky Koch-Chemie, Gyeon, ZviZZer a leštičkami Rupes.' },
       { title: 'Šetrně k laku', text: 'Před leštěním vždy změříme tloušťku laku, abychom nesebrali víc, než je nutné.' },
@@ -148,7 +157,7 @@ const cs = {
   },
   prices: {
     label: 'Ceník',
-    title: 'Ceny a balíčky',
+    title: 'Ceník detailingu',
     lead: 'Orientační ceny pro běžné vozy (sedan / kupé), včetně DPH. Přesnou cenu potvrdíme při prohlídce.',
     body: { sedan: 'Sedan / kupé', suv: 'SUV / crossover +15 %', xxl: 'Dodávka / XXL +25 %' },
     exterior: 'Exteriér',
@@ -166,7 +175,7 @@ const cs = {
   },
   brands: {
     label: 'Čím pracujeme',
-    title: 'Chemie, nářadí a technologie',
+    title: 'Čím pracujeme: Koch-Chemie, Gyeon, Rupes',
     chem: 'Chemie a péče',
     tools: 'Nářadí a technologie',
     toolsList: ['RUPES', 'FLEX', 'Měření tloušťky laku', 'Detailingové světlo', 'Extraktor a pára'],
@@ -190,7 +199,7 @@ const cs = {
   },
   faq: {
     label: 'FAQ',
-    title: 'Zeptejte se nás',
+    title: 'Často kladené dotazy',
     items: [
       {
         tag: 'Termín',

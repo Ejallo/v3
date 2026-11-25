@@ -14,7 +14,7 @@ const { t } = Astro.props;
     <div class="why__side">
       <h2 class="sec-title">{t.why.title}</h2>
       <div class="why__photo">
-        <Picture src={photo} alt="" widths={[600, 900, 1300]} sizes="(max-width: 900px) 100vw, 36vw" formats={['avif', 'webp']} quality={82} />
+        <Picture src={photo} alt={t.why.imgAlt} widths={[600, 900, 1300]} sizes="(max-width: 900px) 100vw, 36vw" formats={['avif', 'webp']} quality={82} />
       </div>
     </div>
     <ul class="why__list">

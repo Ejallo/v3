@@ -1,7 +1,9 @@
 ---
 import '@/styles/global.css';
 import type { Dict } from '@/i18n/cs';
-import { BUSINESS, INDEXABLE } from '@/config';
+import { getImage } from 'astro:assets';
+import { BUSINESS, INDEXABLE, SAME_AS } from '@/config';
+import heroImg from '@/assets/photos/hero-main.jpg';
 import { url } from '@/lib/url';
 
 interface Props {
@@ -13,11 +15,26 @@ const csHref = site;
 const ruHref = site + 'ru/';
 const canonical = t.lang === 'ru' ? ruHref : csHref;
 
+const ogImg = await getImage({ src: heroImg, width: 1200, format: 'jpg' });
+const imageUrl = site ? new URL(ogImg.src, site).href : ogImg.src;
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'AutoWash',
+  '@id': csHref + '#business',
   name: BUSINESS.name,
   url: canonical,
+  image: imageUrl,
+  sameAs: SAME_AS,
+  areaServed: { '@type': 'City', name: 'Praha' },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: t.services.title,
+    itemListElement: t.services.items.map((it) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: it.title },
+    })),
+  },
   telephone: BUSINESS.phone.replace(/\s/g, ''),
   address: {
     '@type': 'PostalAddress',

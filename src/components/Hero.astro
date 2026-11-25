@@ -12,10 +12,10 @@ const { t } = Astro.props;
 ---
 
 <section class="hero">
-  <div class="hero__win" aria-hidden="true">
+  <div class="hero__win">
     <Picture
       src={heroImg}
-      alt=""
+      alt={t.hero.imgAlt}
       widths={[640, 960, 1400, 1920, 2560]}
       sizes="(max-width: 900px) 100vw, 64vw"
       formats={['avif', 'webp']}

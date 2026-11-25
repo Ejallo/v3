@@ -18,7 +18,7 @@ const icons = [Gauge, FlaskConical, ClipboardCheck];
           <li>
             <Icon size={30} strokeWidth={1.4} aria-hidden="true" />
             <div>
-              <h3>{v.title}</h3>
+              <strong class="values__t">{v.title}</strong>
               <p>{v.text}</p>
             </div>
           </li>
@@ -60,7 +60,12 @@ const icons = [Gauge, FlaskConical, ClipboardCheck];
     color: var(--red);
     margin-top: 2px;
   }
-  .values__row h3 {
+  .values__row .values__t {
+    display: block;
+    font-family: var(--display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
     font-size: clamp(17px, 1.3vw, 22px);
     line-height: 1.1;
   }

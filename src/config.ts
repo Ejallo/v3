@@ -32,6 +32,14 @@ export const SOCIAL = {
   googleWriteReview: '',
 };
 
+// Official profiles, used only in JSON-LD sameAs (footer links still come from SOCIAL).
+export const SAME_AS = [
+  'https://www.instagram.com/remauto_detailing/',
+  'https://www.tiktok.com/@rem_auto',
+  'https://www.youtube.com/@Remautocz',
+  'https://www.facebook.com/profile.php?id=61553540698047',
+];
+
 // Telegram form endpoint (Cloudflare Worker). Empty = the form shows a "not connected yet" note.
 export const FORM_ENDPOINT = '';
 

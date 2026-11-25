@@ -32,11 +32,11 @@ const social = [
         <p class="muted">{BUSINESS.street}, {BUSINESS.zip} {BUSINESS.city}</p>
       </div>
       <div>
-        <h3>{t.footer.sections}</h3>
+        <div class="ftr__h">{t.footer.sections}</div>
         <ul>{links.map(([h, l]) => <li><a href={h}>{l}</a></li>)}</ul>
       </div>
       <div>
-        <h3>{t.footer.social}</h3>
+        <div class="ftr__h">{t.footer.social}</div>
         <ul>
           {social.map(([name, href]) => (
             <li>{href ? <a href={href} target="_blank" rel="noopener">{name}</a> : <span>{name} <span class="todo">{t.todo}</span></span>}</li>
@@ -46,7 +46,7 @@ const social = [
         </ul>
       </div>
       <div>
-        <h3>{t.footer.company}</h3>
+        <div class="ftr__h">{t.footer.company}</div>
         <ul class="ftr__co">
           <li>{BUSINESS.legalName}</li>
           <li>IČO: {BUSINESS.ico || <span class="todo">{t.todo}</span>}</li>
@@ -97,7 +97,12 @@ const social = [
   .ftr__tel:hover {
     color: var(--red);
   }
-  .ftr h3 {
+  .ftr__h {
+    font-family: var(--display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
     font-size: 12px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
