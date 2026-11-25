@@ -70,7 +70,8 @@ const { t } = Astro.props;
     padding-bottom: clamp(32px, 4vw, 56px);
   }
   h1 {
-    font-size: clamp(46px, 5.8vw, 112px);
+    /* Capped so the longest word ("ДЕТЕЙЛИНГ") never reaches the slanted photo edge */
+    font-size: clamp(44px, 5vw, 92px);
     font-weight: 800;
     line-height: 0.92;
     max-width: 9ch;
