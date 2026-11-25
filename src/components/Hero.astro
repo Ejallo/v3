@@ -24,7 +24,6 @@ const { t } = Astro.props;
       quality={85}
     />
   </div>
-  <div class="stripes hero__stripes" aria-hidden="true"><i></i><i></i><i></i></div>
 
   <div class="wrap hero__txt">
     <h1>{t.hero.title}</h1>
@@ -65,21 +64,6 @@ const { t } = Astro.props;
     height: 100%;
     object-fit: cover;
     object-position: 46% 50%;
-  }
-  /* Logo stripes run down along the window edge */
-  .hero__stripes {
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    bottom: 0;
-    left: calc(36% + 6.5vw);
-    transform: translateX(-100%);
-  }
-  .hero__stripes i {
-    height: 100%;
-    width: 9px;
-    transform: skewX(-12.5deg);
-    transform-origin: bottom;
   }
   .hero__txt {
     padding-top: clamp(32px, 5vw, 80px);
@@ -128,18 +112,6 @@ const { t } = Astro.props;
     }
     .hero__win :global(img) {
       object-position: 50% 40%;
-    }
-    .hero__stripes {
-      position: relative;
-      z-index: 1;
-      left: auto;
-      transform: none;
-      height: 60px;
-      margin: -34px 0 0 calc(var(--gutter) + 6px);
-      gap: 9px;
-    }
-    .hero__stripes i {
-      width: 6px;
     }
     .hero__txt {
       padding-top: 18px;
