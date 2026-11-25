@@ -74,7 +74,8 @@ const social = [
     <div class="ftr__bot">
       <span>© 2026 {BUSINESS.legalName}</span>
       <span class="ftr__legal">
-        <span>{t.footer.privacy} <span class="todo">{t.todo}</span></span>
+        <a href={home + 'ochrana-udaju/'}>{t.footer.privacy}</a>
+        <a href={home + 'cookies/'}>{t.footer.cookies}</a>
         <button type="button" class="ftr__ck" data-ck="open">{ck.footerLink}</button>
       </span>
     </div>
@@ -164,6 +165,7 @@ const social = [
     text-underline-offset: 3px;
     cursor: pointer;
   }
+  .ftr__legal a:hover,
   .ftr__ck:hover {
     color: var(--fg);
   }

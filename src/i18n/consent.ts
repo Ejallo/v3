@@ -1,8 +1,9 @@
 // Cookie banner, settings dialog and map placeholder texts. Kept apart from cs.ts / ru.ts.
 
 const cs = {
-  title: 'Cookies',
-  text: 'Pro chod webu ukládáme jen vaši volbu cookies. S vaším souhlasem načteme mapu a recenze z Google a statistiky a reklamní měření (Google Analytics, Google Ads, Meta). Volbu změníte kdykoli v patičce webu.',
+  title: 'Používáme cookies',
+  text: 'Cookies nám pomáhají zlepšovat web a analytiku. Více na stránce',
+  more: 'cookies',
   accept: 'Přijmout vše',
   reject: 'Odmítnout vše',
   settings: 'Nastavení',
@@ -38,8 +39,9 @@ const cs = {
 export type ConsentDict = typeof cs;
 
 const ru: ConsentDict = {
-  title: 'Cookies',
-  text: 'Для работы сайта мы сохраняем только ваш выбор по cookies. С вашего согласия загрузим карту и отзывы из Google, а также статистику и рекламные метки (Google Analytics, Google Ads, Meta). Выбор можно изменить в любой момент внизу сайта.',
+  title: 'Мы используем cookie',
+  text: 'Cookie помогают улучшать работу сайта и аналитику. Подробнее на странице',
+  more: 'о cookie',
   accept: 'Принять все',
   reject: 'Отклонить все',
   settings: 'Настроить',

@@ -4,6 +4,7 @@
 import { Cookie, X } from 'lucide-react';
 import { TRACKING } from '@/config';
 import { consentDict } from '@/i18n/consent';
+import { homeFor } from '@/lib/url';
 
 interface Props {
   lang: string;
@@ -22,7 +23,7 @@ const rows = [
     <Cookie size={20} strokeWidth={1.6} aria-hidden="true" />
     <b>{c.title}</b>
   </div>
-  <p>{c.text}</p>
+  <p>{c.text} <a href={homeFor(lang) + 'cookies/'}>{c.more}</a>.</p>
   <div class="ck__btns">
     <button type="button" class="ck-btn ck-btn--red" data-ck="all"><span>{c.accept}</span></button>
     <button type="button" class="ck-btn" data-ck="none"><span>{c.reject}</span></button>
@@ -228,6 +229,10 @@ const rows = [
   }
   .ck__head :global(svg) {
     color: var(--red);
+  }
+  .ck p a {
+    color: var(--fg);
+    text-underline-offset: 3px;
   }
   .ck p {
     margin: 12px 0 18px;

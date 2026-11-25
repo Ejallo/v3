@@ -1,0 +1,51 @@
+---
+import LegalPage from '@/components/LegalPage.astro';
+import CookiePrefs from '@/components/CookiePrefs.astro';
+import ru from '@/i18n/ru';
+import { BUSINESS } from '@/config';
+import { homeFor } from '@/lib/url';
+---
+
+<LegalPage
+  t={ru}
+  path="cookies/"
+  title="Cookie | REMAUTO Detailing"
+  description="Какие cookie использует сайт REMAUTO Detailing и как изменить своё согласие."
+  h1="Cookie"
+  updated="Действует с 25.11.2026"
+>
+  <p class="lead">
+    Cookie — это небольшие файлы, которые сайт сохраняет в вашем браузере. Без некоторых сайт не работает как надо,
+    остальные мы используем только с вашего согласия.
+  </p>
+
+  <h2>Ваши настройки</h2>
+  <p>Включите только то, на что согласны. Выбор можно изменить в любой момент здесь или через «Настройки cookies» внизу сайта.</p>
+  <CookiePrefs lang="ru" />
+
+
+  <h2>Как отозвать согласие</h2>
+  <p>
+    Выключите переключатели выше или нажмите «Только необходимые». Отзыв не влияет на обработку, которая была до него.
+    Cookie можно удалить и в настройках браузера.
+  </p>
+
+  <h2>Передача данных за пределы ЕС</h2>
+  <p>
+    Google и Meta могут обрабатывать данные из cookie в том числе в США. Обе компании участвуют в EU-US Data Privacy
+    Framework, но уровень защиты данных в США может быть ниже, чем в ЕС.
+  </p>
+
+  <h2>Кто отвечает за сайт</h2>
+  <div class="box">
+    <p>
+      <b>{BUSINESS.legalName}</b><br />
+      {BUSINESS.street}, {BUSINESS.zip} {BUSINESS.city}<br />
+      Тел.: <a href={BUSINESS.phoneHref}>{BUSINESS.phone}</a><br />
+      E-mail: {BUSINESS.email ? <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a> : <span class="todo">{ru.todo}</span>}
+    </p>
+  </div>
+  <p style="margin-top:16px">
+    Как мы обращаемся с персональными данными — в <a href={homeFor('ru') + 'ochrana-udaju/'}>политике конфиденциальности</a>.
+  </p>
+</LegalPage>

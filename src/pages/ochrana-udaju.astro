@@ -1,0 +1,143 @@
+---
+import LegalPage from '@/components/LegalPage.astro';
+import cs from '@/i18n/cs';
+import { BUSINESS } from '@/config';
+import { homeFor } from '@/lib/url';
+const todo = cs.todo;
+---
+
+<LegalPage
+  t={cs}
+  path="ochrana-udaju/"
+  title="Ochrana osobních údajů | REMAUTO Detailing"
+  description="Jak REMAUTO Detailing zpracovává osobní údaje zákazníků a návštěvníků webu."
+  h1="Ochrana osobních údajů"
+  updated="Platné od 25. 11. 2026"
+>
+  <p class="lead">
+    Údaje od vás potřebujeme hlavně k tomu, abychom vám mohli odpovědět a auto udělat. Nic nepřeprodáváme a neposíláme
+    reklamu bez souhlasu.
+  </p>
+
+  <h2>Správce údajů</h2>
+  <div class="box">
+    <p>
+      <b>{BUSINESS.legalName}</b><br />
+      IČO: {BUSINESS.ico || <span class="todo">{todo}</span>}<br />
+      Provozovna: {BUSINESS.street}, {BUSINESS.zip} {BUSINESS.city}<br />
+      Tel.: <a href={BUSINESS.phoneHref}>{BUSINESS.phone}</a><br />
+      E-mail: {BUSINESS.email ? <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a> : <span class="todo">{todo}</span>}
+    </p>
+  </div>
+
+  <h2>Jaké údaje a proč</h2>
+  <ul class="dots">
+    <li>
+      <b>Poptávka</b> (formulář na webu, telefon, WhatsApp, Telegram): jméno, telefon nebo jiný kontakt, vůz, služba a
+      zpráva. Když auto vyzvedáváme a vracíme, také adresa. Odpovíme vám a domluvíme termín a cenu. Právní základ:
+      jednání o smlouvě (čl. 6 odst. 1 písm. b GDPR). Pokud zakázka nevznikne, údaje smažeme do 12 měsíců.
+    </li>
+    <li>
+      <b>Zakázka a fakturace</b>: kontaktní a fakturační údaje, údaje o voze a o provedené práci. Právní základ: plnění
+      smlouvy a zákonné povinnosti (čl. 6 odst. 1 písm. b a c). Účetní a daňové doklady uchováváme po dobu, kterou
+      ukládají předpisy (až 10 let).
+    </li>
+    <li>
+      <b>Reklamace</b>: údaje potřebné k posouzení a vyřízení reklamace. Právní základ: zákonná povinnost podle
+      občanského zákoníku (čl. 6 odst. 1 písm. c).
+    </li>
+    <li>
+      <b>Ochrana našich práv</b>: údaje o zakázce a komunikaci uchováváme do konce promlčecí lhůty (zpravidla 3 roky od
+      dokončení zakázky), abychom mohli doložit, co a jak bylo uděláno, kdyby došlo ke sporu. Právní základ: oprávněný
+      zájem (čl. 6 odst. 1 písm. f). Můžete vznést námitku.
+    </li>
+    <li>
+      <b>Provoz webu</b>: hosting automaticky zaznamenává technické údaje (IP adresa, prohlížeč, čas návštěvy) kvůli
+      bezpečnosti. Právní základ: oprávněný zájem (čl. 6 odst. 1 písm. f).
+    </li>
+    <li>
+      <b>Cookies, mapa, analytika a reklama</b>: jen s vaším souhlasem (čl. 6 odst. 1 písm. a). Podrobnosti a nastavení
+      jsou na stránce <a href={homeFor('cs') + 'cookies/'}>Cookies</a>.
+    </li>
+  </ul>
+  <p style="margin-top:12px">
+    Údaje nám dáváte dobrovolně. Bez kontaktu ale nemůžeme poptávku vyřídit ani zakázku přijmout.
+  </p>
+
+  <h2>Fotky a videa aut</h2>
+  <p>
+    Hotová auta rádi ukazujeme na webu a sociálních sítích. Registrační značky na fotkách a videích zakrýváme. Vás ani
+    jiné osoby bez vašeho souhlasu nefotíme a nezveřejňujeme. Pokud nechcete, aby se vaše auto objevilo na webu nebo
+    sítích, stačí nám to říct a fotky nezveřejníme, případně je odstraníme.
+  </p>
+
+  <h2>Sociální sítě</h2>
+  <p>
+    Máme profily na Instagramu, TikToku, Facebooku a YouTube. Když nám tam napíšete, dáte like nebo komentář,
+    zpracováváme vaše údaje jen kvůli komunikaci s vámi a vedení profilu. Právní základ: oprávněný zájem
+    (čl. 6 odst. 1 písm. f). Za zpracování na samotných platformách odpovídají Meta, TikTok a Google podle svých
+    pravidel.
+  </p>
+
+  <h2>WhatsApp a Telegram</h2>
+  <p>
+    Když nám napíšete přes WhatsApp nebo Telegram, zprávy jdou přes tyto služby a platí i jejich pravidla ochrany
+    údajů. Jejich servery mohou být mimo EU.
+  </p>
+
+  <h2>Komu údaje předáváme</h2>
+  <ul class="dots">
+    <li>GitHub, Inc. – hosting webu.</li>
+    <li>Cloudflare, Inc. a Telegram – doručení poptávky z formuláře do našeho chatu.</li>
+    <li>Google Ireland Ltd. – mapa, recenze, analytika a reklama (jen se souhlasem).</li>
+    <li>Meta Platforms Ireland Ltd. – měření reklam na Facebooku a Instagramu (jen se souhlasem).</li>
+    <li>Účetní – kvůli vedení účetnictví a daním.</li>
+    <li>Úřady a další třetí osoby – jen když to ukládá zákon.</li>
+  </ul>
+  <p style="margin-top:12px">Podrobný seznam příjemců vám na požádání pošleme.</p>
+
+  <h2>Předávání mimo EU</h2>
+  <p>
+    Někteří z příjemců mohou údaje zpracovávat i mimo EU, hlavně v USA. Údaje tam předáváme jen s odpovídající
+    ochranou: na základě rozhodnutí Evropské komise o odpovídající ochraně (EU-US Data Privacy Framework) nebo
+    standardních smluvních doložek EU. Úroveň ochrany mimo EU může být i tak nižší než v EU.
+  </p>
+
+  <h2>Vaše práva</h2>
+  <p>Máte právo:</p>
+  <ul class="dots">
+    <li>vědět, jaké údaje o vás máme, a dostat jejich kopii;</li>
+    <li>nechat je opravit nebo smazat (pokud je nemusíme uchovávat ze zákona);</li>
+    <li>omezit jejich zpracování;</li>
+    <li>dostat je ve strojově čitelné podobě (přenositelnost);</li>
+    <li>kdykoli bez udání důvodu vznést námitku proti zpracování pro marketing;</li>
+    <li>vznést námitku proti zpracování na základě oprávněného zájmu z důvodů, které se týkají vaší situace;</li>
+    <li>kdykoli odvolat souhlas, aniž by to ovlivnilo zpracování před odvoláním;</li>
+    <li>
+      podat stížnost u Úřadu pro ochranu osobních údajů (Pplk. Sochora 27, 170 00 Praha 7,
+      <a href="https://uoou.gov.cz" target="_blank" rel="noopener">uoou.gov.cz</a>).
+    </li>
+  </ul>
+
+  <h2>Jak vyřizujeme žádosti</h2>
+  <p>
+    Stačí nám zavolat nebo napsat. Odpovíme nejpozději do jednoho měsíce. Ve složitějších případech můžeme lhůtu
+    prodloužit, o důvodu vás ale předem informujeme. Pokud nebude jasné, kdo žádost posílá, můžeme vás požádat o
+    ověření totožnosti. Záznam o žádosti a odpovědi si necháváme, abychom mohli doložit, že jsme ji vyřídili.
+  </p>
+
+  <h2>Zabezpečení</h2>
+  <p>
+    K údajům mají přístup jen lidé, kteří je potřebují pro svou práci. Od dodavatelů, kteří s údaji pracují, vyžadujeme
+    odpovídající zabezpečení.
+  </p>
+
+  <h2>Automatizované rozhodování</h2>
+  <p>Nepoužíváme. O vaší zakázce vždy rozhoduje člověk.</p>
+
+  <h2>Změny těchto zásad</h2>
+  <p>
+    Zásady můžeme upravit, například při změně zákonů nebo našich služeb. O podstatných změnách vás předem
+    informujeme na webu. Platná verze je vždy na této stránce.
+  </p>
+</LegalPage>
