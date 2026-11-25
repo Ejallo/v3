@@ -20,7 +20,7 @@ const cs = {
   todo: 'doplnit',
   hero: {
     eyebrow: 'Detailing studio · Praha 9',
-    title: 'Detailing v Praze',
+    title: 'Detailingové studio v Praze',
     imgAlt: 'BMW M3 před a po detailingovém mytí ve studiu REMAUTO, Praha 9',
     sub: 'Šetrné mytí, leštění, keramika, tepování interiéru, tónování a ochrana karoserie na Spojovací 783/41, Praha 9. Bez pásové výroby a zbytečného pozlátka.',
     tags: ['Leštění', 'Keramika', 'Tepování', 'Tónování', 'Ochrana karoserie'],

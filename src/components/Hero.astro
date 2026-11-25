@@ -48,15 +48,26 @@ const { t } = Astro.props;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    /* H1 size, and the width of its longest line in em (measured: CZ 6.95, RU 5.89) */
+    --h1-fs: clamp(46px, 5.8vw, 112px);
+    --h1-w: 7;
   }
-  /* The photo sits in a slanted window on the right */
+  :global(html[lang='ru']) .hero {
+    --h1-w: 6;
+  }
+  /* The photo sits in a slanted window on the right. Its left edge moves right on wide
+     screens just enough that the slant stays clear of the headline (text left edge +
+     headline width + 56px gap, corrected for the 22% slant). */
   .hero__win {
     position: absolute;
     z-index: -1;
     top: 0;
     bottom: 0;
     right: 0;
-    width: 64%;
+    left: max(
+      36%,
+      calc((max(clamp(16px, 4vw, 64px), 50% - 736px) + var(--h1-w) * var(--h1-fs) + 56px - 12.1%) / 0.879)
+    );
     clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 100%);
   }
   .hero__win :global(img) {
@@ -70,8 +81,7 @@ const { t } = Astro.props;
     padding-bottom: clamp(32px, 4vw, 56px);
   }
   h1 {
-    /* Capped so the longest word ("ДЕТЕЙЛИНГ") never reaches the slanted photo edge */
-    font-size: clamp(44px, 5vw, 92px);
+    font-size: var(--h1-fs);
     font-weight: 800;
     line-height: 0.92;
     max-width: 9ch;
@@ -106,6 +116,7 @@ const { t } = Astro.props;
     .hero__win {
       position: relative;
       z-index: 0;
+      left: auto;
       width: 100%;
       height: 74vw;
       margin-top: calc(-1 * var(--header-h));
