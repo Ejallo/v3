@@ -1,20 +1,14 @@
 ---
-import { getImage } from 'astro:assets';
 import type { Dict } from '@/i18n/cs';
-import time from '@/assets/photos/faq-time.jpg';
-import polish from '@/assets/photos/faq-polish.jpg';
-import ceramic from '@/assets/photos/faq-ceramic.jpg';
-import wash from '@/assets/photos/faq-wash.jpg';
-import sale from '@/assets/photos/faq-sale.jpg';
 
 interface Props {
   t: Dict;
 }
 const { t } = Astro.props;
 const f = t.faq;
-const photos = await Promise.all(
-  [time, polish, ceramic, wash, sale].map((src) => getImage({ src, width: 1400, format: 'webp', quality: 74 })),
-);
+// Short loops cut from the studio's YouTube shorts: q{n}.mp4 is portrait (phone), q{n}w.mp4 is wide (desktop).
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const vid = (n: number, wide: boolean, ext: string) => `${base}/faq/q${n + 1}${wide ? 'w' : ''}.${ext}`;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -33,11 +27,25 @@ const jsonLd = {
             <span class="faq__qt">{i.q}</span>
           </button>
           <div class="faq__body" id={`faq-a${n}`}>
-            <div class="faq__card">
-              <img src={photos[n].src} alt="" loading="lazy" decoding="async" />
-              <div class="faq__ov">
-                <span class="faq__tag"><span>{i.tag}</span></span>
-                <p class="faq__a">{i.a.split(' ').map((w, k) => <span style={`--k:${k}`}>{w} </span>)}</p>
+            <div class="faq__in">
+              <div class="faq__card" style={`--pw:url(${vid(n, true, 'jpg')});--pm:url(${vid(n, false, 'jpg')})`}>
+                <video
+                  muted
+                  loop
+                  playsinline
+                  preload="none"
+                  data-d={vid(n, true, 'mp4')}
+                  data-m={vid(n, false, 'mp4')}
+                  data-pd={vid(n, true, 'jpg')}
+                  data-pm={vid(n, false, 'jpg')}
+                  aria-hidden="true"></video>
+                <span class="faq__rec" aria-hidden="true"><i></i>Remauto</span>
+                <span class="faq__ld" aria-hidden="true"><b><i></i><i></i><i></i></b>Remauto</span>
+                <span class="faq__bar" aria-hidden="true"></span>
+                <div class="faq__ov">
+                  <span class="faq__tag"><span>{i.tag}</span></span>
+                  <p class="faq__a">{i.a.split(' ').map((w, k) => <span style={`--k:${k}`}>{w} </span>)}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -52,10 +60,39 @@ const jsonLd = {
   const root = document.getElementById('faq');
   if (root) {
     const items = [...root.querySelectorAll<HTMLLIElement>('.faq__item')];
+    const wide = matchMedia('(min-width: 901px)');
     const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
     let cur = 0;
     let lock = 0;
     let timer: number | undefined;
+
+    // Load and start the clip of one tab; the card stays blurred with a loader until frames run
+    const play = (li: HTMLLIElement) => {
+      const card = li.querySelector<HTMLElement>('.faq__card')!;
+      const v = card.querySelector('video')!;
+      const t0 = performance.now();
+      card.classList.remove('is-ready');
+      const src = wide.matches ? v.dataset.d! : v.dataset.m!;
+      if (!v.src.endsWith(src)) {
+        v.poster = wide.matches ? v.dataset.pd! : v.dataset.pm!;
+        v.src = src;
+      }
+      v.currentTime = 0;
+      const ready = () => {
+        window.setTimeout(() => card.classList.add('is-ready'), Math.max(0, 650 - (performance.now() - t0)));
+      };
+      v.addEventListener('playing', ready, { once: true });
+      v.play().catch(() => card.classList.add('is-ready'));
+    };
+    const progress = (e: Event) => {
+      const v = e.currentTarget as HTMLVideoElement;
+      if (v.duration && v.buffered.length) {
+        const p = Math.min(100, (v.buffered.end(v.buffered.length - 1) / v.duration) * 100);
+        v.parentElement!.style.setProperty('--p', `${p}%`);
+      }
+    };
+    items.forEach((li) => li.querySelector('video')!.addEventListener('progress', progress));
+
     const set = (i: number) => {
       if (i === cur) return;
       cur = i;
@@ -64,12 +101,8 @@ const jsonLd = {
         const on = k === i;
         li.classList.toggle('is-on', on);
         li.querySelector('.faq__q')?.setAttribute('aria-expanded', String(on));
-        const card = li.querySelector<HTMLElement>('.faq__card');
-        if (on && card) {
-          card.classList.remove('is-play');
-          void card.offsetWidth;
-          card.classList.add('is-play');
-        }
+        if (on) play(li);
+        else window.setTimeout(() => !li.classList.contains('is-on') && li.querySelector('video')!.pause(), 700);
       });
     };
     items.forEach((li, i) => {
@@ -80,13 +113,36 @@ const jsonLd = {
         q.addEventListener('mouseenter', () => {
           clearTimeout(timer);
           timer = window.setTimeout(() => {
-            if (Date.now() - lock > 650) set(i);
+            if (Date.now() - lock > 800) set(i);
           }, 160);
         });
         q.addEventListener('mouseleave', () => clearTimeout(timer));
       }
+      const card = li.querySelector<HTMLElement>('.faq__card')!;
+      const v = card.querySelector('video')!;
+      if (fine) {
+        card.addEventListener('mousemove', (e) => {
+          const r = card.getBoundingClientRect();
+          v.style.setProperty('--px', `${(0.5 - (e.clientX - r.left) / r.width) * 18}px`);
+          v.style.setProperty('--py', `${(0.5 - (e.clientY - r.top) / r.height) * 12}px`);
+        });
+        card.addEventListener('mouseleave', () => {
+          v.style.removeProperty('--px');
+          v.style.removeProperty('--py');
+        });
+      }
     });
-    items[0]?.querySelector('.faq__card')?.classList.add('is-play');
+    // The first tab starts its clip only once the section comes near the screen
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          play(items[cur]);
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    io.observe(root);
   }
 </script>
 
@@ -155,40 +211,151 @@ const jsonLd = {
   .faq__q:hover .faq__qt {
     color: var(--fg);
   }
+
+  /* Tab unfolds; the clip already runs underneath while it opens */
   .faq__body {
-    display: none;
-    padding: 0 18px 18px;
+    display: grid;
+    grid-template-rows: 0fr;
+    padding: 0 18px;
+    transition:
+      grid-template-rows 0.65s cubic-bezier(0.65, 0, 0.2, 1),
+      padding 0.65s cubic-bezier(0.65, 0, 0.2, 1);
   }
   .faq__item.is-on .faq__body {
-    display: block;
+    grid-template-rows: 1fr;
+    padding-bottom: 18px;
+  }
+  .faq__in {
+    overflow: hidden;
+    min-height: 0;
   }
   .faq__card {
     position: relative;
-    aspect-ratio: 16 / 7;
+    aspect-ratio: 2 / 1;
     overflow: hidden;
-    background: #0b0b0b;
+    background: #111 var(--pw) center / cover no-repeat;
     border: 1px solid var(--line-strong);
-    animation: faq-in 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+    transform-origin: top;
+    transform: perspective(1400px) rotateX(-14deg) scale(0.96);
+    opacity: 0.4;
+    transition:
+      transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.5s;
   }
-  .faq__card img {
+  .faq__item.is-on .faq__card {
+    transform: none;
+    opacity: 1;
+  }
+  .faq__card video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: blur(18px) brightness(0.55);
+    transform: scale(1.14);
+    transition:
+      filter 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .faq__card.is-ready video {
+    filter: none;
+    transform: scale(1.04) translate(var(--px, 0), var(--py, 0));
   }
   .faq__card::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.25) 35%, rgba(0, 0, 0, 0.85));
+    z-index: 1;
+    background:
+      linear-gradient(90deg, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.45) 45%, rgba(0, 0, 0, 0) 75%),
+      linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.5));
+  }
+  .faq__rec {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.55);
+    padding: 5px 9px;
+  }
+  .faq__rec i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: faq-blink 1.2s infinite;
+  }
+  .faq__ld {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 14px;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: opacity 0.45s;
+  }
+  .faq__ld b {
+    display: flex;
+    gap: 7px;
+  }
+  .faq__ld b i {
+    width: 14px;
+    height: 34px;
+    background: var(--red);
+    transform: skewX(var(--sk));
+    animation: faq-ld 0.9s ease-in-out infinite;
+  }
+  .faq__ld b i:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+  .faq__ld b i:nth-child(3) {
+    animation-delay: 0.24s;
+  }
+  .faq__bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 4;
+    height: 3px;
+    width: var(--p, 0%);
+    background: var(--red);
+    transition:
+      width 0.3s,
+      opacity 0.5s 0.3s;
+  }
+  .faq__card.is-ready .faq__ld,
+  .faq__card.is-ready .faq__bar {
+    opacity: 0;
+  }
+  .faq__card.is-ready .faq__bar {
+    width: 100%;
   }
   .faq__ov {
     position: absolute;
     left: 0;
-    right: 0;
+    top: 0;
     bottom: 0;
-    z-index: 2;
+    width: 50%;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
     padding: clamp(18px, 2.4vw, 44px);
   }
   .faq__tag {
@@ -220,22 +387,17 @@ const jsonLd = {
   .faq__a > span {
     display: inline-block;
     white-space: pre;
+    opacity: 0;
   }
-  .faq__card.is-play img {
-    animation: faq-kb 9s ease-out both;
-  }
-  .faq__card.is-play .faq__a > span {
+  .faq__card.is-ready .faq__a > span {
     animation: faq-flow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-    animation-delay: calc(0.25s + var(--k) * 0.045s);
+    animation-delay: calc(0.15s + var(--k) * 0.045s);
   }
-  .faq__card.is-play .faq__tag {
-    animation: faq-fade 0.4s 0.1s both;
+  .faq__card .faq__tag {
+    opacity: 0;
   }
-  @keyframes faq-in {
-    from {
-      opacity: 0;
-      transform: translateY(12px) scale(0.98);
-    }
+  .faq__card.is-ready .faq__tag {
+    animation: faq-fade 0.4s both;
   }
   @keyframes faq-flow {
     from {
@@ -243,26 +405,41 @@ const jsonLd = {
       filter: blur(12px);
       transform: translateY(14px);
     }
+    to {
+      opacity: 1;
+    }
   }
   @keyframes faq-fade {
-    from {
-      opacity: 0;
+    to {
+      opacity: 1;
     }
   }
-  @keyframes faq-kb {
-    from {
-      transform: scale(1.14);
+  @keyframes faq-ld {
+    0%,
+    100% {
+      opacity: 0.25;
+      transform: skewX(var(--sk)) scaleY(0.6);
     }
-    to {
-      transform: scale(1.02);
+    50% {
+      opacity: 1;
+      transform: skewX(var(--sk)) scaleY(1);
+    }
+  }
+  @keyframes faq-blink {
+    50% {
+      opacity: 0.25;
     }
   }
   @media (prefers-reduced-motion: reduce) {
+    .faq__body,
     .faq__card,
-    .faq__card.is-play img,
-    .faq__card.is-play .faq__a > span,
-    .faq__card.is-play .faq__tag {
+    .faq__card video {
+      transition: none;
+    }
+    .faq__card.is-ready .faq__a > span,
+    .faq__card.is-ready .faq__tag {
       animation: none;
+      opacity: 1;
     }
   }
   @media (max-width: 900px) {
@@ -277,10 +454,22 @@ const jsonLd = {
       font-size: 15px;
     }
     .faq__body {
-      padding: 0 12px 12px;
+      padding: 0 12px;
+    }
+    .faq__item.is-on .faq__body {
+      padding-bottom: 12px;
     }
     .faq__card {
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 4 / 5;
+      background-image: var(--pm);
+    }
+    .faq__card::after {
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.85));
+    }
+    .faq__ov {
+      top: auto;
+      right: 0;
+      width: auto;
     }
   }
 </style>
