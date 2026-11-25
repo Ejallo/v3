@@ -3,8 +3,8 @@ import type { Dict } from '@/i18n/cs';
 import { EXTERIOR, INTERIOR, PACKAGES, SPECIAL, kc, withSurcharge, type Program } from '@/i18n/prices';
 import { SURCHARGE, type BodyType } from '@/config';
 
-type Props = { lang: 'cs' | 'ru'; t: Dict['prices']; from: string };
 type Tab = 'packages' | 'exterior' | 'interior' | 'special';
+type Props = { lang: 'cs' | 'ru'; t: Dict['prices']; from: string; initialTab?: Tab };
 
 function Btn({ children, href = '#objednat', variant = 'ghost' }: { children: string; href?: string; variant?: string }) {
   return (
@@ -17,9 +17,9 @@ function Btn({ children, href = '#objednat', variant = 'ghost' }: { children: st
   );
 }
 
-export default function Pricing({ lang, t, from }: Props) {
+export default function Pricing({ lang, t, from, initialTab = 'packages' }: Props) {
   const [body, setBody] = useState<BodyType>('sedan');
-  const [tab, setTab] = useState<Tab>('packages');
+  const [tab, setTab] = useState<Tab>(initialTab);
   const s = SURCHARGE[body];
   const price = (n: number) => kc(withSurcharge(n, s));
   const tabs: [Tab, string][] = [

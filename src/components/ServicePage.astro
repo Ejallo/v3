@@ -1,0 +1,632 @@
+---
+// One template for every service page (CZ / RU, later UA). Content comes from src/data/services.ts.
+// Blocks without data are not rendered at all, so there are never empty headings.
+import type { Dict } from '@/i18n/cs';
+import Base from '@/layouts/Base.astro';
+import Header from './Header.astro';
+import Prices from './Prices.astro';
+import Services from './Services.astro';
+import Contact from './Contact.astro';
+import Footer from './Footer.astro';
+import StickyBar from './StickyBar.astro';
+import Consent from './Consent.astro';
+import FlowButton from './FlowButton.astro';
+import PhotoSlot from './PhotoSlot.astro';
+import Rich from './Rich.astro';
+import { BUSINESS, INDEXABLE } from '@/config';
+import { url, homeFor } from '@/lib/url';
+import { LANGS, servicePath, UI, type Lang, type Service } from '@/data/services';
+
+interface Props {
+  t: Dict;
+  s: Service;
+}
+const { t, s } = Astro.props;
+const lang = t.lang as Lang;
+const x = s[lang];
+const ui = UI[lang];
+const h = x.h2;
+
+const alternates = Object.fromEntries(LANGS.map((l) => [l, servicePath(s, l)])) as Record<Lang, string>;
+const site = Astro.site ? new URL(import.meta.env.BASE_URL.replace(/\/?$/, '/'), Astro.site).href : '';
+const pageUrl = site + alternates[lang];
+const homeUrl = site + (lang === 'cs' ? '' : lang + '/');
+const formService = t.services.items[s.tile].title;
+// Placeholders for missing photos are shown only on the noindex mockup; on the live site the block disappears.
+const showBa = !INDEXABLE && !!s.needPhotos.ba?.length;
+
+const jsonLd: object[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: x.name,
+    serviceType: formService,
+    description: x.description,
+    url: pageUrl,
+    inLanguage: lang,
+    areaServed: { '@type': 'City', name: 'Praha' },
+    provider: { '@id': site + '#business' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: ui.home, item: homeUrl },
+      { '@type': 'ListItem', position: 2, name: ui.services, item: homeUrl + '#sluzby' },
+      { '@type': 'ListItem', position: 3, name: x.name, item: pageUrl },
+    ],
+  },
+];
+if (x.faq?.length) {
+  jsonLd.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: x.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  });
+}
+---
+
+<Base t={t} title={x.title} description={x.description} alternates={alternates} jsonLd={jsonLd}>
+  <Header t={t} alternates={alternates} />
+  <main class="sp">
+    <section class="sp-hero">
+      <div class="wrap">
+        <nav class="crumbs" aria-label={ui.crumbs}>
+          <ol>
+            <li><a href={homeFor(lang)}>{ui.home}</a></li>
+            <li><a href={homeFor(lang) + '#sluzby'}>{ui.services}</a></li>
+            <li><span aria-current="page">{x.name}</span></li>
+          </ol>
+        </nav>
+        <div class="sp-hero__grid">
+          <div class="sp-hero__txt">
+            <h1>{x.h1}</h1>
+            <p class="sp-hero__lead">{x.lead}</p>
+            <div class="sp-hero__btns">
+              <FlowButton href="#objednat" variant="primary">{ui.book}</FlowButton>
+              <FlowButton href={BUSINESS.whatsapp} target="_blank" rel="noopener">{ui.photos}</FlowButton>
+            </div>
+            {x.draft && <p class="sp-draft"><span class="todo">{ui.draft}</span></p>}
+          </div>
+          <PhotoSlot class="sp-hero__ph" label={ui.photoNeeded} need={s.needPhotos.hero} />
+        </div>
+      </div>
+    </section>
+
+    <section class="sec sec--panel sp-sec">
+      <div class="wrap">
+        <h2 class="sp-h2">{h.includes}</h2>
+        <ul class:list={['sp-inc', { 'sp-inc--short': x.includes.every((i) => !i.d) }]}>
+          {x.includes.map((i) => (
+            <li>
+              <strong>{i.t}</strong>
+              {i.d && <p>{i.d}</p>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    {x.when?.length && h.when && (
+      <section class="sec sp-sec">
+        <div class="wrap">
+          <h2 class="sp-h2">{h.when}</h2>
+          <ul class="sp-when">
+            {x.when.map((w) => (
+              <li>
+                <strong>{w.t}</strong>
+                <p>{w.d}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    {x.options?.length && h.options && (
+      <section class="sec sec--panel sp-sec">
+        <div class="wrap">
+          <div class="sp-head">
+            <h2 class="sp-h2">{h.options}</h2>
+            {x.optionsLead && <p class="sec-lead">{x.optionsLead}</p>}
+          </div>
+          <div class="sp-opts">
+            {x.options.map((o) => (
+              <article class="sp-opt">
+                <h3>{o.name}</h3>
+                <dl>
+                  <dt>{ui.for}</dt>
+                  <dd>{o.for}</dd>
+                  <dt>{ui.time}</dt>
+                  <dd><Rich text={o.time} /></dd>
+                  {o.lasts && (
+                    <>
+                      <dt>{ui.lasts}</dt>
+                      <dd><Rich text={o.lasts} /></dd>
+                    </>
+                  )}
+                </dl>
+                <ul>
+                  {o.list.map((li) => (
+                    <li>{li}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {x.process?.length && h.process && (
+      <section class="sec sp-sec">
+        <div class="wrap">
+          <h2 class="sp-h2">{h.process}</h2>
+          <ol class="sp-steps">
+            {x.process.map((p) => (
+              <li>
+                <strong>{p.t}</strong>
+                <p>{p.d}</p>
+              </li>
+            ))}
+          </ol>
+          {x.duration && <p class="sp-dur"><Rich text={x.duration} /></p>}
+        </div>
+      </section>
+    )}
+
+    <Prices t={t} tab={s.priceTab} title={h.prices} />
+
+    {showBa && h.ba && (
+      <section class="sec sp-sec">
+        <div class="wrap">
+          <h2 class="sp-h2">{h.ba}</h2>
+          <div class="sp-ba">
+            {s.needPhotos.ba!.map((need) => <PhotoSlot label={`${ui.photoNeeded} · ${ui.baPair}`} need={need} />)}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {x.tools && h.tools && (
+      <section class="sec sp-sec">
+        <div class="wrap sp-tools">
+          <h2 class="sp-h2">{h.tools}</h2>
+          <div>
+            <p class="sp-tools__txt">{x.tools.text}</p>
+            <ul class="chips sp-tools__list">
+              {x.tools.list.map((n) => (
+                <li class="chip"><span>{n}</span></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    )}
+
+    {x.faq?.length && h.faq && (
+      <section class="sec sp-sec">
+        <div class="wrap">
+          <h2 class="sp-h2">{h.faq}</h2>
+          <div class="sp-faq">
+            {x.faq.map((f, i) => (
+              <details open={i === 0}>
+                <summary><span>{f.q}</span></summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <Services t={t} exclude={s.tile} title={h.other} id="dalsi-sluzby" />
+    <Contact t={t} title={h.form} service={formService} />
+  </main>
+  <Footer t={t} />
+  <StickyBar t={t} />
+  <Consent lang={t.lang} />
+</Base>
+
+<style>
+  .sp-hero {
+    padding: calc(var(--header-h) * 0.4) 0 clamp(64px, 8vw, 120px);
+  }
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 0;
+    margin: 0 0 clamp(28px, 4vw, 56px);
+    padding: 0;
+    list-style: none;
+    font-size: 13.5px;
+    color: var(--grey);
+  }
+  .crumbs li + li::before {
+    content: '›';
+    margin: 0 10px;
+    color: var(--red);
+  }
+  .crumbs a {
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    color: var(--fg);
+  }
+  .crumbs [aria-current] {
+    color: var(--muted);
+  }
+  .sp-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 40px clamp(40px, 5vw, 96px);
+    align-items: center;
+  }
+  .sp-hero h1 {
+    font-size: clamp(38px, 4.6vw, 86px);
+    font-weight: 800;
+    line-height: 0.98;
+    max-width: 16ch;
+  }
+  .sp-hero__lead {
+    margin-top: 26px;
+    max-width: 52ch;
+    color: var(--muted);
+    font-size: clamp(16px, 1.15vw, 19px);
+  }
+  .sp-hero__btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 18px;
+    margin-top: 36px;
+    padding-left: 8px;
+  }
+  .sp-draft {
+    margin-top: 22px;
+  }
+  .sp-hero :global(.sp-hero__ph) {
+    margin-right: 12px;
+  }
+
+  /* Section rhythm: a bit tighter than the main page, this is a text page */
+  .sp-sec {
+    padding-top: clamp(56px, 6vw, 100px);
+    padding-bottom: clamp(56px, 6vw, 100px);
+  }
+  .sp-sec.sec--panel {
+    padding-top: calc(var(--cut) + clamp(36px, 4vw, 72px));
+  }
+  .sp-h2 {
+    font-size: clamp(30px, 3.3vw, 60px);
+    font-weight: 800;
+    max-width: 22ch;
+    margin-bottom: clamp(28px, 3.2vw, 52px);
+  }
+  .sp-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0 48px;
+  }
+  .sp-head .sec-lead {
+    margin-bottom: clamp(28px, 3.2vw, 52px);
+  }
+
+  /* What's included: two columns of short entries with the slanted red marker */
+  .sp-inc {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 clamp(32px, 4vw, 80px);
+  }
+  .sp-inc--short {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .sp-inc li,
+  .sp-when li {
+    position: relative;
+    padding: 20px 0 20px 28px;
+    border-top: 1px solid var(--line);
+  }
+  .sp-inc li::before,
+  .sp-when li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 27px;
+    width: 7px;
+    height: 14px;
+    background: var(--red);
+    transform: skewX(var(--sk));
+  }
+  .sp-inc strong,
+  .sp-when strong {
+    display: block;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(17px, 1.25vw, 21px);
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+  .sp-inc p,
+  .sp-when p {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 15.5px;
+    max-width: 52ch;
+  }
+
+  /* When it's worth it: slanted cards */
+  .sp-when {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 clamp(28px, 3vw, 56px);
+  }
+  .sp-when li::before {
+    background: var(--grey);
+  }
+
+  /* Options */
+  .sp-opts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px clamp(24px, 2.6vw, 44px);
+  }
+  .sp-opt {
+    padding: 26px 0 8px;
+    border-top: 3px solid var(--line-strong);
+  }
+  .sp-opt:last-child {
+    border-top-color: var(--red);
+  }
+  .sp-opt h3 {
+    font-size: clamp(19px, 1.5vw, 25px);
+    line-height: 1.1;
+  }
+  .sp-opt dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 16px;
+    margin: 18px 0;
+    font-size: 15px;
+  }
+  .sp-opt dt {
+    color: var(--grey);
+  }
+  .sp-opt dd {
+    margin: 0;
+    color: var(--muted);
+  }
+  .sp-opt ul {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .sp-opt li {
+    position: relative;
+    padding-left: 16px;
+  }
+  .sp-opt li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 5px;
+    height: 10px;
+    background: var(--grey);
+    transform: skewX(var(--sk));
+  }
+
+  /* Steps: no numbers, the order is shown by a line with arrowheads */
+  .sp-steps {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 0 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sp-steps li {
+    position: relative;
+    padding-top: 40px;
+  }
+  .sp-steps li::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 0;
+    right: -24px;
+    height: 2px;
+    background: var(--line-strong);
+  }
+  .sp-steps li::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 0;
+    width: 10px;
+    height: 14px;
+    background: var(--red);
+    transform: skewX(var(--sk));
+  }
+  .sp-steps li:not(:last-child) strong::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: -14px;
+    width: 9px;
+    height: 9px;
+    border-top: 2px solid var(--grey);
+    border-right: 2px solid var(--grey);
+    rotate: 45deg;
+  }
+  .sp-steps li:last-child::before {
+    right: 0;
+  }
+  .sp-steps strong {
+    display: block;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(17px, 1.25vw, 21px);
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+  .sp-steps p {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .sp-dur {
+    margin-top: 36px;
+    color: var(--grey);
+    font-size: 15px;
+  }
+
+  /* Before / after placeholders */
+  .sp-ba {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px 34px;
+    padding: 0 12px;
+  }
+
+  /* Tools */
+  .sp-tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 clamp(32px, 5vw, 96px);
+    align-items: start;
+  }
+  .sp-tools .sp-h2 {
+    margin-bottom: 0;
+  }
+  .sp-tools__txt {
+    color: var(--muted);
+    font-size: clamp(16px, 1.15vw, 18px);
+    max-width: 52ch;
+  }
+  .sp-tools__list {
+    margin-top: 24px;
+  }
+  .sp-tools__list .chip {
+    cursor: default;
+  }
+
+  /* FAQ: plain accordion */
+  .sp-faq {
+    max-width: 980px;
+    border-top: 1px solid var(--line);
+  }
+  .sp-faq details {
+    border-bottom: 1px solid var(--line);
+  }
+  .sp-faq summary {
+    position: relative;
+    display: block;
+    padding: 22px 56px 22px 0;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(17px, 1.3vw, 22px);
+    line-height: 1.25;
+    text-transform: uppercase;
+  }
+  .sp-faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .sp-faq summary::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    margin-top: -9px;
+    border-right: 2px solid var(--red);
+    border-bottom: 2px solid var(--red);
+    rotate: 45deg;
+    transition: rotate 0.3s;
+  }
+  .sp-faq details[open] summary::after {
+    rotate: 225deg;
+    margin-top: -3px;
+  }
+  .sp-faq summary:hover span {
+    color: var(--muted);
+  }
+  .sp-faq details p {
+    padding: 0 56px 26px 0;
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 72ch;
+  }
+
+  @media (max-width: 1100px) {
+    .sp-when,
+    .sp-opts,
+    .sp-ba,
+    .sp-inc--short {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .sp-steps {
+      grid-auto-flow: row;
+      gap: 0;
+    }
+    /* Vertical line on the left */
+    .sp-steps li {
+      padding: 0 0 28px 36px;
+    }
+    .sp-steps li::before {
+      top: 6px;
+      bottom: -6px;
+      left: 4px;
+      right: auto;
+      width: 2px;
+      height: auto;
+    }
+    .sp-steps li:last-child::before {
+      display: none;
+    }
+    .sp-steps li::after {
+      top: 4px;
+      left: 0;
+    }
+    .sp-steps li:not(:last-child) strong::after {
+      display: none;
+    }
+    .sp-tools {
+      grid-template-columns: 1fr;
+    }
+    .sp-tools .sp-h2 {
+      margin-bottom: 24px;
+    }
+  }
+  @media (max-width: 860px) {
+    .sp-hero__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 700px) {
+    .sp-inc,
+    .sp-inc--short,
+    .sp-when,
+    .sp-opts,
+    .sp-ba {
+      grid-template-columns: 1fr;
+    }
+    .sp-hero__btns {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .sp-faq summary {
+      padding-right: 40px;
+    }
+    .sp-faq details p {
+      padding-right: 0;
+    }
+  }
+</style>

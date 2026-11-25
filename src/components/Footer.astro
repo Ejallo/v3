@@ -1,7 +1,8 @@
 ---
 import type { Dict } from '@/i18n/cs';
 import { BUSINESS, SOCIAL } from '@/config';
-import { homeFor } from '@/lib/url';
+import { homeFor, url } from '@/lib/url';
+import { SERVICES, servicePath, type Lang } from '@/data/services';
 import Logo from './Logo.astro';
 import { consentDict } from '@/i18n/consent';
 
@@ -10,13 +11,18 @@ interface Props {
 }
 const { t } = Astro.props;
 const ck = consentDict(t.lang);
+const home = homeFor(t.lang);
+const prefix = Astro.url.pathname === home ? '' : home;
 const links = [
   ['#sluzby', t.nav.services],
   ['#realizace', t.nav.works],
   ['#cenik', t.nav.prices],
   ['#faq', t.nav.faq],
   ['#kontakt', t.nav.contact],
-];
+].map(([h, l]) => [prefix + h, l]);
+const lang = t.lang as Lang;
+const here = Astro.url.pathname;
+const services = SERVICES.map((s) => ({ href: url(servicePath(s, lang)), name: s[lang].name }));
 const social = [
   ['Instagram', SOCIAL.instagram],
   ['TikTok', SOCIAL.tiktok],
@@ -32,6 +38,14 @@ const social = [
         <p class="ftr__slogan">{t.footer.slogan}</p>
         <a class="ftr__tel" href={BUSINESS.phoneHref}>{BUSINESS.phone}</a>
         <p class="muted">{BUSINESS.street}, {BUSINESS.zip} {BUSINESS.city}</p>
+      </div>
+      <div>
+        <div class="ftr__h">{t.nav.services}</div>
+        <ul>
+          {services.map((s) => (
+            <li><a href={s.href} aria-current={s.href === here ? 'page' : undefined}>{s.name}</a></li>
+          ))}
+        </ul>
       </div>
       <div>
         <div class="ftr__h">{t.footer.sections}</div>
@@ -74,7 +88,7 @@ const social = [
   }
   .ftr__top {
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+    grid-template-columns: 1.3fr 1.2fr 0.8fr 0.8fr 1.1fr;
     gap: 40px;
   }
   .ftr__brand {
@@ -121,7 +135,8 @@ const social = [
     text-decoration: none;
     color: var(--muted);
   }
-  .ftr ul a:hover {
+  .ftr ul a:hover,
+  .ftr ul a[aria-current='page'] {
     color: var(--fg);
   }
   .ftr__co {
@@ -156,6 +171,14 @@ const social = [
     display: flex;
     flex-wrap: wrap;
     gap: 12px 24px;
+  }
+  @media (max-width: 1200px) {
+    .ftr__top {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .ftr__brand {
+      grid-column: 1 / -1;
+    }
   }
   @media (max-width: 1000px) {
     .ftr__top {

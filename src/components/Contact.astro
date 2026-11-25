@@ -8,8 +8,11 @@ import { consentDict } from '@/i18n/consent';
 
 interface Props {
   t: Dict;
+  /** Service pages: own form title and the service preselected in the form */
+  title?: string;
+  service?: string;
 }
-const { t } = Astro.props;
+const { t, title, service } = Astro.props;
 const c = t.contact;
 const services = t.services.items.map((i) => i.title);
 const ck = consentDict(t.lang);
@@ -18,7 +21,7 @@ const ck = consentDict(t.lang);
 <section class="sec" id="objednat">
   <div class="wrap ct">
     <div class="ct__side">
-      <h2 class="sec-title">{c.title}</h2>
+      <h2 class="sec-title">{title ?? c.title}</h2>
       <p class="ct__promise">{c.promise}</p>
       <ul class="qc">
         <li>
@@ -54,7 +57,7 @@ const ck = consentDict(t.lang);
         </li>
       </ul>
     </div>
-    <ContactForm client:load t={c.form} services={services} lang={t.lang} />
+    <ContactForm client:load t={c.form} services={services} lang={t.lang} preset={service} />
   </div>
 </section>
 

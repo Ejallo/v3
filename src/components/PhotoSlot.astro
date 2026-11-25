@@ -1,0 +1,44 @@
+---
+// Placeholder for a photo the studio still has to shoot. The text says exactly which shot is needed.
+import { Camera } from 'lucide-react';
+
+interface Props {
+  label: string;
+  need: string;
+  class?: string;
+}
+const { label, need, class: cls = '' } = Astro.props;
+---
+
+<div class:list={['slot', cls]}>
+  <div class="slot__in">
+    <Camera size={38} strokeWidth={1.2} aria-hidden="true" />
+    <span class="todo">{label}</span>
+    <p>{need}</p>
+  </div>
+</div>
+
+<style>
+  .slot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 3 / 2;
+    background: #0d0d0d;
+    border: 1.5px dashed var(--line-strong);
+    transform: skewX(var(--sk));
+  }
+  .slot__in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 34ch;
+    padding: 20px 28px;
+    text-align: center;
+    color: var(--grey);
+    font-size: 14px;
+    line-height: 1.45;
+    transform: skewX(calc(var(--sk) * -1));
+  }
+</style>

@@ -4,6 +4,8 @@ import { Armchair } from 'lucide-react';
 import type { Dict } from '@/i18n/cs';
 import { kc } from '@/i18n/prices';
 import FlowButton from './FlowButton.astro';
+import { url } from '@/lib/url';
+import { serviceByTile, servicePath, UI, type Lang } from '@/data/services';
 import wash from '@/assets/photos/wash-pressure.jpg';
 import polish from '@/assets/photos/headlight-foam.jpg';
 import ceramic from '@/assets/photos/glass-light.jpg';
@@ -14,19 +16,30 @@ import interior from '@/assets/photos/salon-cleaning.jpg';
 
 interface Props {
   t: Dict;
+  /** Tile index to leave out (the service page we are on). Service pages show prices only in the price list, so tiles hide them. */
+  exclude?: number;
+  /** Section title instead of the main-page one; also hides the lead */
+  title?: string;
+  id?: string;
 }
-const { t } = Astro.props;
+const { t, exclude, title, id = 'sluzby' } = Astro.props;
 const s = t.services;
+const lang = t.lang as Lang;
+const pageHref = (i: number) => {
+  const sv = serviceByTile(i);
+  return sv ? url(servicePath(sv, lang)) : undefined;
+};
+const items = s.items.map((it, i) => ({ it, i })).filter((x) => x.i !== exclude);
 // Same order as services.items; null shows a placeholder.
 const photos = [wash, polish, ceramic, interior, ppf, extra];
 const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 62%'];
 ---
 
-<section class="sec sec--panel" id="sluzby">
+<section class="sec sec--panel" id={id} data-svc>
   <div class="wrap">
     <div class="sec-head svc-head">
-      <h2 class="sec-title">{s.title}</h2>
-      <p class="sec-lead">{s.lead}</p>
+      <h2 class="sec-title">{title ?? s.title}</h2>
+      {!title && <p class="sec-lead">{s.lead}</p>}
       <!-- Phone only: shows that the cards scroll sideways -->
       <div class="svc-nav">
         <div class="svc-nav__btns">
@@ -38,7 +51,7 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
           </button>
         </div>
         <div class="svc-nav__dots" aria-hidden="true">
-          {s.items.map((_, i) => <span class:list={[{ on: i === 0 }]} />)}
+          {items.map((_, k) => <span class:list={[{ on: k === 0 }]} />)}
         </div>
       </div>
     </div>
@@ -46,8 +59,9 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
 
   <div class="tiles-scroll">
     <ul class="tiles">
-      {s.items.map((it, i) => {
+      {items.map(({ it, i }) => {
         const img = photos[i];
+        const href = pageHref(i);
         return (
           <li class="tile neon">
             <div class="tile__img">
@@ -69,14 +83,14 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
               )}
             </div>
             <div class="tile__body">
-              <h3>{it.title}</h3>
+              <h3>{href ? <a class="tile__link" href={href}>{it.title}</a> : it.title}</h3>
               <ul>
                 {it.list.slice(0, 3).map((li) => (
                   <li>{li}</li>
                 ))}
               </ul>
               <div class="tile__foot">
-                <p class="tile__price">
+                {exclude === undefined && <p class="tile__price">
                   {it.price ? (
                     <>
                       <small>{s.from}</small> <span class="price-num">{kc(it.price)}</span>
@@ -84,8 +98,11 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
                   ) : (
                     <span class="tile__ind">{s.individual}</span>
                   )}
-                </p>
-                <FlowButton href="#objednat" size="sm" arrow={false}>{s.more}</FlowButton>
+                </p>}
+                <div class="tile__acts">
+                  {href && <a class="tile__more" href={href}>{UI[lang].details}</a>}
+                  <FlowButton href="#objednat" size="sm" arrow={false}>{s.more}</FlowButton>
+                </div>
               </div>
             </div>
           </li>
@@ -98,8 +115,9 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
 
 <script>
   // Phone carousel: arrows scroll one card, dots follow the card nearest the centre.
-  const scroller = document.querySelector<HTMLElement>('#sluzby .tiles-scroll');
-  const nav = document.querySelector<HTMLElement>('#sluzby .svc-nav');
+  document.querySelectorAll<HTMLElement>('[data-svc]').forEach((sec) => {
+  const scroller = sec.querySelector<HTMLElement>('.tiles-scroll');
+  const nav = sec.querySelector<HTMLElement>('.svc-nav');
   if (scroller && nav) {
     const cards = [...scroller.querySelectorAll<HTMLElement>('.tile')];
     const dots = [...nav.querySelectorAll('.svc-nav__dots span')];
@@ -135,6 +153,7 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
       }),
     );
   }
+  });
 </script>
 
 <style>
@@ -237,6 +256,31 @@ const positions = ['45% 55%', '35% 45%', '50% 40%', '50% 48%', '45% 55%', '50% 6
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+  }
+  .tile__link {
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .tile__link:hover {
+    color: var(--muted);
+  }
+  .tile__acts {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .tile__more {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    text-underline-offset: 4px;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .tile__more:hover {
+    color: var(--fg);
   }
   .tile__price {
     font-size: 24px;

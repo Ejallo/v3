@@ -1,0 +1,11 @@
+---
+// Text with [[...]] parts shown as yellow "to fill" markers.
+import { parts } from '@/data/services';
+
+interface Props {
+  text: string;
+}
+const { text } = Astro.props;
+---
+
+{parts(text).map((p) => ('todo' in p ? <span class="todo">{p.todo}</span> : p.text))}

@@ -2,10 +2,10 @@ import { useState, type SyntheticEvent } from 'react';
 import type { Dict } from '@/i18n/cs';
 import { FORM_ENDPOINT } from '@/config';
 
-type Props = { t: Dict['contact']['form']; services: string[]; lang: string };
+type Props = { t: Dict['contact']['form']; services: string[]; lang: string; preset?: string };
 type State = 'idle' | 'sending' | 'ok' | 'error' | 'offline';
 
-export default function ContactForm({ t, services, lang }: Props) {
+export default function ContactForm({ t, services, lang, preset = '' }: Props) {
   const [state, setState] = useState<State>('idle');
 
   async function submit(e: SyntheticEvent<HTMLFormElement>) {
@@ -48,7 +48,7 @@ export default function ContactForm({ t, services, lang }: Props) {
       </label>
       <label className="cf__f">
         <span>{t.service}</span>
-        <select name="service" defaultValue="">
+        <select name="service" defaultValue={preset}>
           <option value="" disabled>
             {t.servicePh}
           </option>

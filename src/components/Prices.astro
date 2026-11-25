@@ -4,18 +4,21 @@ import Pricing from './Pricing';
 
 interface Props {
   t: Dict;
+  /** Service pages open the price list on their own tab and use their own title */
+  tab?: 'packages' | 'exterior' | 'interior' | 'special';
+  title?: string;
 }
-const { t } = Astro.props;
+const { t, tab, title } = Astro.props;
 const p = t.prices;
 ---
 
 <section class="sec sec--panel" id="cenik">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="sec-title">{p.title}</h2>
+      <h2 class="sec-title">{title ?? p.title}</h2>
     </div>
 
-    <Pricing client:visible lang={t.lang as 'cs' | 'ru'} t={p} from={t.services.from} />
+    <Pricing client:visible lang={t.lang as 'cs' | 'ru'} t={p} from={t.services.from} initialTab={tab} />
 
   </div>
 </section>
