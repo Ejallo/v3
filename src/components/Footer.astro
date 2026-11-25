@@ -3,11 +3,13 @@ import type { Dict } from '@/i18n/cs';
 import { BUSINESS, SOCIAL } from '@/config';
 import { homeFor } from '@/lib/url';
 import Logo from './Logo.astro';
+import { consentDict } from '@/i18n/consent';
 
 interface Props {
   t: Dict;
 }
 const { t } = Astro.props;
+const ck = consentDict(t.lang);
 const links = [
   ['#sluzby', t.nav.services],
   ['#realizace', t.nav.works],
@@ -59,7 +61,7 @@ const social = [
       <span>© 2026 {BUSINESS.legalName}</span>
       <span class="ftr__legal">
         <span>{t.footer.privacy} <span class="todo">{t.todo}</span></span>
-        <span>{t.footer.cookies} <span class="todo">{t.todo}</span></span>
+        <button type="button" class="ftr__ck" data-ck="open">{ck.footerLink}</button>
       </span>
     </div>
   </div>
@@ -135,6 +137,20 @@ const social = [
     gap: 12px 24px;
     font-size: 13.5px;
     color: var(--grey);
+  }
+  .ftr__ck {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .ftr__ck:hover {
+    color: var(--fg);
   }
   .ftr__legal {
     display: flex;

@@ -40,6 +40,14 @@ export const SAME_AS = [
   'https://www.facebook.com/profile.php?id=61553540698047',
 ];
 
+// Tracking IDs. Empty = not loaded at all. Each one loads only after the visitor agrees
+// in the cookie banner: GA4 → "analytics", Google Ads + Meta Pixel → "marketing".
+export const TRACKING = {
+  ga4: '', // G-XXXXXXXXXX
+  googleAds: '', // AW-XXXXXXXXXX
+  metaPixel: '', // 15–16 digit pixel ID
+};
+
 // Telegram form endpoint (Cloudflare Worker). Empty = the form shows a "not connected yet" note.
 export const FORM_ENDPOINT = '';
 

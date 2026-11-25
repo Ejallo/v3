@@ -4,6 +4,7 @@ import type { Dict } from '@/i18n/cs';
 import { BUSINESS } from '@/config';
 import ContactForm from './ContactForm';
 import FlowButton from './FlowButton.astro';
+import { consentDict } from '@/i18n/consent';
 
 interface Props {
   t: Dict;
@@ -11,6 +12,7 @@ interface Props {
 const { t } = Astro.props;
 const c = t.contact;
 const services = t.services.items.map((i) => i.title);
+const ck = consentDict(t.lang);
 ---
 
 <section class="sec" id="objednat">
@@ -68,8 +70,11 @@ const services = t.services.items.map((i) => i.title);
         <div class="map__ph">
           <MapPin size={34} strokeWidth={1.4} aria-hidden="true" />
           <p><b>REMAUTO Detailing</b><br />{BUSINESS.street}, {BUSINESS.zip} {BUSINESS.city}</p>
-          <button class="chip" type="button" data-map-load>{c.showMap}</button>
-          <small>{c.mapNote}</small>
+          <small>{ck.mapText}</small>
+          <div class="map__btns">
+            <button class="chip" type="button" data-map-load><span>{ck.mapOnce}</span></button>
+            <button class="map__set" type="button" data-ck="open">{ck.footerLink}</button>
+          </div>
         </div>
       </div>
       <div class="loc__info">
@@ -94,17 +99,59 @@ const services = t.services.items.map((i) => i.title);
   </div>
 </section>
 
-<script define:vars={{ src: BUSINESS.mapEmbed }}>
-  document.querySelector('[data-map-load]')?.addEventListener('click', () => {
-    const box = document.querySelector('[data-map]');
-    if (!box) return;
+<script is:inline data-map-src type="application/json" set:html={JSON.stringify(BUSINESS.mapEmbed)} />
+
+<script>
+  import { allowed, onConsent } from '@/lib/consent';
+
+  // The map is Google content: it loads only with "external content" consent, once the visitor
+  // has scrolled through half of the page (or the map itself comes near the screen).
+  // Without consent the button shows it once for this page view.
+  const box = document.querySelector<HTMLElement>('[data-map]');
+  const src: string = JSON.parse(document.querySelector('[data-map-src]')?.textContent || '""');
+  let done = false;
+  let reached = false;
+
+  function load() {
+    if (done || !box || !src) return;
+    done = true;
     const f = document.createElement('iframe');
     f.src = src;
     f.title = 'Google Maps';
-    f.loading = 'lazy';
     f.referrerPolicy = 'no-referrer-when-downgrade';
     box.replaceChildren(f);
-  });
+    removeEventListener('scroll', onScroll);
+    io?.disconnect();
+  }
+
+  function check() {
+    if (reached && allowed('media')) load();
+  }
+
+  function onScroll() {
+    const doc = document.documentElement;
+    if (scrollY + innerHeight >= doc.scrollHeight / 2) {
+      reached = true;
+      check();
+    }
+  }
+
+  const io = box
+    ? new IntersectionObserver(
+        (es) => {
+          if (es.some((e) => e.isIntersecting)) {
+            reached = true;
+            check();
+          }
+        },
+        { rootMargin: '800px 0px' },
+      )
+    : null;
+  if (box) io!.observe(box);
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  onConsent(() => check());
+  document.querySelector('[data-map-load]')?.addEventListener('click', load);
 </script>
 
 <style>
@@ -265,7 +312,30 @@ const services = t.services.items.map((i) => i.title);
   }
   .map__ph small {
     color: var(--grey);
-    font-size: 12.5px;
+    font-size: 13px;
+    max-width: 34ch;
+  }
+  .map__btns {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px 20px;
+  }
+  .map__set {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 4px 2px;
+    font: inherit;
+    font-size: 13.5px;
+    color: var(--grey);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .map__set:hover {
+    color: var(--fg);
   }
   .loc__info {
     display: flex;

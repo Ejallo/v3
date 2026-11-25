@@ -78,6 +78,8 @@ const cfg = {
 </section>
 
 <script>
+  import { allowed } from '@/lib/consent';
+
   interface Review {
     name: string;
     text: string;
@@ -226,10 +228,22 @@ const cfg = {
     );
   }
 
-  document.querySelectorAll<HTMLElement>('[data-reviews]').forEach(async (sec) => {
+  // Live Google reviews are external content: fetched only with "media" consent
+  // (right away, or as soon as the visitor gives it). Until then the single quote stays.
+  async function render(sec: HTMLElement) {
     const cfg: Cfg = JSON.parse(sec.dataset.reviews || '{}');
     let data: Data | null = cfg.demo;
-    if (!data && cfg.apiKey && cfg.placeId) {
+    const live = !data && !!cfg.apiKey && !!cfg.placeId;
+    if (live && !allowed('media')) {
+      const wait = () => {
+        if (!allowed('media')) return;
+        removeEventListener('rm:consent', wait);
+        render(sec);
+      };
+      addEventListener('rm:consent', wait);
+      return;
+    }
+    if (live) {
       try {
         data = await loadGoogle(cfg);
       } catch (e) {
@@ -242,7 +256,9 @@ const cfg = {
       (it) => it.text && (it.rating ?? 5) >= cfg.minRating && !skip.includes(it.name.trim().toLowerCase()),
     );
     if (items.length >= 3) showWall(sec, data, items, cfg.lang);
-  });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-reviews]').forEach((sec) => render(sec));
 </script>
 
 <style>

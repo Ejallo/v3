@@ -15,6 +15,7 @@ import Faq from './Faq.astro';
 import Contact from './Contact.astro';
 import Footer from './Footer.astro';
 import StickyBar from './StickyBar.astro';
+import Consent from './Consent.astro';
 
 interface Props {
   t: Dict;
@@ -39,4 +40,5 @@ const { t } = Astro.props;
   </main>
   <Footer t={t} />
   <StickyBar t={t} />
+  <Consent lang={t.lang} />
 </Base>
